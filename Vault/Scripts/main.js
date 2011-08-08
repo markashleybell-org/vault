@@ -368,9 +368,84 @@ function generatePasswordHash64(password) {
 
 }
 
-function changePassword() {
+function changePassword(userId, masterKey) {
 
-    alert('change');
+    var newPassword = $('#NewPassword').val();
+    var newPasswordHash = Passpack.utils.hashx(newPassword);
+    var newMasterKey = Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1);
+
+    //console.log($_VAULT);
+
+    var newData = [];
+
+    // Get all the credentials, decrypt each with the old password 
+    // and re-encrypt it with the new one
+    $.ajax({
+        url: '/Main/GetAllComplete',
+        data: { userId: userId },
+        dataType: 'json',
+        type: 'POST',
+        success: function (data, status, request) {
+
+            var excludes = ['CredentialID', 'UserID'];
+
+            $.each(data, function (i, item) {
+
+                newData.push(encryptObject(decryptObject(item, masterKey, excludes), newMasterKey, excludes));
+
+            });
+
+            //console.log(newData);
+
+            for (var i = 0; i < newData.length; i++) {
+                $.ajax({
+                    url: '/Main/Update',
+                    data: newData[i],
+                    dataType: 'json',
+                    type: 'POST',
+                    success: function (data, status, request) {
+
+                        //console.log('saved ' + data.CredentialID);
+
+                    },
+                    error: function (request, status, error) {
+
+                        alert('Http Error: ' + status + ' - ' + error);
+
+                    }
+                });
+            }
+
+            // Store the new password in hashed form
+            $.ajax({
+                url: '/Main/UpdatePassword',
+                data: {
+                    newHash: newPasswordHash,
+                    userid: $_VAULT.USER_ID,
+                    oldHash: Passpack.utils.hashx($_VAULT.PASSWORD)
+                },
+                dataType: 'json',
+                type: 'POST',
+                success: function (data, status, request) {
+
+                    //console.log('updated');
+
+                },
+                error: function (request, status, error) {
+
+                    alert('Http Error: ' + status + ' - ' + error);
+
+                }
+            });
+
+        },
+        error: function (request, status, error) {
+
+            alert('Http Error: ' + status + ' - ' + error);
+
+        }
+    });
+
     return false;
 
 }
@@ -381,7 +456,7 @@ function options() {
                      '<form>' +
                      '<p><label for="NewPassword">Password</label><input type="text" id="NewPassword" name="NewPassword" value="" /></p>' +
                      '<p><label for="NewPasswordConfirm">Confirm</label><input type="text" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
-                     '<p><button onclick="changePassword(); return false;">Change Password</button></p>' +
+                     '<p><button onclick="changePassword(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Change Password</button></p>' +
                      '</form>';
 
     $('#modal-dialog').html(dialogHtml).dialog({

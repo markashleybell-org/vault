@@ -57,6 +57,42 @@ namespace Vault.Controllers
         }
 
         [HttpPost]
+        public ActionResult GetAllComplete(string userId)
+        {
+            _conn.Open();
+
+            var cmd = new SQLiteCommand("select * from tcredential where userid = @UserID", _conn);
+            cmd.Parameters.Add("@UserID", DbType.String).Value = userId;
+
+            var credentials = new List<CredentialViewModel>();
+
+            using (var r = cmd.ExecuteReader())
+            {
+                while (r.Read())
+                {
+                    credentials.Add(new CredentialViewModel {
+                        CredentialID = r["CredentialID"].ToString(),
+                        UserID = r["UserID"].ToString(),
+                        Description = r["Description"].ToString(),
+                        Username = r["UserName"].ToString(),
+                        Password = r["Password"].ToString(),
+                        PasswordConfirmation = r["Password"].ToString(),
+                        Url = r["Url"].ToString(),
+                        Notes = r["Notes"].ToString(),
+                        UserDefined1 = r["UserDefined1"].ToString(),
+                        UserDefined1Label = r["UserDefined1Label"].ToString(),
+                        UserDefined2 = r["UserDefined2"].ToString(),
+                        UserDefined2Label = r["UserDefined2Label"].ToString()
+                    });
+                }
+            }
+
+            _conn.Close();
+
+            return Json(credentials);
+        }
+
+        [HttpPost]
         public ActionResult Load(string id)
         {
             _conn.Open();
@@ -153,6 +189,25 @@ namespace Vault.Controllers
             _conn.Close();
 
             return Json(new { CredentialID = model.CredentialID });
+        }
+
+        [HttpPost]
+        public ActionResult UpdatePassword(string userId, string oldHash, string newHash)
+        {
+            _conn.Open();
+
+            var sql = "update tUser set Password = @NewHash where UserID = @UserID and Password = @OldHash; select @UserID as id;";
+            var cmd = new SQLiteCommand(sql, _conn);
+
+            cmd.Parameters.Add("@UserID", DbType.String).Value = userId;
+            cmd.Parameters.Add("@OldHash", DbType.String).Value = oldHash;
+            cmd.Parameters.Add("@NewHash", DbType.String).Value = newHash;
+
+            cmd.ExecuteNonQuery();
+
+            _conn.Close();
+
+            return Json(new { success = true });
         }
 
         [HttpPost]
