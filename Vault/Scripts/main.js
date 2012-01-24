@@ -412,10 +412,16 @@ function changePassword(userId, masterKey) {
         return false;
     }
 
+    if (!confirm('When the password change is complete you will be logged out and will need to log back in.\n\nAre you sure you want to change the master password?'))
+        return false;
+
     var newPasswordHash = Passpack.utils.hashx(newPassword);
     var newMasterKey = Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1);
 
     //console.log($_VAULT);
+
+    // Show a spinner until complete because this can take some time!
+    $('#change-password-button').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
 
     var newData = [];
 
@@ -438,46 +444,47 @@ function changePassword(userId, masterKey) {
 
             //console.log(newData);
 
-            for (var i = 0; i < newData.length; i++) {
-                $.ajax({
-                    url: '/Main/Update',
-                    data: newData[i],
-                    dataType: 'json',
-                    type: 'POST',
-                    success: function (data, status, request) {
-
-                        //console.log('saved ' + data.CredentialID);
-
-                    },
-                    error: function (request, status, error) {
-
-                        alert('Http Error: ' + status + ' - ' + error);
-
-                    }
-                });
-            }
-
-            // Store the new password in hashed form
             $.ajax({
-                url: '/Main/UpdatePassword',
-                data: {
-                    newHash: newPasswordHash,
-                    userid: $_VAULT.USER_ID,
-                    oldHash: Passpack.utils.hashx($_VAULT.PASSWORD)
-                },
+                url: '/Main/UpdateMultiple',
+                data: JSON.stringify(newData),
                 dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
                 type: 'POST',
                 success: function (data, status, request) {
 
-                    //console.log('updated');
+                    console.log('Saved all');
+
+                    // Store the new password in hashed form
+                    $.ajax({
+                        url: '/Main/UpdatePassword',
+                        data: {
+                            newHash: newPasswordHash,
+                            userid: $_VAULT.USER_ID,
+                            oldHash: Passpack.utils.hashx($_VAULT.PASSWORD)
+                        },
+                        dataType: 'json',
+                        type: 'POST',
+                        success: function (data, status, request) {
+
+                            window.location.href = '/';
+
+                        },
+                        error: function (request, status, error) {
+
+                            console.log('Http Error: ' + status + ' - ' + error);
+
+                        }
+                    });
 
                 },
                 error: function (request, status, error) {
 
-                    alert('Http Error: ' + status + ' - ' + error);
+                    console.log('Http Error: ' + status + ' - ' + error);
 
                 }
             });
+
+
 
         },
         error: function (request, status, error) {
@@ -497,7 +504,7 @@ function options() {
                      '<form>' +
                      '<p><label for="NewPassword">Password</label><input type="text" id="NewPassword" name="NewPassword" value="" /></p>' +
                      '<p><label for="NewPasswordConfirm">Confirm</label><input type="text" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
-                     '<p><button onclick="changePassword(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Change Password</button></p>' +
+                     '<p><button id=\"change-password-button\" onclick="changePassword(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Change Password</button></p>' +
                      '</form>';
 
     $('#modal-dialog').html(dialogHtml).dialog({

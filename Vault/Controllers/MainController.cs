@@ -157,7 +157,23 @@ namespace Vault.Controllers
         }
 
         [HttpPost]
+        public ActionResult UpdateMultiple(IList<CredentialViewModel> model)
+        {
+            foreach(var item in model)
+                UpdateCredential(item);
+
+            return Json(new { Updated = model.Count });
+        }
+
+        [HttpPost]
         public ActionResult Update(CredentialViewModel model)
+        {
+            var updated = UpdateCredential(model);
+
+            return Json(new { CredentialID = updated.CredentialID });
+        }
+
+        private CredentialViewModel UpdateCredential(CredentialViewModel model)
         {
             _conn.Open();
 
@@ -185,10 +201,10 @@ namespace Vault.Controllers
             cmd.Parameters.Add("@Notes", DbType.String).Value = model.Notes;
 
             model.CredentialID = Convert.ToString(cmd.ExecuteScalar());
-                    
+
             _conn.Close();
 
-            return Json(new { CredentialID = model.CredentialID });
+            return model;
         }
 
         [HttpPost]
