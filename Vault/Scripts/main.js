@@ -397,6 +397,11 @@ function changePassword(userId, masterKey) {
     var newPassword = $('#NewPassword').val();
     var newPasswordConfirm = $('#NewPasswordConfirm').val();
 
+    if (newPassword === '') {
+        alert('Password cannot be left blank.');
+        return false;
+    }
+
     if (newPassword != newPasswordConfirm) {
         alert('Password confirmation does not match password.');
         return false;
