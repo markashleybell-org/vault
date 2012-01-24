@@ -24,6 +24,18 @@ window.$_VAULT = {
     CACHED_LIST: null
 };
 
+function htmlEncode(value) {
+
+    return $('<div/>').text(value).html();
+
+}
+
+function htmlDecode(value) {
+
+    return $('<div/>').html(value).text();
+    
+}
+
 // Utility function to check a value exists in an array
 Array.prototype.contains = function (value) {
 
@@ -202,7 +214,18 @@ function showDetail(credentialId, masterKey) {
         success: function (data, status, request) {
 
             // CredentialID and UserID are not currently encrypted so don't try to decode them
-            data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
+            var excludeProperties = ['CredentialID', 'UserID'];
+
+            data = decryptObject(data, masterKey, excludeProperties);
+
+            // Loop through all the properties of the data object (except the excludes)
+            // and HTMLEncode them for display
+            $.each(data, function (name, value) {
+
+                if(!excludeProperties.contains(name))
+                    data[name] = htmlEncode(value);
+
+            });
 
             var details = [];
 
@@ -223,7 +246,7 @@ function showDetail(credentialId, masterKey) {
             if (data.UserDefined2 != '')
                 details.push('<tr><th>' + data.UserDefined2Label + ' ' + insertCopyLink(data.UserDefined2) + '</th><td>' + data.UserDefined2 + '</td></tr>');
 
-            if (data.Notes != '') 
+            if (data.Notes != '')
                 details.push('<tr><th>Notes</th><td class="notes">' + data.Notes.replace(/\r\n|\n|\r/gi, '<br />') + '</td></tr>');
 
             details.push('</table>');
@@ -688,8 +711,5 @@ $(function () {
         return false;
 
     });
-
-    // Initially show the login form
-    // $('#login-form-dialog').dialog({ title: 'Log In', width: 500, modal: true });
 
 });

@@ -108,18 +108,18 @@ namespace Vault.Controllers
                 {
                     credential = new CredentialViewModel
                     {
-                        CredentialID = Server.HtmlEncode(r["CredentialID"].ToString()),
-                        UserID = Server.HtmlEncode(r["UserID"].ToString()),
-                        Description = Server.HtmlEncode(r["Description"].ToString()),
-                        Username = Server.HtmlEncode(r["Username"].ToString()),
-                        Password = Server.HtmlEncode(r["Password"].ToString()),
-                        PasswordConfirmation = Server.HtmlEncode(r["Password"].ToString()),
-                        Url = Server.HtmlEncode(r["Url"].ToString()),
-                        UserDefined1Label = Server.HtmlEncode(r["UserDefined1Label"].ToString()),
-                        UserDefined1 = Server.HtmlEncode(r["UserDefined1"].ToString()),
-                        UserDefined2Label = Server.HtmlEncode(r["UserDefined2Label"].ToString()),
-                        UserDefined2 = Server.HtmlEncode(r["UserDefined2"].ToString()),
-                        Notes = Server.HtmlEncode(r["Notes"].ToString())
+                        CredentialID = r["CredentialID"].ToString(),
+                        UserID = r["UserID"].ToString(),
+                        Description = r["Description"].ToString(),
+                        Username = r["Username"].ToString(),
+                        Password = r["Password"].ToString(),
+                        PasswordConfirmation = r["Password"].ToString(),
+                        Url = r["Url"].ToString(),
+                        UserDefined1Label = r["UserDefined1Label"].ToString(),
+                        UserDefined1 = r["UserDefined1"].ToString(),
+                        UserDefined2Label = r["UserDefined2Label"].ToString(),
+                        UserDefined2 = r["UserDefined2"].ToString(),
+                        Notes = r["Notes"].ToString()
                     };
                 }
             }
