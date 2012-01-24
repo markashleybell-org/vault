@@ -219,7 +219,7 @@ function showDetail(credentialId, masterKey) {
             data = decryptObject(data, masterKey, excludeProperties);
 
             // Loop through all the properties of the data object (except the excludes)
-            // and HTMLEncode them for display
+            // and encode any HTML for display
             $.each(data, function (name, value) {
 
                 if(!excludeProperties.contains(name))
@@ -395,6 +395,13 @@ function generatePasswordHash64(password) {
 function changePassword(userId, masterKey) {
 
     var newPassword = $('#NewPassword').val();
+    var newPasswordConfirm = $('#NewPasswordConfirm').val();
+
+    if (newPassword != newPasswordConfirm) {
+        alert('Password confirmation does not match password.');
+        return false;
+    }
+
     var newPasswordHash = Passpack.utils.hashx(newPassword);
     var newMasterKey = Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1);
 
