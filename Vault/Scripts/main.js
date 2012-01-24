@@ -136,7 +136,8 @@ function loadCredentials(userId, masterKey, callback) {
             success: function (data, status, request) {
 
                 var items = [];
-                // At this point we only need to decrypt Description for display, which speeds up table construction time dramatically
+                // At this point we only actually need to decrypt Description for display, 
+                // which speeds up client-side table construction time dramatically
                 var excludes = ['CredentialID', 'UserID'];
 
                 $.each(data, function (i, item) {
@@ -551,7 +552,7 @@ $(function () {
     $("head").append(tableStyles);
 
     // Initialise globals and load data on correct login
-    $('#login-form').bind('submit', function () {
+    $('#login-form').on('submit', function () {
 
         var _username = $('#login-form #Username').val();
         var _password = $('#login-form #Password').val();
@@ -610,7 +611,7 @@ $(function () {
     });
 
     // Save the new details on edit form submit
-    $('#credential-form').bind('submit', function () {
+    $('#credential-form').on('submit', function () {
 
         $('#validation-message').remove();
         $('input[class!=submit], textarea', $(this)).removeClass('invalid');
