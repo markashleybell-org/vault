@@ -346,6 +346,11 @@ function deleteCredential(credentialId, userId) {
 
                     $('#modal-dialog').dialog('destroy');
 
+                    // Append the clear filter button
+                    $('#records_filter').before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+
+                    $('#records_filter input:last').focus();
+
                 });
 
             }
@@ -623,7 +628,13 @@ $(function () {
                         $('#container').append('<p id="add-link"><button onclick="loadCredential(null, \'' + $_VAULT.MASTER_KEY + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
                         $('#login-form').hide();
                         $('#login-form-dialog').dialog('destroy');
-                        $('#records_filter input:first').focus();
+
+                        // Append the clear filter button
+                        $('#records_filter').before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+
+                        $('#records_filter input:last').focus();
+
+
 
                     });
 
@@ -707,6 +718,11 @@ $(function () {
                     $('#spinner').remove();
 
                     $('#credential-form-dialog').dialog('destroy');
+
+                    // Append the clear filter button
+                    $('#records_filter').before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+
+                    $('#records_filter input:last').focus();
 
                 });
 
