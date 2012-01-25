@@ -7,9 +7,6 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; padding: 0 0 
 .display tbody { font-weight: bold; }
 .display tbody a { color: #000; }
 .display tbody img { border: none; }
-.dataTables_info { width: 180px; padding-left: 5px; }
-.dataTables_filter { padding-right: 5px; }
-.paging_full_numbers { width: 300px !important; }
 
 .ui-dialog-content h2 { margin-top: 10px; }
 .ui-dialog-content table { border-collapse: collapse; margin-top: 10px; }
