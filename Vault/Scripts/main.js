@@ -446,7 +446,7 @@ function changePassword(userId, masterKey) {
 
             $.ajax({
                 url: '/Main/UpdateMultiple',
-                data: JSON.stringify(newData),
+                data: Passpack.JSON.stringify(newData),
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
                 type: 'POST',
@@ -504,7 +504,7 @@ function options() {
                      '<form>' +
                      '<p><label for="NewPassword">Password</label><input type="text" id="NewPassword" name="NewPassword" value="" /></p>' +
                      '<p><label for="NewPasswordConfirm">Confirm</label><input type="text" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
-                     '<p><button id=\"change-password-button\" onclick="changePassword(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Change Password</button></p>' +
+                     '<p><button class="submit" id=\"change-password-button\" onclick="changePassword(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Change Password</button></p>' +
                      '</form>';
 
     $('#modal-dialog').html(dialogHtml).dialog({
