@@ -183,7 +183,7 @@ function insertCopyLink(text) {
            '<param name="allowScriptAccess" value="always" />' +
            '<param name="quality" value="high" />' +
            '<param name="scale" value="noscale" />' +
-           '<param name="FlashVars" value="text=' + encodeURIComponent(text) + '">' +
+           '<param name="FlashVars" value="text=' + text + '">' +
            '<param name="bgcolor" value="#ffffff">' +
            '<param name="wmode" value="opaque">' + 
            '<embed src="/content/img/clippy.swf"' +
@@ -196,7 +196,7 @@ function insertCopyLink(text) {
            '       allowScriptAccess="always"' +
            '       type="application/x-shockwave-flash"' +
            '       pluginspage="http://www.macromedia.com/go/getflashplayer"' +
-           '       FlashVars="text=' + encodeURIComponent(text) + '"' +
+           '       FlashVars="text=' + text + '"' +
            '       bgcolor="#ffffff"' +
            '/>' +
            '</object></span>';
