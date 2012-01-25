@@ -1,0 +1,34 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/Main.cshtml";
+}
+
+@section head {
+
+    <script type="text/javascript" src="@Url.Content("~/")scripts/main.js"></script>
+    <script type="text/javascript">
+        $_VAULT.BASE_URL = '@Url.Content("~/")';
+    </script>
+
+}
+
+@section main {
+
+    @{Html.RenderPartial("Credential");}
+
+    @{Html.RenderPartial("Login");}
+
+    <script type="text/javascript">
+        $('#login-form-dialog').dialog({ title: 'Log In', width: 500, modal: true });
+    </script>
+
+}
+
+@section endpage {
+
+    <script type="text/javascript" src="@Url.Content("~/")scripts/passpack-v1.1.min.js"></script>
+    <script type="text/javascript" src="@Url.Content("~/")scripts/jquery.dataTables.min.js"></script>
+
+}

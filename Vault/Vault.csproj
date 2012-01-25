@@ -83,60 +83,30 @@
   <ItemGroup>
     <Content Include="App_Data\schema.sql" />
     <Content Include="Content\Css\datatables.css" />
-    <Content Include="Content\Css\jquery-ui-1.8.9.custom.css" />
     <Content Include="Content\Css\screen.css" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\delete.png" />
     <Content Include="Content\Img\edit.png" />
     <Content Include="Content\Img\key.png" />
-    <Content Include="Content\Img\ui-bg_flat_0_000000_40x100.png" />
-    <Content Include="Content\Img\ui-bg_flat_0_aaaaaa_40x100.png" />
-    <Content Include="Content\Img\ui-bg_flat_0_eeeeee_40x100.png" />
-    <Content Include="Content\Img\ui-bg_flat_55_ffffff_40x100.png" />
-    <Content Include="Content\Img\ui-bg_flat_75_ffffff_40x100.png" />
-    <Content Include="Content\Img\ui-bg_glass_65_ffffff_1x400.png" />
-    <Content Include="Content\Img\ui-bg_highlight-soft_100_f6f6f6_1x100.png" />
-    <Content Include="Content\Img\ui-bg_highlight-soft_25_0073ea_1x100.png" />
-    <Content Include="Content\Img\ui-bg_highlight-soft_50_dddddd_1x100.png" />
-    <Content Include="Content\Img\ui-icons_0073ea_256x240.png" />
-    <Content Include="Content\Img\ui-icons_454545_256x240.png" />
-    <Content Include="Content\Img\ui-icons_666666_256x240.png" />
-    <Content Include="Content\Img\ui-icons_ff0084_256x240.png" />
-    <Content Include="Content\Img\ui-icons_ffffff_256x240.png" />
     <Content Include="Content\Img\view.png" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\jquery.dataTables.min.js" />
-    <Content Include="Scripts\json2.js" />
     <Content Include="Scripts\main.js" />
     <Content Include="Scripts\passpack-v1.1.js" />
     <Content Include="Scripts\passpack-v1.1.min.js" />
-    <Content Include="Views\Main\Generate.aspx" />
-    <Content Include="Views\Main\Index.aspx" />
-    <Content Include="Views\Shared\Credential.ascx" />
-    <Content Include="Views\Shared\Login.ascx" />
+    <None Include="Views\Main\Generate.cshtml" />
+    <None Include="Views\Main\Index.cshtml" />
+    <None Include="Views\Shared\Credential.cshtml" />
+    <None Include="Views\Shared\Login.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Web.config" />
-    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
-    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
-    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
-    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
-    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
-    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
-    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
-    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
-    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
-    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
-    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
-    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
-    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
-    <Content Include="Content\themes\base\jquery-ui.css" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
     <None Include="App_Data\vault.sqlite" />
-    <Content Include="Views\Shared\Main.Master" />
+    <None Include="Views\Shared\Main.cshtml" />
     <Content Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

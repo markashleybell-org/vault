@@ -1,11 +1,12 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Main.Master" Inherits="System.Web.Mvc.ViewPage<dynamic>" %>
+﻿@model dynamic
 
-<asp:Content ID="TitleContent" ContentPlaceHolderID="TitleContent" runat="server">
-	Generate
-</asp:Content>
+@{
+    ViewBag.Title = "Generate Hash";
+    Layout = "~/Views/Shared/Main.cshtml";
+}
 
-<asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
-    
+@section head {
+
     <script type="text/javascript">
 
         function generatePassword() {
@@ -19,9 +20,9 @@
 
     </script>
 
-</asp:Content>
+}
 
-<asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
+@section main {
 
     <h2>Generate</h2>
 
@@ -33,10 +34,10 @@
         <p><input type="button" onclick="generatePassword();" value="Generate" /></p>
 	</form>
 
-</asp:Content>
+}
 
-<asp:Content ID="EndPageContent" ContentPlaceHolderID="EndPageContent" runat="server">
+@section endpage {
 
-    <script type="text/javascript" src="<%= ResolveUrl("~/") %>scripts/passpack-v1.1.min.js"></script>
+    <script type="text/javascript" src="@Url.Content("~/")scripts/passpack-v1.1.min.js"></script>
 
-</asp:Content>
+}
