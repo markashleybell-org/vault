@@ -183,7 +183,7 @@ function insertCopyLink(text) {
            '<param name="allowScriptAccess" value="always" />' +
            '<param name="quality" value="high" />' +
            '<param name="scale" value="noscale" />' +
-           '<param name="FlashVars" value="text=' + text + '">' +
+           '<param name="FlashVars" value="text=' + encodeURIComponent(text) + '">' +
            '<param name="bgcolor" value="#ffffff">' +
            '<param name="wmode" value="opaque">' + 
            '<embed src="/content/img/clippy.swf"' +
@@ -196,7 +196,7 @@ function insertCopyLink(text) {
            '       allowScriptAccess="always"' +
            '       type="application/x-shockwave-flash"' +
            '       pluginspage="http://www.macromedia.com/go/getflashplayer"' +
-           '       FlashVars="text=' + text + '"' +
+           '       FlashVars="text=' + encodeURIComponent(text) + '"' +
            '       bgcolor="#ffffff"' +
            '/>' +
            '</object></span>';
@@ -222,7 +222,7 @@ function showDetail(credentialId, masterKey) {
             // and encode any HTML for display
             $.each(data, function (name, value) {
 
-                if(!excludeProperties.contains(name))
+                if(!excludeProperties.contains(name) && name != 'Password')
                     data[name] = htmlEncode(value);
 
             });
@@ -238,7 +238,7 @@ function showDetail(credentialId, masterKey) {
                 details.push('<tr><th>Username ' + insertCopyLink(data.Username) + '</th><td>' + data.Username + '</td></tr>');
 
             if (data.Password != '')
-                details.push('<tr><th>Password ' + insertCopyLink(data.Password) + '</th><td>' + data.Password + '</td></tr>');
+                details.push('<tr><th>Password ' + insertCopyLink(data.Password) + '</th><td>' + htmlEncode(data.Password) + '</td></tr>');
 
             if (data.UserDefined1 != '')
                 details.push('<tr><th>' + data.UserDefined1Label + ' ' + insertCopyLink(data.UserDefined1) + '</th><td>' + data.UserDefined1 + '</td></tr>');
