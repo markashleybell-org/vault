@@ -12,7 +12,7 @@ namespace Vault.Models
     {
         public override void Load()
         {
-            Bind<ConnectionFactoryBase>().To<SQLiteConnectionFactory>()
+            Bind<ConnectionFactoryBase>().To<SqlConnectionFactory>()
                                          .InRequestScope()
                                          .WithConstructorArgument("connectionString", ConfigurationManager.ConnectionStrings["Vault"].ConnectionString);
         }
