@@ -106,7 +106,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\schema.sql" />
+    <None Include="App_Data\schema.sql" />
     <Content Include="Content\Css\datatables.css" />
     <Content Include="Content\Css\screen.css" />
     <Content Include="Content\Img\ajax-loader.gif" />
@@ -119,10 +119,10 @@
     <Content Include="Scripts\main.js" />
     <Content Include="Scripts\passpack-v1.1.js" />
     <Content Include="Scripts\passpack-v1.1.min.js" />
-    <None Include="Views\Main\Generate.cshtml" />
-    <None Include="Views\Main\Index.cshtml" />
-    <None Include="Views\Shared\Credential.cshtml" />
-    <None Include="Views\Shared\Login.cshtml" />
+    <Content Include="Views\Main\Generate.cshtml" />
+    <Content Include="Views\Main\Index.cshtml" />
+    <Content Include="Views\Shared\Credential.cshtml" />
+    <Content Include="Views\Shared\Login.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -131,7 +131,7 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="App_Data\vault.sqlite" />
-    <None Include="Views\Shared\Main.cshtml" />
+    <Content Include="Views\Shared\Main.cshtml" />
     <Content Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
