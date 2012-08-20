@@ -251,7 +251,7 @@ function showDetail(credentialId, masterKey) {
 
             details.push('</table>');
 
-            $('#modal-dialog').html(details.join('')).dialog({ title: data.Description, width: 500, minHeight: 50, modal: true });
+            $('#modal-dialog').html(details.join('')).dialog({ title: data.Description, width: 600, minHeight: 50, modal: true });
 
         },
         error: function (request, status, error) {

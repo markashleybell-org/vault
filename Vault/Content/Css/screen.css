@@ -11,8 +11,8 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; padding: 0 0 
 .ui-dialog-content h2 { margin-top: 10px; }
 .ui-dialog-content table { border-collapse: collapse; margin-top: 10px; }
 .ui-dialog-content th { width: 150px; vertical-align: top; text-align: right; padding: 6px 20px 10px 0; font-size: 12px; }
-.ui-dialog-content td { vertical-align: top; padding: 0 20px 10px 0; font-size: 20px; }
-.ui-dialog-content td.notes { font-size: 12px; padding-top: 6px; }
+.ui-dialog-content td { vertical-align: top; padding: 0 20px 0 0; font-size: 20px; }
+.ui-dialog-content td.notes { font-size: 12px; padding-top: 6px; padding-bottom: 10px; }
 
 .ui-dialog-content form { overflow: auto; padding-top: 10px; padding-bottom: 20px; }
 .ui-dialog-content p { overflow: auto; padding-top: 10px; padding-right: 0; }
