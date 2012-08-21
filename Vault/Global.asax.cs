@@ -22,7 +22,6 @@ namespace Vault
                 "{controller}/{action}/{id}",
                 new { controller = "Main", action = "Index", id = UrlParameter.Optional }
             );
-
         }
 
         protected void Application_Start()
