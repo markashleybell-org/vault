@@ -8,8 +8,6 @@ Although all data is encrypted before transmission over HTTP, as an extra precau
 External Libraries/Dependencies
 ========================
 
-Details are stored in a SQLite database, hence Vault requires that [System.Data.SQLite.dll](http://sqlite.phxsoftware.com/) be present in either the Global Assembly Cache or the application `bin` folder.
-
 * Vault uses [jQuery](http://jquery.com/), [jQuery UI](http://jqueryui.com/) and images/CSS from the 'Flick' theme found at [ThemeRoller](http://jqueryui.com/themeroller/). 
 * Icons are from the excellent [Silk](http://www.famfamfam.com/lab/icons/silk/) collection by [Mark James](http://www.famfamfam.com/). 
 * Table sort/filter/pagination courtesy of the [DataTables](http://www.datatables.net/) jQuery plugin by [Allan Jardine](http://www.sprymedia.co.uk/).

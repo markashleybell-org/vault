@@ -4,9 +4,6 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Vault.Models;
-using System.Data.SQLite;
-using System.Configuration;
-using System.Data;
 using Dapper;
 
 namespace Vault.Controllers
@@ -49,7 +46,7 @@ namespace Vault.Controllers
         {
             IEnumerable<CredentialListViewModel> credentials;
 
-            using(var conn = _cf.GetConnection())
+            using (var conn = _cf.GetConnection())
             {
                 conn.Open();
                 credentials = conn.Query<CredentialListViewModel>("select * from tCredential where UserID = @UserID", new { UserID = userId });
@@ -63,7 +60,7 @@ namespace Vault.Controllers
         {
             CredentialViewModel credential;
 
-            using(var conn = _cf.GetConnection())
+            using (var conn = _cf.GetConnection())
             {
                 conn.Open();
                 credential = conn.Query<CredentialViewModel>("select * from tCredential where CredentialID = @CredentialID", new { CredentialID = id }).FirstOrDefault();
@@ -81,7 +78,7 @@ namespace Vault.Controllers
         {
             var success = true;
 
-            using(var conn = _cf.GetConnection())
+            using (var conn = _cf.GetConnection())
             {
                 conn.Open();
                 conn.Execute("delete from tcredential where UserID = @UserID and CredentialID = @CredentialID", new { UserID = userId, CredentialID = credentialId });
@@ -93,7 +90,7 @@ namespace Vault.Controllers
         [HttpPost]
         public ActionResult UpdateMultiple(IList<CredentialViewModel> model)
         {
-            foreach(var item in model)
+            foreach (var item in model)
                 UpdateCredential(item);
 
             return Json(new { Updated = model.Count });
@@ -121,7 +118,7 @@ namespace Vault.Controllers
             if (model.CredentialID == null)
                 model.CredentialID = Guid.NewGuid().ToString();
 
-            using(var conn = _cf.GetConnection())
+            using (var conn = _cf.GetConnection())
             {
                 conn.Open();
                 conn.Execute(sql, model);
@@ -133,7 +130,7 @@ namespace Vault.Controllers
         [HttpPost]
         public ActionResult UpdatePassword(string userId, string oldHash, string newHash)
         {
-            using(var conn = _cf.GetConnection())
+            using (var conn = _cf.GetConnection())
             {
                 conn.Open();
                 conn.Execute("update tUser set Password = @NewHash where UserID = @UserID and Password = @OldHash", new { UserID = userId, OldHash = oldHash, NewHash = newHash });
@@ -147,7 +144,7 @@ namespace Vault.Controllers
         {
             var userId = "";
 
-            using(var conn = _cf.GetConnection())
+            using (var conn = _cf.GetConnection())
             {
                 conn.Open();
                 userId = conn.Query<string>("select * from tUser where Username = @Username and Password = @Password", new { Username = model.Username, Password = model.Password }).FirstOrDefault();

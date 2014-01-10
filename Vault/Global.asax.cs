@@ -1,34 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Optimization;
 using System.Web.Routing;
+using Microsoft.Practices.Unity;
+using Vault.Models;
 
 namespace Vault
 {
-    // Note: For instructions on enabling IIS6 or IIS7 classic mode, 
-    // visit http://go.microsoft.com/?LinkId=9394801
-
     public class MvcApplication : System.Web.HttpApplication
     {
-        public static void RegisterRoutes(RouteCollection routes)
-        {
-            routes.IgnoreRoute("{resource}/favicon.ico");
-            routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-
-            routes.MapRoute(
-                null,
-                "{controller}/{action}/{id}",
-                new { controller = "Main", action = "Index", id = UrlParameter.Optional }
-            );
-        }
-
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            RegisterRoutes(RouteTable.Routes);
+            // Set up object mappings for Unity DI
+            var container = new UnityContainer();
+
+            // TODO: Look into object lifetime management
+            container.RegisterType<ConnectionFactoryBase>(new HttpContextLifetimeManager<SqlConnectionFactory>(), new InjectionFactory(c => new SqlConnectionFactory(ConfigurationManager.ConnectionStrings["Vault"].ConnectionString)));
+
+            var resolver = new UnityDependencyResolver(container);
+
+            DependencyResolver.SetResolver(resolver);
         }
     }
 }
