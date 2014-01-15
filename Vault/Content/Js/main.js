@@ -434,7 +434,7 @@ function changePassword(userId, masterKey) {
         type: 'POST',
         success: function (data, status, request) {
 
-            var excludes = ['CredentialID', 'UserID'];
+        	var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
 
             $.each(data, function (i, item) {
 
@@ -498,6 +498,45 @@ function changePassword(userId, masterKey) {
 
 }
 
+function exportData(userId, masterKey) {
+
+	// Show a spinner until complete because this can take some time!
+	$('#export-button').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+
+	var exportItems = [];
+
+	// Get all the credentials, decrypt each one
+	$.ajax({
+		url: '/Main/GetAllComplete',
+		data: { userId: userId },
+		dataType: 'json',
+		type: 'POST',
+		success: function (data, status, request) {
+
+			var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
+
+			$.each(data, function (i, item) {
+
+				exportItems.push(decryptObject(item, masterKey, excludes));
+
+			});
+
+			console.log(JSON.stringify(exportItems, undefined, 4));
+
+			$('#spinner').remove();
+
+		},
+		error: function (request, status, error) {
+
+			alert('Http Error: ' + status + ' - ' + error);
+
+		}
+	});
+
+	return false;
+
+}
+
 function options() {
 
     var dialogHtml = '<p>Change password:</p>' +
@@ -505,6 +544,7 @@ function options() {
                      '<p><label for="NewPassword">Password</label><input type="text" id="NewPassword" name="NewPassword" value="" /></p>' +
                      '<p><label for="NewPasswordConfirm">Confirm</label><input type="text" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
                      '<p><button class="submit" id=\"change-password-button\" onclick="changePassword(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Change Password</button></p>' +
+					 '<p><button class="submit" id=\"export-button\" onclick="exportData(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Export</button></p>' +
                      '</form>';
 
     $('#modal-dialog').html(dialogHtml).dialog({

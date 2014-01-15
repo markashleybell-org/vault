@@ -44,12 +44,12 @@ namespace Vault.Controllers
         [HttpPost]
         public ActionResult GetAllComplete(string userId)
         {
-            IEnumerable<CredentialListViewModel> credentials;
+            IEnumerable<CredentialViewModel> credentials;
 
             using (var conn = _cf.GetConnection())
             {
                 conn.Open();
-                credentials = conn.Query<CredentialListViewModel>("select * from tCredential where UserID = @UserID", new { UserID = userId });
+                credentials = conn.Query<CredentialViewModel>("select * from tCredential where UserID = @UserID", new { UserID = userId });
             }
 
             return Json(credentials);
