@@ -417,9 +417,7 @@ function changePassword(userId, masterKey) {
 
     var newPasswordHash = Passpack.utils.hashx(newPassword);
     var newMasterKey = Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1);
-
-    //console.log($_VAULT);
-
+  
     // Show a spinner until complete because this can take some time!
     $('#change-password-button').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
 
@@ -442,8 +440,6 @@ function changePassword(userId, masterKey) {
 
             });
 
-            //console.log(newData);
-
             $.ajax({
                 url: '/Main/UpdateMultiple',
                 data: Passpack.JSON.stringify(newData),
@@ -451,8 +447,6 @@ function changePassword(userId, masterKey) {
                 contentType: 'application/json; charset=utf-8',
                 type: 'POST',
                 success: function (data, status, request) {
-
-                    console.log('Saved all');
 
                     // Store the new password in hashed form
                     $.ajax({
@@ -471,7 +465,7 @@ function changePassword(userId, masterKey) {
                         },
                         error: function (request, status, error) {
 
-                            console.log('Http Error: ' + status + ' - ' + error);
+                            alert('Http Error: ' + status + ' - ' + error);
 
                         }
                     });
@@ -479,7 +473,7 @@ function changePassword(userId, masterKey) {
                 },
                 error: function (request, status, error) {
 
-                    console.log('Http Error: ' + status + ' - ' + error);
+                    alert('Http Error: ' + status + ' - ' + error);
 
                 }
             });
