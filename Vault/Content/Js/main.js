@@ -515,7 +515,15 @@ function exportData(userId, masterKey) {
 
 			});
 
-			console.log(JSON.stringify(exportItems, undefined, 4));
+			// console.log(JSON.stringify(exportItems, undefined, 4));
+
+			var exportWindow = window.open("", "EXPORT_WINDOW", "WIDTH=700, HEIGHT=600");
+
+			if (exportWindow && exportWindow.top) {
+			    exportWindow.document.write('<html><head><title>Exported Data</title></head><body style="margin: 0; padding: 0;"><textarea style="border: none; width: 100%; height: 600px;">' + JSON.stringify(exportItems, undefined, 4) + '</textarea></body>');
+			} else {
+			    alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
+			}
 
 			$('#spinner').remove();
 
