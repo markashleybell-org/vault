@@ -23,8 +23,11 @@ namespace Vault
             // Set up object mappings for Unity DI
             var container = new UnityContainer();
 
-            // TODO: Look into object lifetime management
-            container.RegisterType<ConnectionFactoryBase>(new HttpContextLifetimeManager<SqlConnectionFactory>(), new InjectionFactory(c => new SqlConnectionFactory(ConfigurationManager.ConnectionStrings["Vault"].ConnectionString)));
+            // Inject the correct connection factory depending on the DB type
+            if(ConfigurationManager.AppSettings["DbType"] == "SQLite")
+                container.RegisterType<ConnectionFactoryBase>(new HttpContextLifetimeManager<SQLiteConnectionFactory>(), new InjectionFactory(c => new SQLiteConnectionFactory(ConfigurationManager.ConnectionStrings["Vault"].ConnectionString)));
+            else
+                container.RegisterType<ConnectionFactoryBase>(new HttpContextLifetimeManager<SqlConnectionFactory>(), new InjectionFactory(c => new SqlConnectionFactory(ConfigurationManager.ConnectionStrings["Vault"].ConnectionString)));
 
             var resolver = new UnityDependencyResolver(container);
 
