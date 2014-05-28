@@ -1,21 +1,22 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
+﻿@using StackExchange.Profiling;
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
-<head runat="server">
-    <title>@ViewBag.Title</title>
-    <link rel="shortcut icon" href="/content/img/favicon.ico" />
-    <link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/smoothness/jquery-ui.css" />
-	<link rel="stylesheet" type="text/css" href="/content/css/screen.css" />
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-    @RenderSection("head")
-</head>
-<body>
-    <div>
-        <div id="container">
-            @RenderSection("main")
+    <head runat="server">
+        <title>@ViewBag.Title</title>
+        <link rel="shortcut icon" href="/content/img/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/smoothness/jquery-ui.css" />
+        <link rel="stylesheet" type="text/css" href="/content/css/screen.css" />
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+        @RenderSection("head")
+    </head>
+    <body>
+        <div>
+            <div id="container">
+                @RenderSection("main")
+            </div>
         </div>
-    </div>
-    @RenderSection("endpage")
-</body>
+        @RenderSection("endpage")
+        @MiniProfiler.RenderIncludes(position: RenderPosition.Right, showTrivial: true, showTimeWithChildren: true)
+    </body>
 </html>

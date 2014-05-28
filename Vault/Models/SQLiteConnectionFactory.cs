@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Data;
 using System.Data.SQLite;
+using StackExchange.Profiling.Data;
+using StackExchange.Profiling;
 
 namespace Vault.Models
 {
@@ -13,7 +15,7 @@ namespace Vault.Models
 
         public override IDbConnection GetConnection()
         {
-            return new SQLiteConnection(_connectionString);
+            return new ProfiledDbConnection(new SQLiteConnection(_connectionString), MiniProfiler.Current);
         }
     }
 }

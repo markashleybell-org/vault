@@ -7,12 +7,15 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Microsoft.Practices.Unity;
+using StackExchange.Profiling;
 using Vault.Models;
 
 namespace Vault
 {
     public class MvcApplication : System.Web.HttpApplication
     {
+        private bool profiling = Convert.ToBoolean(ConfigurationManager.AppSettings["Profiling"]);
+
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
@@ -32,6 +35,18 @@ namespace Vault
             var resolver = new UnityDependencyResolver(container);
 
             DependencyResolver.SetResolver(resolver);
+        }
+
+        protected void Application_BeginRequest()
+        {
+            if (profiling)
+                MiniProfiler.Start();
+        }
+
+        protected void Application_EndRequest()
+        {
+            if (profiling)
+                MiniProfiler.Stop();
         }
     }
 }
