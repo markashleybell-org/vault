@@ -151,7 +151,9 @@
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -209,9 +211,6 @@
   <ItemGroup>
     <Content Include="Views\Main\Generate.cshtml" />
     <Content Include="Views\Main\Index.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="App_Data\vault.sqlite" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
