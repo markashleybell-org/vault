@@ -24,20 +24,24 @@
 
 @section main {
 
-    <h2>Generate</h2>
+    <div id="generate-form-dialog">
+        <form id="generate-form" action="" method="post">
+            <p><label for="Password">Value</label> 
+            <input type="text" size="40" id="Password" name="Password" value="" /></p>
+            <p><label for="Hashed">Hashed</label> 
+            <input type="text" size="40" id="Hashed" name="Hashed" value="" /></p>
+            <p><input type="button" class="submit" onclick="generatePassword();" value="Generate" /></p>
+	    </form>
+    </div>
 
-    <form id="generate-form" action="" method="post">
-        <p><label for="Password">Password</label> 
-        <input type="text" size="40" id="Password" name="Password" value="" /></p>
-        <p><label for="Hashed">Hashed</label> 
-        <input type="text" size="40" id="Hashed" name="Hashed" value="" /></p>
-        <p><input type="button" onclick="generatePassword();" value="Generate" /></p>
-	</form>
+    <script type="text/javascript">
+        $('#generate-form-dialog').dialog({ title: 'Generate', width: 500, modal: true });
+    </script>
 
 }
 
 @section endpage {
 
-    <script type="text/javascript" src="@Url.Content("~/")scripts/passpack-v1.1.min.js"></script>
+    <script type="text/javascript" src="/content/js/passpack-v1.1.min.js"></script>
 
 }
