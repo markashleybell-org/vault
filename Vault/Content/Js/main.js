@@ -59,7 +59,7 @@ function encryptObject(obj, masterKey, excludes) {
 
     for (var p in obj)
         if (!excludes.contains(p))
-            obj[p] = Passpack.encode('AES', obj[p], masterKey);
+            obj[p] = Passpack.encode('AES', obj[p], b64_to_utf8(masterKey));
 
     return obj;
 
@@ -71,7 +71,7 @@ function decryptObject(obj, masterKey, excludes) {
 
     for (var p in obj)
         if (!excludes.contains(p))
-            obj[p] = Passpack.decode('AES', obj[p], masterKey);
+            obj[p] = Passpack.decode('AES', obj[p], b64_to_utf8(masterKey));
 
     return obj;
 
@@ -625,6 +625,14 @@ function validateRecord(f) {
 
 }
 
+function utf8_to_b64(str) {
+    return window.btoa(encodeURIComponent(escape(str)));
+}
+
+function b64_to_utf8(str) {
+    return unescape(decodeURIComponent(window.atob(str)));
+}
+
 $(function () {
 
     $('body').append('<div id="modal-dialog"></div>');
@@ -665,7 +673,7 @@ $(function () {
                     $_VAULT.USER_ID = data.id;
                     $_VAULT.USERNAME = _username;
                     $_VAULT.PASSWORD = _password;
-                    $_VAULT.MASTER_KEY = Passpack.utils.hashx($_VAULT.PASSWORD + Passpack.utils.hashx($_VAULT.PASSWORD, 1, 1), 1, 1);
+                    $_VAULT.MASTER_KEY = utf8_to_b64(window.Passpack.utils.hashx($_VAULT.PASSWORD + Passpack.utils.hashx($_VAULT.PASSWORD, 1, 1), 1, 1));
 
                     loadCredentials($_VAULT.USER_ID, $_VAULT.MASTER_KEY, function (rows) {
 
