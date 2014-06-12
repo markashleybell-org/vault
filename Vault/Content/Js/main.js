@@ -59,7 +59,7 @@ function encryptObject(obj, masterKey, excludes) {
 
     for (var p in obj)
         if (!excludes.contains(p))
-            obj[p] = Passpack.encode('AES', obj[p], masterKey);
+            obj[p] = Passpack.encode('AES', obj[p], b64_to_utf8(masterKey));
 
     return obj;
 
@@ -71,7 +71,7 @@ function decryptObject(obj, masterKey, excludes) {
 
     for (var p in obj)
         if (!excludes.contains(p))
-            obj[p] = Passpack.decode('AES', obj[p], masterKey);
+            obj[p] = Passpack.decode('AES', obj[p], b64_to_utf8(masterKey));
 
     return obj;
 
@@ -416,7 +416,8 @@ function changePassword(userId, masterKey) {
         return false;
 
     var newPasswordHash = Passpack.utils.hashx(newPassword);
-    var newMasterKey = Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1);
+    // Convert the new master key to Base64 so that encryptObject() gets what it's expecting
+    var newMasterKey = utf8_to_b64(Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1));
   
     // Show a spinner until complete because this can take some time!
     $('#change-password-button').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
@@ -543,8 +544,8 @@ function options() {
 
     var dialogHtml = '<p>Change password:</p>' +
                      '<form>' +
-                     '<p><label for="NewPassword">Password</label><input type="text" id="NewPassword" name="NewPassword" value="" /></p>' +
-                     '<p><label for="NewPasswordConfirm">Confirm</label><input type="text" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
+                     '<p><label for="NewPassword">Password</label><input type="password" id="NewPassword" name="NewPassword" value="" /></p>' +
+                     '<p><label for="NewPasswordConfirm">Confirm</label><input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
                      '<p><button class="submit" id=\"change-password-button\" onclick="changePassword(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Change Password</button></p>' +
 					 '<p><button class="submit" id=\"export-button\" onclick="exportData(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Export</button></p>' +
                      '</form>';
@@ -625,6 +626,14 @@ function validateRecord(f) {
 
 }
 
+function utf8_to_b64(str) {
+    return window.btoa(encodeURIComponent(escape(str)));
+}
+
+function b64_to_utf8(str) {
+    return unescape(decodeURIComponent(window.atob(str)));
+}
+
 $(function () {
 
     $('body').append('<div id="modal-dialog"></div>');
@@ -665,7 +674,7 @@ $(function () {
                     $_VAULT.USER_ID = data.id;
                     $_VAULT.USERNAME = _username;
                     $_VAULT.PASSWORD = _password;
-                    $_VAULT.MASTER_KEY = Passpack.utils.hashx($_VAULT.PASSWORD + Passpack.utils.hashx($_VAULT.PASSWORD, 1, 1), 1, 1);
+                    $_VAULT.MASTER_KEY = utf8_to_b64(window.Passpack.utils.hashx($_VAULT.PASSWORD + Passpack.utils.hashx($_VAULT.PASSWORD, 1, 1), 1, 1));
 
                     loadCredentials($_VAULT.USER_ID, $_VAULT.MASTER_KEY, function (rows) {
 
