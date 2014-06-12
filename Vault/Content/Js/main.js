@@ -416,7 +416,8 @@ function changePassword(userId, masterKey) {
         return false;
 
     var newPasswordHash = Passpack.utils.hashx(newPassword);
-    var newMasterKey = Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1);
+    // Convert the new master key to Base64 so that encryptObject() gets what it's expecting
+    var newMasterKey = utf8_to_b64(Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1));
   
     // Show a spinner until complete because this can take some time!
     $('#change-password-button').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
@@ -543,8 +544,8 @@ function options() {
 
     var dialogHtml = '<p>Change password:</p>' +
                      '<form>' +
-                     '<p><label for="NewPassword">Password</label><input type="text" id="NewPassword" name="NewPassword" value="" /></p>' +
-                     '<p><label for="NewPasswordConfirm">Confirm</label><input type="text" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
+                     '<p><label for="NewPassword">Password</label><input type="password" id="NewPassword" name="NewPassword" value="" /></p>' +
+                     '<p><label for="NewPasswordConfirm">Confirm</label><input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
                      '<p><button class="submit" id=\"change-password-button\" onclick="changePassword(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Change Password</button></p>' +
 					 '<p><button class="submit" id=\"export-button\" onclick="exportData(\'' + $_VAULT.USER_ID + '\', \'' + $_VAULT.MASTER_KEY + '\'); return false;">Export</button></p>' +
                      '</form>';
