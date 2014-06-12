@@ -5,6 +5,8 @@ Vault is a very simple ASP.NET MVC web application for storing encrypted persona
 
 Although all data is encrypted before transmission over HTTP, as an extra precaution **this application should *always* be used over an SSL-encrypted connection**.
 
+*Please Note:* Due to the use of the native `window.atob` and `window.btoa` functions, Vault only works in Firefox, Chrome, Safari or Internet Explorer *10+*.
+
 External Libraries/Dependencies
 ========================
 
