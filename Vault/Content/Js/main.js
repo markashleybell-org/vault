@@ -1,6 +1,6 @@
 ﻿var Vault = (function ($) {
 
-    function insertCopyLink(text) {
+    function _insertCopyLink(text) {
 
         return '<span class="copy-link"><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' +
                '        width="14"' +
@@ -29,33 +29,33 @@
 
     }
 
-    function htmlEncode(value) {
+    function _htmlEncode(value) {
         return $('<div/>').text(value).html();
     }
 
-    function htmlDecode(value) {
+    function _htmlDecode(value) {
         return $('<div/>').html(value).text();
     }
 
     // Encrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
-    function encryptObject(obj, masterKey, excludes) {
+    function _encryptObject(obj, masterKey, excludes) {
         for (var p in obj)
             if (!_contains(excludes, p))
-                obj[p] = Passpack.encode('AES', obj[p], b64_to_utf8(masterKey));
+                obj[p] = Passpack.encode('AES', obj[p], _b64_to_utf8(masterKey));
         return obj;
     }
 
     // Encrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
-    function decryptObject(obj, masterKey, excludes) {
+    function _decryptObject(obj, masterKey, excludes) {
         for (var p in obj)
             if (!_contains(excludes, p))
-                obj[p] = Passpack.decode('AES', obj[p], b64_to_utf8(masterKey));
+                obj[p] = Passpack.decode('AES', obj[p], _b64_to_utf8(masterKey));
         return obj;
     }
 
-    function removeFromList(id, list) {
+    function _removeFromList(id, list) {
 
         var i;
 
@@ -73,7 +73,7 @@
 
     }
 
-    function updateDescription(id, description, userId, list) {
+    function _updateDescription(id, description, userId, list) {
 
         for (var i = 0; i < list.length; i++) {
 
@@ -90,13 +90,13 @@
 
     }
 
-    function buildDataTable(data, callback, masterKey) {
+    function _buildDataTable(data, callback, masterKey) {
         var rows = [];
 
         // Create a table row for each record and add it to the rows array
         $.each(data, function (i, item) {
 
-            rows.push(createCredentialTableRow(item, masterKey));
+            rows.push(_createCredentialTableRow(item, masterKey));
 
         });
 
@@ -105,11 +105,11 @@
     }
 
     // Load all records for a specific user
-    function loadCredentials(userId, masterKey, callback, cachedList) {
+    function _loadCredentials(userId, masterKey, callback, cachedList) {
 
         if (cachedList != null) {
 
-            buildDataTable(cachedList, callback, masterKey);
+            _buildDataTable(cachedList, callback, masterKey);
 
         } else {
 
@@ -127,13 +127,13 @@
 
                     $.each(data, function (i, item) {
 
-                        items.push(decryptObject(item, masterKey, excludes));
+                        items.push(_decryptObject(item, masterKey, excludes));
 
                     });
 
                     // Cache the whole (decrypted) list on the client
                     cachedList = items;
-                    buildDataTable(cachedList, callback, masterKey);
+                    _buildDataTable(cachedList, callback, masterKey);
 
                 },
                 error: function (request, status, error) {
@@ -148,7 +148,7 @@
     }
 
     // Show the read-only details dialog 
-    function showDetail(credentialId, masterKey) {
+    function _showDetail(credentialId, masterKey) {
 
         $.ajax({
             url: '/Main/Load',
@@ -160,14 +160,14 @@
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 var excludeProperties = ['CredentialID', 'UserID'];
 
-                data = decryptObject(data, masterKey, excludeProperties);
+                data = _decryptObject(data, masterKey, excludeProperties);
 
                 // Loop through all the properties of the data object (except the excludes)
                 // and encode any HTML for display
                 $.each(data, function (name, value) {
 
                     if (!_contains(excludeProperties, name) && name != 'Password')
-                        data[name] = htmlEncode(value);
+                        data[name] = _htmlEncode(value);
 
                 });
 
@@ -179,16 +179,16 @@
                     details.push('<tr><th>Url</th><td><a class="display-link" href="' + data.Url + '" onclick="window.open(this.href); return false;">' + _truncate(data.Url, 30) + '</a></td></tr>');
 
                 if (data.Username != '')
-                    details.push('<tr><th>Username ' + insertCopyLink(data.Username) + '</th><td>' + data.Username + '</td></tr>');
+                    details.push('<tr><th>Username ' + _insertCopyLink(data.Username) + '</th><td>' + data.Username + '</td></tr>');
 
                 if (data.Password != '')
-                    details.push('<tr><th>Password ' + insertCopyLink(data.Password) + '</th><td>' + htmlEncode(data.Password) + '</td></tr>');
+                    details.push('<tr><th>Password ' + _insertCopyLink(data.Password) + '</th><td>' + _htmlEncode(data.Password) + '</td></tr>');
 
                 if (data.UserDefined1 != '')
-                    details.push('<tr><th>' + data.UserDefined1Label + ' ' + insertCopyLink(data.UserDefined1) + '</th><td>' + data.UserDefined1 + '</td></tr>');
+                    details.push('<tr><th>' + data.UserDefined1Label + ' ' + _insertCopyLink(data.UserDefined1) + '</th><td>' + data.UserDefined1 + '</td></tr>');
 
                 if (data.UserDefined2 != '')
-                    details.push('<tr><th>' + data.UserDefined2Label + ' ' + insertCopyLink(data.UserDefined2) + '</th><td>' + data.UserDefined2 + '</td></tr>');
+                    details.push('<tr><th>' + data.UserDefined2Label + ' ' + _insertCopyLink(data.UserDefined2) + '</th><td>' + data.UserDefined2 + '</td></tr>');
 
                 if (data.Notes != '')
                     details.push('<tr><th>Notes</th><td class="notes">' + data.Notes.replace(/\r\n|\n|\r/gi, '<br />') + '</td></tr>');
@@ -209,7 +209,7 @@
 
     // Load a record into the edit form
     // If null is passed as the credentialId, we set up the form for adding a new record
-    function loadCredential(credentialId, masterKey, userId) {
+    function _loadCredential(credentialId, masterKey, userId) {
 
         if (credentialId != null) {
 
@@ -221,7 +221,7 @@
                 success: function (data, status, request) {
 
                     // CredentialID and UserID are not currently encrypted so don't try to decode them
-                    data = decryptObject(data, masterKey, ['CredentialID', 'UserID']);
+                    data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
 
                     var f = $('#credential-form');
 
@@ -277,16 +277,16 @@
                     $('#records, #add-link').remove();
 
                     // Remove the deleted item from the cached list before reload
-                    removeFromList(credentialId);
+                    _removeFromList(credentialId);
 
                     // For now we just reload the entire table in the background
-                    loadCredentials(userId, masterKey, function (rows) {
+                    _loadCredentials(userId, masterKey, function (rows) {
 
-                        $('#container').append(createCredentialTable(rows));
+                        $('#container').append(_createCredentialTable(rows));
 
                         table = $('#records').dataTable(tableOptions);
 
-                        $('#container').append('<p id="add-link"><button onclick="loadCredential(null, \'' + masterKey + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
+                        $('#container').append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + masterKey + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
 
                         $('#modal-dialog').dialog('destroy');
 
@@ -312,7 +312,7 @@
     }
 
     // Show delete confirmation dialog
-    function confirmDelete(id, userId) {
+    function _confirmDelete(id, userId) {
 
         var dialogHtml = '<p>Are you sure you want to delete this credential?</p>' +
                          '<form>' +
@@ -328,20 +328,20 @@
 
     }
 
-    function generatePasswordHash(password) {
+    function _generatePasswordHash(password) {
 
         return Passpack.utils.hashx(password);
 
     }
 
     // The hash is now a full 64 char string
-    function generatePasswordHash64(password) {
+    function _generatePasswordHash64(password) {
 
         return Passpack.utils.hashx(password, false, true);
 
     }
 
-    function changePassword(userId, masterKey, oldPassword) {
+    function _changePassword(userId, masterKey, oldPassword) {
 
         var newPassword = $('#NewPassword').val();
         var newPasswordConfirm = $('#NewPasswordConfirm').val();
@@ -361,7 +361,7 @@
 
         var newPasswordHash = Passpack.utils.hashx(newPassword);
         // Convert the new master key to Base64 so that encryptObject() gets what it's expecting
-        var newMasterKey = utf8_to_b64(Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1));
+        var newMasterKey = _utf8_to_b64(Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1));
 
         // Show a spinner until complete because this can take some time!
         $('#change-password-button').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
@@ -381,7 +381,7 @@
 
                 $.each(data, function (i, item) {
 
-                    newData.push(encryptObject(decryptObject(item, masterKey, excludes), newMasterKey, excludes));
+                    newData.push(_encryptObject(_decryptObject(item, masterKey, excludes), newMasterKey, excludes));
 
                 });
 
@@ -437,7 +437,7 @@
 
     }
 
-    function exportData(userId, masterKey) {
+    function _exportData(userId, masterKey) {
 
         // Show a spinner until complete because this can take some time!
         $('#export-button').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
@@ -456,7 +456,7 @@
 
                 $.each(data, function (i, item) {
 
-                    exportItems.push(decryptObject(item, masterKey, excludes));
+                    exportItems.push(_decryptObject(item, masterKey, excludes));
 
                 });
 
@@ -484,7 +484,7 @@
 
     }
 
-    function options(userId, masterKey) {
+    function _options(userId, masterKey) {
 
         var dialogHtml = '<p>Change password:</p>' +
                          '<form>' +
@@ -503,7 +503,7 @@
 
     }
 
-    function createCredentialTable(rows) {
+    function _createCredentialTable(rows) {
 
         return '<table id="records" class="display">' +
                '    <thead>' +
@@ -521,7 +521,7 @@
 
     }
 
-    function createCredentialTableRow(credential, masterKey) {
+    function _createCredentialTableRow(credential, masterKey) {
 
         var row = [];
 
@@ -545,7 +545,7 @@
 
     }
 
-    function validateRecord(f) {
+    function _validateRecord(f) {
 
         var errors = [];
 
@@ -570,53 +570,53 @@
 
     }
 
-    function utf8_to_b64(str) {
+    // Encode string to Base64
+    var _utf8_to_b64 = function (str) {
         return window.btoa(encodeURIComponent(escape(str)));
-    }
+    };
 
-    function b64_to_utf8(str) {
+    // Decode Base64 string
+    var _b64_to_utf8 = function (str) {
         return unescape(decodeURIComponent(window.atob(str)));
-    }
+    };
 
     // Utility function to check a value exists in an array
     var _contains = function (arr, value) {
-
         for (var i = 0; i < arr.length; i++)
             if (arr[i] == value) return true;
-
         return false;
-
     };
 
     // Truncate a string at a specified length
     var _truncate = function (str, len) {
-
         return (str.length > len) ? str.substring(0, (len - 3)) + '...' : str;
+    };
 
-    }
-
-    var init = function () {
-
+    // Initialise the app
+    var _init = function () {
+        // Add the modal dialog container
         $('body').append('<div id="modal-dialog"></div>');
+        // Cache UI selectors
+        _ui.loginFormDialog = $('#login-form-dialog');
+        _ui.credentialFormDialog = $('#credential-form-dialog');
+        _ui.loginForm = $('#login-form');
+        _ui.credentialForm = $('#credential-form');
+        _ui.container = $('#container');
+        _ui.spinner = $('#spinner');
+        _ui.recordsFilter = $('#records_filter');
+        _ui.modalDialog = $('#modal-dialog');
 
-        // Load the datatable stylesheet
-        var tableStyles = $("<link>");
-
-        tableStyles.attr({
-            type: 'text/css',
-            rel: 'stylesheet',
-            href: Vault.baseUrl + 'content/css/datatables.css'
-        });
-
+        // Load the datatable stylesheet dynamically
+        var tableStyles = $('<link rel="stylesheet" type="text/css" href="/content/css/datatables.css" />');
         $("head").append(tableStyles);
 
         // Initialise globals and load data on correct login
-        $('#login-form').on('submit', function () {
+        _ui.loginForm.on('submit', function () {
 
-            var username = $('#login-form #Username').val();
-            var password = $('#login-form #Password').val();
+            var username = _ui.loginForm.find('#Username').val();
+            var password = _ui.loginForm.find('#Password').val();
 
-            $('#login-form-dialog .submit').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+            _ui.loginFormDialog.find('.submit').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
 
             $.ajax({
                 url: '/Main/Login',
@@ -631,40 +631,42 @@
                     // If the details were valid
                     if (data.result == 1 && data.id != '') {
 
-                        // Set some global variables so that we can use them for encryption during this session
-                        Vault.userId = data.id;
-                        Vault.username = username;
-                        Vault.password = password;
-                        Vault.masterKey = Vault.utf8_to_b64(window.Passpack.utils.hashx(Vault.password + Passpack.utils.hashx(Vault.password, 1, 1), 1, 1));
+                        // Set some private variables so that we can use them for encryption during this session
+                        _userId = data.id;
+                        _username = username;
+                        _password = password;
+                        _masterKey = _utf8_to_b64(window.Passpack.utils.hashx(_password + Passpack.utils.hashx(_password, 1, 1), 1, 1));
 
-                        Vault.loadCredentials(Vault.userId, Vault.masterKey, function (rows) {
+                        _loadCredentials(_userId, _masterKey, function (rows) {
 
-                            $('#container').append(Vault.createCredentialTable(rows));
+                            _ui.container.append(_createCredentialTable(rows));
+                            // Cache the table selector
+                            _ui.records = $('#records');
 
-                            Vault.table = $('#records').dataTable(Vault.tableOptions);
+                            _table = _ui.records.dataTable(_tableOptions);
 
                             // Successfully logged in. Hide the login form
-                            $('#container').append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + Vault.masterKey + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
-                            $('#login-form').hide();
-                            $('#login-form-dialog').dialog('destroy');
+                            _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
+                            _ui.loginForm.hide();
+                            _ui.loginFormDialog.dialog('destroy');
 
                             // Append the clear filter button
-                            $('#records_filter').before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+                            _ui.recordsFilter.before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
 
-                            $('#records_filter input:last').focus();
+                            _ui.recordsFilter.find('input:last').focus();
 
                         });
 
                     }
 
-                    $('#spinner').remove();
+                    _ui.spinner.remove();
 
                 },
                 error: function (request, status, error) {
 
                     alert('Http Error: ' + status + ' - ' + error);
 
-                    $('#spinner').remove();
+                    _ui.spinner.remove();
 
                 }
             });
@@ -724,7 +726,7 @@
                     $('#records, #add-link').remove();
 
                     // For now we just reload the entire table in the background
-                    Vault.loadCredentials(Vault.userId, Vault.masterKey, function (rows) {
+                    _loadCredentials(Vault.userId, Vault.masterKey, function (rows) {
 
                         $('#container').append(createCredentialTable(rows));
 
@@ -778,35 +780,26 @@
 		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
         ]
     },
-    _baseUrl = '',
     _cachedList = null, 
     _ui = {
         modalBackground: null,
         loginFormDialog: null,
         credentialFormDialog: null,
         loginForm: null,
-        credentialForm: null
+        credentialForm: null,
+        container: null,
+        spinner: null,
+        recordsFilter: null,
+        modalDialog: null,
+        records: null
     };
 
+    // Expose public methods
     var vault = {
-        userId: _userId,
-        baseUrl: _baseUrl,
-        username: _username,
-        password: _password,
-        masterKey: _masterKey,
-        table: _table,
-        tableOptions: _tableOptions,
-        cachedList: _cachedList,
-        loadCredentials: loadCredentials,
-        loadCredential: loadCredential,
-        utf8_to_b64: utf8_to_b64,
-        b64_to_utf8: b64_to_utf8,
-        createCredentialTable: createCredentialTable,
-        updateDescription: updateDescription,
-        encryptObject: encryptObject,
-        decryptObject: decryptObject,
-        showDetail: showDetail,
-        init: init
+        init: _init,
+        showDetail: _showDetail,
+        loadCredential: _loadCredential,
+        confirmDelete: _confirmDelete
     };
 
     return vault;
