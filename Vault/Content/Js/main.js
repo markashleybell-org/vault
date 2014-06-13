@@ -41,7 +41,7 @@
     // excludes is an array of property names whose values should not be encrypted
     function encryptObject(obj, masterKey, excludes) {
         for (var p in obj)
-            if (!excludes.contains(p))
+            if (!_contains(excludes, p))
                 obj[p] = Passpack.encode('AES', obj[p], b64_to_utf8(masterKey));
         return obj;
     }
@@ -50,7 +50,7 @@
     // excludes is an array of property names whose values should not be encrypted
     function decryptObject(obj, masterKey, excludes) {
         for (var p in obj)
-            if (!excludes.contains(p))
+            if (!_contains(excludes, p))
                 obj[p] = Passpack.decode('AES', obj[p], b64_to_utf8(masterKey));
         return obj;
     }
@@ -166,7 +166,7 @@
                 // and encode any HTML for display
                 $.each(data, function (name, value) {
 
-                    if (!excludeProperties.contains(name) && name != 'Password')
+                    if (!_contains(excludeProperties, name) && name != 'Password')
                         data[name] = htmlEncode(value);
 
                 });
@@ -176,7 +176,7 @@
                 details.push('<table>');
 
                 if (data.Url != '')
-                    details.push('<tr><th>Url</th><td><a class="display-link" href="' + data.Url + '" onclick="window.open(this.href); return false;">' + data.Url.truncate(30) + '</a></td></tr>');
+                    details.push('<tr><th>Url</th><td><a class="display-link" href="' + data.Url + '" onclick="window.open(this.href); return false;">' + _truncate(data.Url, 30) + '</a></td></tr>');
 
                 if (data.Username != '')
                     details.push('<tr><th>Username ' + insertCopyLink(data.Username) + '</th><td>' + data.Username + '</td></tr>');
@@ -578,6 +578,26 @@
         return unescape(decodeURIComponent(window.atob(str)));
     }
 
+    // Utility function to check a value exists in an array
+    var _contains = function (arr, value) {
+
+        for (var i = 0; i < arr.length; i++)
+            if (arr[i] == value) return true;
+
+        return false;
+
+    };
+
+    // Truncate a string at a specified length
+    var _truncate = function (str, len) {
+
+        return (str.length > len) ? str.substring(0, (len - 3)) + '...' : str;
+
+    }
+
+    var init = function () {
+    };
+
     var _userId = '',
     _username = '',
     _password = '',
@@ -599,7 +619,14 @@
         ]
     },
     _baseUrl = '',
-    _cachedList = null;
+    _cachedList = null, 
+    _ui = {
+        modalBackground: null,
+        loginFormDialog: null,
+        credentialFormDialog: null,
+        loginForm: null,
+        credentialForm: null
+    };
 
     var vault = {
         userId: _userId,
@@ -624,24 +651,6 @@
     return vault;
 
 }(jQuery));
-
-
-// Utility function to check a value exists in an array
-Array.prototype.contains = function (value) {
-
-    for (var i = 0; i < this.length; i++)
-        if (this[i] == value) return true;
-
-    return false;
-
-};
-
-// Truncate a string at a specified length
-String.prototype.truncate = function (len) {
-
-    return (this.length > len) ? this.substring(0, (len - 3)) + '...' : this;
-
-}
 
 
 $(function () {
