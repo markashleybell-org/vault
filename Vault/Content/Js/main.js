@@ -596,6 +596,166 @@
     }
 
     var init = function () {
+
+        $('body').append('<div id="modal-dialog"></div>');
+
+        // Load the datatable stylesheet
+        var tableStyles = $("<link>");
+
+        tableStyles.attr({
+            type: 'text/css',
+            rel: 'stylesheet',
+            href: Vault.baseUrl + 'content/css/datatables.css'
+        });
+
+        $("head").append(tableStyles);
+
+        // Initialise globals and load data on correct login
+        $('#login-form').on('submit', function () {
+
+            var username = $('#login-form #Username').val();
+            var password = $('#login-form #Password').val();
+
+            $('#login-form-dialog .submit').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+
+            $.ajax({
+                url: '/Main/Login',
+                data: {
+                    Username: Passpack.utils.hashx(username),
+                    Password: Passpack.utils.hashx(password)
+                },
+                dataType: 'json',
+                type: 'POST',
+                success: function (data, status, request) {
+
+                    // If the details were valid
+                    if (data.result == 1 && data.id != '') {
+
+                        // Set some global variables so that we can use them for encryption during this session
+                        Vault.userId = data.id;
+                        Vault.username = username;
+                        Vault.password = password;
+                        Vault.masterKey = Vault.utf8_to_b64(window.Passpack.utils.hashx(Vault.password + Passpack.utils.hashx(Vault.password, 1, 1), 1, 1));
+
+                        Vault.loadCredentials(Vault.userId, Vault.masterKey, function (rows) {
+
+                            $('#container').append(Vault.createCredentialTable(rows));
+
+                            Vault.table = $('#records').dataTable(Vault.tableOptions);
+
+                            // Successfully logged in. Hide the login form
+                            $('#container').append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + Vault.masterKey + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
+                            $('#login-form').hide();
+                            $('#login-form-dialog').dialog('destroy');
+
+                            // Append the clear filter button
+                            $('#records_filter').before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+
+                            $('#records_filter input:last').focus();
+
+                        });
+
+                    }
+
+                    $('#spinner').remove();
+
+                },
+                error: function (request, status, error) {
+
+                    alert('Http Error: ' + status + ' - ' + error);
+
+                    $('#spinner').remove();
+
+                }
+            });
+
+            return false;
+
+        });
+
+        // Save the new details on edit form submit
+        $('#credential-form').on('submit', function () {
+
+            $('#validation-message').remove();
+            $('input[class!=submit], textarea', $(this)).removeClass('invalid');
+
+            var errors = validateRecord($(this));
+            var errorMsg = [];
+
+            if (errors.length > 0) {
+
+                for (var i = 0; i < errors.length; i++) {
+                    errorMsg.push(errors[i].msg);
+                    errors[i].field.addClass('invalid');
+                }
+
+                $(this).prepend('<div id="validation-message"><p>' + errorMsg.join('<br />') + '</p></div>');
+                return false;
+
+            }
+
+            $('.submit', $(this)).after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+
+            var credential = {};
+
+            // Serialize the form into an object
+            $('input[class!=submit], textarea', $(this)).each(function () {
+                credential[this.name] = $(this).val();
+            });
+
+            // Hold the modified Description so we can update the list if the update succeeds
+            var description = $('#Description', $(this)).val();
+
+            // CredentialID and UserID are not currently encrypted so don't try to decode them
+            credential = Vault.encryptObject(credential, $_VAULT.MASTER_KEY, ['CredentialID', 'UserID']);
+
+            $.ajax({
+                url: '/Main/Update',
+                data: credential,
+                dataType: 'json',
+                type: 'POST',
+                success: function (data, status, request) {
+
+                    // Update the cached credential list with the new Description so it is correct when we rebuild 
+                    Vault.updateDescription(data.CredentialID, description, Vault.userId);
+
+                    // Completely destroy the existing DataTable and remove the table and add link from the DOM
+                    Vault.table.fnDestroy();
+                    $('#records, #add-link').remove();
+
+                    // For now we just reload the entire table in the background
+                    Vault.loadCredentials(Vault.userId, Vault.masterKey, function (rows) {
+
+                        $('#container').append(createCredentialTable(rows));
+
+                        Vault.table = $('#records').dataTable(Vault.tableOptions);
+
+                        $('#container').append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + Vault.masterKey + '\'); return false;">Add Item</button></p>');
+
+                        $('#spinner').remove();
+
+                        $('#credential-form-dialog').dialog('destroy');
+
+                        // Append the clear filter button
+                        $('#records_filter').before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+
+                        $('#records_filter input:last').focus();
+
+                    });
+
+                },
+                error: function (request, status, error) {
+
+                    alert('Http Error: ' + status + ' - ' + error);
+
+                    $('#spinner').remove();
+
+                }
+            });
+
+            return false;
+
+        });
     };
 
     var _userId = '',
@@ -645,7 +805,8 @@
         updateDescription: updateDescription,
         encryptObject: encryptObject,
         decryptObject: decryptObject,
-        showDetail: showDetail
+        showDetail: showDetail,
+        init: init
     };
 
     return vault;
@@ -655,166 +816,6 @@
 
 $(function () {
 
-    $('body').append('<div id="modal-dialog"></div>');
-
-    // Load the datatable stylesheet
-    var tableStyles = $("<link>");
-
-    tableStyles.attr({
-        type: 'text/css',
-        rel: 'stylesheet',
-        href: Vault.baseUrl + 'content/css/datatables.css'
-    });
-
-    $("head").append(tableStyles);
-
-    // Initialise globals and load data on correct login
-    $('#login-form').on('submit', function () {
-
-        var _username = $('#login-form #Username').val();
-        var _password = $('#login-form #Password').val();
-
-        $('#login-form-dialog .submit').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
-
-        $.ajax({
-            url: '/Main/Login',
-            data: {
-                Username: Passpack.utils.hashx(_username),
-                Password: Passpack.utils.hashx(_password)
-            },
-            dataType: 'json',
-            type: 'POST',
-            success: function (data, status, request) {
-
-                // If the details were valid
-                if (data.result == 1 && data.id != '') {
-
-                    // Set some global variables so that we can use them for encryption during this session
-                    Vault.userId = data.id;
-                    Vault.username = _username;
-                    Vault.password = _password;
-                    Vault.masterKey = Vault.utf8_to_b64(window.Passpack.utils.hashx(Vault.password + Passpack.utils.hashx(Vault.password, 1, 1), 1, 1));
-
-                    Vault.loadCredentials(Vault.userId, Vault.masterKey, function (rows) {
-
-                        $('#container').append(Vault.createCredentialTable(rows));
-
-                        Vault.table = $('#records').dataTable(Vault.tableOptions);
-
-                        // Successfully logged in. Hide the login form
-                        $('#container').append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + Vault.masterKey + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
-                        $('#login-form').hide();
-                        $('#login-form-dialog').dialog('destroy');
-
-                        // Append the clear filter button
-                        $('#records_filter').before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
-
-                        $('#records_filter input:last').focus();
-
-
-
-                    });
-
-                }
-
-                $('#spinner').remove();
-
-            },
-            error: function (request, status, error) {
-
-                alert('Http Error: ' + status + ' - ' + error);
-
-                $('#spinner').remove();
-
-            }
-        });
-
-        return false;
-
-    });
-
-    // Save the new details on edit form submit
-    $('#credential-form').on('submit', function () {
-
-        $('#validation-message').remove();
-        $('input[class!=submit], textarea', $(this)).removeClass('invalid');
-
-        var errors = validateRecord($(this));
-        var errorMsg = [];
-
-        if (errors.length > 0) {
-
-            for (var i = 0; i < errors.length; i++) {
-                errorMsg.push(errors[i].msg);
-                errors[i].field.addClass('invalid');
-            }
-
-            $(this).prepend('<div id="validation-message"><p>' + errorMsg.join('<br />') + '</p></div>');
-            return false;
-
-        }
-
-        $('.submit', $(this)).after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
-
-        var credential = {};
-
-        // Serialize the form into an object
-        $('input[class!=submit], textarea', $(this)).each(function () {
-            credential[this.name] = $(this).val();
-        });
-
-        // Hold the modified Description so we can update the list if the update succeeds
-        var description = $('#Description', $(this)).val();
-
-        // CredentialID and UserID are not currently encrypted so don't try to decode them
-        credential = Vault.encryptObject(credential, $_VAULT.MASTER_KEY, ['CredentialID', 'UserID']);
-
-        $.ajax({
-            url: '/Main/Update',
-            data: credential,
-            dataType: 'json',
-            type: 'POST',
-            success: function (data, status, request) {
-
-                // Update the cached credential list with the new Description so it is correct when we rebuild 
-                Vault.updateDescription(data.CredentialID, description, Vault.userId);
-
-                // Completely destroy the existing DataTable and remove the table and add link from the DOM
-                Vault.table.fnDestroy();
-                $('#records, #add-link').remove();
-
-                // For now we just reload the entire table in the background
-                Vault.loadCredentials(Vault.userId, Vault.masterKey, function (rows) {
-
-                    $('#container').append(createCredentialTable(rows));
-
-                    Vault.table = $('#records').dataTable(Vault.tableOptions);
-
-                    $('#container').append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + Vault.masterKey + '\'); return false;">Add Item</button></p>');
-
-                    $('#spinner').remove();
-
-                    $('#credential-form-dialog').dialog('destroy');
-
-                    // Append the clear filter button
-                    $('#records_filter').before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
-
-                    $('#records_filter input:last').focus();
-
-                });
-
-            },
-            error: function (request, status, error) {
-
-                alert('Http Error: ' + status + ' - ' + error);
-
-                $('#spinner').remove();
-
-            }
-        });
-
-        return false;
-
-    });
+    Vault.init();
 
 });
