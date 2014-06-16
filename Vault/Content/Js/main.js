@@ -105,11 +105,11 @@
     }
 
     // Load all records for a specific user
-    function _loadCredentials(userId, masterKey, callback, cachedList) {
+    function _loadCredentials(userId, masterKey, callback) {
 
-        if (cachedList != null) {
+        if (_cachedList != null) {
 
-            _buildDataTable(cachedList, callback, masterKey);
+            _buildDataTable(_cachedList, callback, masterKey);
 
         } else {
 
@@ -132,8 +132,8 @@
                     });
 
                     // Cache the whole (decrypted) list on the client
-                    cachedList = items;
-                    _buildDataTable(cachedList, callback, masterKey);
+                    _cachedList = items;
+                    _buildDataTable(_cachedList, callback, masterKey);
 
                 },
                 error: function (request, status, error) {
@@ -286,7 +286,7 @@
 
                         table = $('#records').dataTable(tableOptions);
 
-                        $('#container').append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + masterKey + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
+                        $('#container').append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
 
                         $('#modal-dialog').dialog('destroy');
 
@@ -537,7 +537,7 @@
 
         row.push('</td>');
         row.push('<td class="center"><a href="#" onclick="Vault.showDetail(\'' + credential.CredentialID + '\', \'' + masterKey + '\'); return false;" title="View Details"><img src="/content/img/key.png" width="16" height="16" alt="View Details" /></a></td>');
-        row.push('<td class="center"><a href="#" onclick="Vault.loadCredential(\'' + credential.CredentialID + '\', \'' + masterKey + '\'); return false;" title="Edit Details"><img src="/content/img/edit.png" width="16" height="16" alt="Edit Details" /></a></td>');
+        row.push('<td class="center"><a href="#" onclick="Vault.loadCredential(\'' + credential.CredentialID + '\', \'' + masterKey + '\', \'' + _userId + '\'); return false;" title="Edit Details"><img src="/content/img/edit.png" width="16" height="16" alt="Edit Details" /></a></td>');
         row.push('<td class="center"><a href="#" onclick="Vault.confirmDelete(\'' + credential.CredentialID + '\'); return false;" title="Delete"><img src="/content/img/delete.png" width="16" height="16" alt="Delete" /></a></td>');
         row.push('</tr>');
 
@@ -642,11 +642,10 @@
                             _ui.container.append(_createCredentialTable(rows));
                             // Cache the table selector
                             _ui.records = $('#records');
-
                             _table = _ui.records.dataTable(_tableOptions);
 
                             // Successfully logged in. Hide the login form
-                            _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
+                            _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
                             _ui.loginForm.hide();
                             _ui.loginFormDialog.dialog('destroy');
 
@@ -676,12 +675,13 @@
         });
 
         // Save the new details on edit form submit
-        $('#credential-form').on('submit', function () {
-
+        _ui.credentialForm.on('submit', function () {
+            var form = $(this);
             $('#validation-message').remove();
-            $('input[class!=submit], textarea', $(this)).removeClass('invalid');
+            var inputs = form.find('input[class!=submit], textarea');
+            inputs.removeClass('invalid');
 
-            var errors = validateRecord($(this));
+            var errors = _validateRecord(form);
             var errorMsg = [];
 
             if (errors.length > 0) {
@@ -691,25 +691,25 @@
                     errors[i].field.addClass('invalid');
                 }
 
-                $(this).prepend('<div id="validation-message"><p>' + errorMsg.join('<br />') + '</p></div>');
+                form.prepend('<div id="validation-message"><p>' + errorMsg.join('<br />') + '</p></div>');
                 return false;
 
             }
 
-            $('.submit', $(this)).after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+            form.find('.submit').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
 
             var credential = {};
 
-            // Serialize the form into an object
-            $('input[class!=submit], textarea', $(this)).each(function () {
+            // Serialize the form inputs into an object
+            inputs.each(function () {
                 credential[this.name] = $(this).val();
             });
 
             // Hold the modified Description so we can update the list if the update succeeds
-            var description = $('#Description', $(this)).val();
+            var description = form.find('#Description').val();
 
             // CredentialID and UserID are not currently encrypted so don't try to decode them
-            credential = Vault.encryptObject(credential, $_VAULT.MASTER_KEY, ['CredentialID', 'UserID']);
+            credential = _encryptObject(credential, _masterKey, ['CredentialID', 'UserID']);
 
             $.ajax({
                 url: '/Main/Update',
@@ -719,29 +719,30 @@
                 success: function (data, status, request) {
 
                     // Update the cached credential list with the new Description so it is correct when we rebuild 
-                    Vault.updateDescription(data.CredentialID, description, Vault.userId);
+                    _updateDescription(data.CredentialID, description, _userId, _cachedList);
 
                     // Completely destroy the existing DataTable and remove the table and add link from the DOM
-                    Vault.table.fnDestroy();
+                    _table.fnDestroy();
                     $('#records, #add-link').remove();
 
                     // For now we just reload the entire table in the background
-                    _loadCredentials(Vault.userId, Vault.masterKey, function (rows) {
+                    _loadCredentials(_userId, _masterKey, function (rows) {
 
-                        $('#container').append(createCredentialTable(rows));
+                        _ui.container.append(_createCredentialTable(rows));
 
-                        Vault.table = $('#records').dataTable(Vault.tableOptions);
+                        _ui.records = $('#records');
+                        _ui.table = _ui.records.dataTable(_tableOptions);
 
-                        $('#container').append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + Vault.masterKey + '\'); return false;">Add Item</button></p>');
+                        _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button></p>');
 
-                        $('#spinner').remove();
+                        _ui.spinner.remove();
 
-                        $('#credential-form-dialog').dialog('destroy');
+                        _ui.credentialFormDialog.dialog('destroy');
 
                         // Append the clear filter button
-                        $('#records_filter').before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+                        _ui.recordsFilter.before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
 
-                        $('#records_filter input:last').focus();
+                        _ui.recordsFilter.find('input:last').focus();
 
                     });
 
@@ -750,7 +751,7 @@
 
                     alert('Http Error: ' + status + ' - ' + error);
 
-                    $('#spinner').remove();
+                    _ui.spinner.remove();
 
                 }
             });
@@ -780,7 +781,7 @@
 		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
         ]
     },
-    _cachedList = null, 
+    _cachedList = [], 
     _ui = {
         modalBackground: null,
         loginFormDialog: null,
