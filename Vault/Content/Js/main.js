@@ -107,7 +107,7 @@
     // Load all records for a specific user
     function _loadCredentials(userId, masterKey, callback) {
 
-        if (_cachedList != null) {
+        if (_cachedList != null && _cachedList.length) {
 
             _buildDataTable(_cachedList, callback, masterKey);
 
@@ -507,12 +507,12 @@
 
         return '<table id="records" class="display">' +
                '    <thead>' +
-               '	    <tr>' +
-               '		    <th>Description</th>' +
-               '		    <th>Details</th>' +
-               '		    <th>Edit</th>' +
+               '        <tr>' +
+               '            <th>Description</th>' +
+               '            <th>Details</th>' +
+               '            <th>Edit</th>' +
                '            <th>Delete</th>' +
-               '	    </tr>' +
+               '        </tr>' +
                '    </thead>' +
                '    <tbody>' +
                        rows.join('') +
@@ -775,10 +775,10 @@
         'sScrollY': 441,
         'aaSorting': [[0, 'asc']],
         'aoColumns': [
-		    { 'sType': 'html' },
-		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
-		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
-		    { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
+            { 'sType': 'html' },
+            { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
+            { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
+            { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
         ]
     },
     _cachedList = [], 
