@@ -56,21 +56,13 @@
     }
 
     function _removeFromList(id, list) {
-
         var i;
 
-        for (i = 0; i < list.length; i++) {
-
-            if (list[i].CredentialID == id) {
-
+        for (i = 0; i < list.length; i++) 
+            if (list[i].CredentialID == id) 
                 break;
 
-            }
-
-        }
-
         list.splice(i, 1);
-
     }
 
     function _updateDescription(id, description, userId, list) {
@@ -261,7 +253,7 @@
     }
 
     // Delete a record
-    function deleteCredential(credentialId, userId, masterKey, table, tableOptions) {
+    function _deleteCredential(credentialId, userId, masterKey) {
 
         $.ajax({
             url: '/Main/Delete',
@@ -273,27 +265,28 @@
                 if (data.Success) {
 
                     // Completely destroy the existing DataTable and remove the table and add link from the DOM
-                    table.fnDestroy();
+                    _table.fnDestroy();
                     $('#records, #add-link').remove();
 
                     // Remove the deleted item from the cached list before reload
-                    _removeFromList(credentialId);
+                    _removeFromList(credentialId, _cachedList);
 
                     // For now we just reload the entire table in the background
-                    _loadCredentials(userId, masterKey, function (rows) {
+                    _loadCredentials(userId, _b64_to_utf8(masterKey), function (rows) {
 
-                        $('#container').append(_createCredentialTable(rows));
+                        _ui.container.append(_createCredentialTable(rows));
 
-                        table = $('#records').dataTable(tableOptions);
+                        _ui.records = $('#records');
+                        _table = _ui.records.dataTable(_tableOptions);
 
-                        $('#container').append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
+                        _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + masterKey + '\', \'' + userId + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
 
-                        $('#modal-dialog').dialog('destroy');
+                        _ui.modalDialog.dialog('destroy');
 
                         // Append the clear filter button
-                        $('#records_filter').before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+                        _ui.recordsFilter.before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
 
-                        $('#records_filter input:last').focus();
+                        _ui.recordsFilter.find('input:last').focus();
 
                     });
 
@@ -316,7 +309,7 @@
 
         var dialogHtml = '<p>Are you sure you want to delete this credential?</p>' +
                          '<form>' +
-                         '<p><button onclick="$(\'#modal-dialog\').dialog(\'destroy\'); return false;">No</button> <button onclick="deleteCredential(\'' + id + '\', \'' + userId + '\'); return false;">Yes</button></p>' +
+                         '<p><button onclick="$(\'#modal-dialog\').dialog(\'destroy\'); return false;">No</button> <button onclick="Vault.deleteCredential(\'' + id + '\', \'' + userId + '\', \'' + _utf8_to_b64(_masterKey) + '\'); return false;">Yes</button></p>' +
                          '</form>';
 
         $('#modal-dialog').html(dialogHtml).dialog({
@@ -538,7 +531,7 @@
         row.push('</td>');
         row.push('<td class="center"><a href="#" onclick="Vault.showDetail(\'' + credential.CredentialID + '\', \'' + masterKey + '\'); return false;" title="View Details"><img src="/content/img/key.png" width="16" height="16" alt="View Details" /></a></td>');
         row.push('<td class="center"><a href="#" onclick="Vault.loadCredential(\'' + credential.CredentialID + '\', \'' + masterKey + '\', \'' + _userId + '\'); return false;" title="Edit Details"><img src="/content/img/edit.png" width="16" height="16" alt="Edit Details" /></a></td>');
-        row.push('<td class="center"><a href="#" onclick="Vault.confirmDelete(\'' + credential.CredentialID + '\'); return false;" title="Delete"><img src="/content/img/delete.png" width="16" height="16" alt="Delete" /></a></td>');
+        row.push('<td class="center"><a href="#" onclick="Vault.confirmDelete(\'' + credential.CredentialID + '\', \'' + _userId + '\'); return false;" title="Delete"><img src="/content/img/delete.png" width="16" height="16" alt="Delete" /></a></td>');
         row.push('</tr>');
 
         return row.join('');
@@ -731,7 +724,7 @@
                         _ui.container.append(_createCredentialTable(rows));
 
                         _ui.records = $('#records');
-                        _ui.table = _ui.records.dataTable(_tableOptions);
+                        _table = _ui.records.dataTable(_tableOptions);
 
                         _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button></p>');
 
@@ -800,7 +793,9 @@
         init: _init,
         showDetail: _showDetail,
         loadCredential: _loadCredential,
-        confirmDelete: _confirmDelete
+        confirmDelete: _confirmDelete,
+        deleteCredential: _deleteCredential,
+        options: _options
     };
 
     return vault;
