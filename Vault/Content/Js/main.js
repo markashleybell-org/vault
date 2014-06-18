@@ -8,8 +8,8 @@ var Vault = (function ($) {
     _username = '', // Current user's username
     _password = '', // Current user's password
     _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
-    _table = null,
-    _tableOptions = {
+    _dataTable = null, // Cache DataTable in memory
+    _dataTableOptions = {
         'bJQueryUI': true,
         'sPaginationType': 'full_numbers',
         'bAutoWidth': false,
@@ -36,6 +36,20 @@ var Vault = (function ($) {
         recordsFilter: null,
         modalDialog: null,
         records: null
+    },
+    _templates = {
+        copyLink: null,
+        detailTable: null,
+        credentialForm: null,
+        footerControls: null,
+        clearFilterButton: null,
+        deleteConfirmationDialog: null,
+        spinner: null,
+        optionsDialog: null,
+        exportedDataWindow: null,
+        credentialTable: null,
+        credentialTableRow: null,
+        validationMessage: null
     };
 
     function _insertCopyLink(text) {
@@ -217,7 +231,7 @@ var Vault = (function ($) {
 
                 details.push('</table>');
 
-                $('#modal-dialog').html(details.join('')).dialog({ title: data.Description, width: 600, minHeight: 50, modal: true });
+                _ui.modalDialog.html(details.join('')).dialog({ title: data.Description, width: 600, minHeight: 50, modal: true });
 
             },
             error: function (request, status, error) {
@@ -295,7 +309,7 @@ var Vault = (function ($) {
                 if (data.Success) {
 
                     // Completely destroy the existing DataTable and remove the table and add link from the DOM
-                    _table.fnDestroy();
+                    _dataTable.fnDestroy();
                     $('#records, #add-link').remove();
 
                     // Remove the deleted item from the cached list before reload
@@ -307,7 +321,7 @@ var Vault = (function ($) {
                         _ui.container.append(_createCredentialTable(rows));
 
                         _ui.records = $('#records');
-                        _table = _ui.records.dataTable(_tableOptions);
+                        _dataTable = _ui.records.dataTable(_dataTableOptions);
 
                         _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + masterKey + '\', \'' + userId + '\'); return false;">Add Item</button> <button onclick="Vault.options(); return false;">Options</button></p>');
 
@@ -661,7 +675,7 @@ var Vault = (function ($) {
                             _ui.container.append(_createCredentialTable(rows));
                             // Cache the table selector
                             _ui.records = $('#records');
-                            _table = _ui.records.dataTable(_tableOptions);
+                            _dataTable = _ui.records.dataTable(_dataTableOptions);
 
                             // Successfully logged in. Hide the login form
                             _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button> <button onclick="Vault.options(); return false;">Options</button></p>');
@@ -741,7 +755,7 @@ var Vault = (function ($) {
                     _updateDescription(data.CredentialID, description, _userId, _cachedList);
 
                     // Completely destroy the existing DataTable and remove the table and add link from the DOM
-                    _table.fnDestroy();
+                    _dataTable.fnDestroy();
                     $('#records, #add-link').remove();
 
                     // For now we just reload the entire table in the background
@@ -750,7 +764,7 @@ var Vault = (function ($) {
                         _ui.container.append(_createCredentialTable(rows));
 
                         _ui.records = $('#records');
-                        _table = _ui.records.dataTable(_tableOptions);
+                        _dataTable = _ui.records.dataTable(_dataTableOptions);
 
                         _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button></p>');
 

@@ -13,9 +13,9 @@
 
 @section main {
 
-    @{Html.RenderPartial("Credential");}
+    @{Html.RenderPartial("Credential", new CredentialViewModel());}
 
-    @{Html.RenderPartial("Login");}
+    @{Html.RenderPartial("Login", new LoginViewModel());}
 
     <script type="text/javascript">
         $('#login-form-dialog').dialog({ title: 'Log In', width: 500, modal: true });

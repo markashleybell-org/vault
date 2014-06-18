@@ -25,5 +25,20 @@ namespace Vault.Models
         [DisplayName("Custom 2")]
         public string UserDefined2 { get; set; }
         public string Notes { get; set; }
+
+        public CredentialViewModel() {
+            CredentialID = "{{CredentialID}}";
+            UserID = "{{UserID}}";
+            Description = "{{Description}}";
+            Username = "{{Username}}";
+            Password = "{{Password}}";
+            PasswordConfirmation = "{{PasswordConfirmation}}";
+            Url = "{{Url}}";
+            UserDefined1Label = "{{UserDefined1Label}}";
+            UserDefined1 = "{{UserDefined1}}";
+            UserDefined2Label = "{{UserDefined2Label}}";
+            UserDefined2 = "{{UserDefined2}}";
+            Notes = "{{Notes}}";
+        }
     }
 }
