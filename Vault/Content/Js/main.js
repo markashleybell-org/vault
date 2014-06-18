@@ -1,4 +1,42 @@
-﻿var Vault = (function ($) {
+﻿//////////////////////////////////////////////////////////////////////////////////
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+var Vault = (function ($) {
+    // Private member variables
+    var _userId = '', // GUID identifying logged-in user
+    _username = '', // Current user's username
+    _password = '', // Current user's password
+    _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
+    _table = null,
+    _tableOptions = {
+        'bJQueryUI': true,
+        'sPaginationType': 'full_numbers',
+        'bAutoWidth': false,
+        'bLengthChange': false,
+        'iDisplayLength': 20,
+        'sScrollY': 441,
+        'aaSorting': [[0, 'asc']],
+        'aoColumns': [
+            { 'sType': 'html' },
+            { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
+            { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
+            { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
+        ]
+    },
+    _cachedList = [],
+    _ui = {
+        modalBackground: null,
+        loginFormDialog: null,
+        credentialFormDialog: null,
+        loginForm: null,
+        credentialForm: null,
+        container: null,
+        spinner: null,
+        recordsFilter: null,
+        modalDialog: null,
+        records: null
+    };
 
     function _insertCopyLink(text) {
 
@@ -68,14 +106,10 @@
     function _updateDescription(id, description, userId, list) {
 
         for (var i = 0; i < list.length; i++) {
-
             if (list[i].CredentialID == id) {
-
                 list[i].Description = description;
                 return;
-
             }
-
         }
 
         list.push({ CredentialID: id, Description: description, UserID: userId });
@@ -87,9 +121,7 @@
 
         // Create a table row for each record and add it to the rows array
         $.each(data, function (i, item) {
-
             rows.push(_createCredentialTableRow(item, masterKey));
-
         });
 
         // Fire the callback and pass it the array of rows
@@ -118,9 +150,7 @@
                     var excludes = ['CredentialID', 'UserID'];
 
                     $.each(data, function (i, item) {
-
                         items.push(_decryptObject(item, masterKey, excludes));
-
                     });
 
                     // Cache the whole (decrypted) list on the client
@@ -297,7 +327,7 @@
 
                 alert('Http Error: ' + status + ' - ' + error);
 
-                $('#modal-dialog').dialog('destroy');
+                _ui.modalDialog.dialog('destroy');
 
             }
         });
@@ -312,7 +342,7 @@
                          '<p><button onclick="$(\'#modal-dialog\').dialog(\'destroy\'); return false;">No</button> <button onclick="Vault.deleteCredential(\'' + id + '\', \'' + userId + '\', \'' + _utf8_to_b64(_masterKey) + '\'); return false;">Yes</button></p>' +
                          '</form>';
 
-        $('#modal-dialog').html(dialogHtml).dialog({
+        _ui.modalDialog.html(dialogHtml).dialog({
             title: 'Delete Credential',
             width: 500,
             modal: true,
@@ -448,12 +478,8 @@
                 var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
 
                 $.each(data, function (i, item) {
-
                     exportItems.push(_decryptObject(item, masterKey, excludes));
-
                 });
-
-                // console.log(JSON.stringify(exportItems, undefined, 4));
 
                 var exportWindow = window.open("", "EXPORT_WINDOW", "WIDTH=700, HEIGHT=600");
 
@@ -624,7 +650,7 @@
                     // If the details were valid
                     if (data.result == 1 && data.id != '') {
 
-                        // Set some private variables so that we can use them for encryption during this session
+                        // Set some private variables so that we can reuse them for encryption during this session
                         _userId = data.id;
                         _username = username;
                         _password = password;
@@ -752,40 +778,6 @@
             return false;
 
         });
-    };
-
-    var _userId = '',
-    _username = '',
-    _password = '',
-    _masterKey = '',
-    _table = null,
-    _tableOptions = {
-        'bJQueryUI': true,
-        'sPaginationType': 'full_numbers',
-        'bAutoWidth': false,
-        'bLengthChange': false,
-        'iDisplayLength': 20,
-        'sScrollY': 441,
-        'aaSorting': [[0, 'asc']],
-        'aoColumns': [
-            { 'sType': 'html' },
-            { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
-            { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
-            { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
-        ]
-    },
-    _cachedList = [], 
-    _ui = {
-        modalBackground: null,
-        loginFormDialog: null,
-        credentialFormDialog: null,
-        loginForm: null,
-        credentialForm: null,
-        container: null,
-        spinner: null,
-        recordsFilter: null,
-        modalDialog: null,
-        records: null
     };
 
     // Expose public methods
