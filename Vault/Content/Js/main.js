@@ -279,7 +279,7 @@
                         _ui.records = $('#records');
                         _table = _ui.records.dataTable(_tableOptions);
 
-                        _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + masterKey + '\', \'' + userId + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
+                        _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + masterKey + '\', \'' + userId + '\'); return false;">Add Item</button> <button onclick="Vault.options(); return false;">Options</button></p>');
 
                         _ui.modalDialog.dialog('destroy');
 
@@ -334,7 +334,7 @@
 
     }
 
-    function _changePassword(userId, masterKey, oldPassword) {
+    function _changePassword(userId, masterKey) {
 
         var newPassword = $('#NewPassword').val();
         var newPasswordConfirm = $('#NewPasswordConfirm').val();
@@ -392,7 +392,7 @@
                             data: {
                                 newHash: newPasswordHash,
                                 userid: userId,
-                                oldHash: Passpack.utils.hashx(oldPassword)
+                                oldHash: Passpack.utils.hashx(_password)
                             },
                             dataType: 'json',
                             type: 'POST',
@@ -477,14 +477,14 @@
 
     }
 
-    function _options(userId, masterKey) {
+    function _options() {
 
         var dialogHtml = '<p>Change password:</p>' +
                          '<form>' +
                          '<p><label for="NewPassword">Password</label><input type="password" id="NewPassword" name="NewPassword" value="" /></p>' +
                          '<p><label for="NewPasswordConfirm">Confirm</label><input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
-                         '<p><button class="submit" id=\"change-password-button\" onclick="changePassword(\'' + userId + '\', \'' + masterKey + '\'); return false;">Change Password</button></p>' +
-                         '<p><button class="submit" id=\"export-button\" onclick="exportData(\'' + userId + '\', \'' + masterKey + '\'); return false;">Export</button></p>' +
+                         '<p><button class="submit" id=\"change-password-button\" onclick="Vault.changePassword(\'' + _userId + '\', \'' + _masterKey + '\'); return false;">Change Password</button></p>' +
+                         '<p><button class="submit" id=\"export-button\" onclick="Vault.exportData(\'' + _userId + '\', \'' + _masterKey + '\'); return false;">Export</button></p>' +
                          '</form>';
 
         $('#modal-dialog').html(dialogHtml).dialog({
@@ -638,7 +638,7 @@
                             _table = _ui.records.dataTable(_tableOptions);
 
                             // Successfully logged in. Hide the login form
-                            _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button> <button onclick="options(); return false;">Options</button></p>');
+                            _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button> <button onclick="Vault.options(); return false;">Options</button></p>');
                             _ui.loginForm.hide();
                             _ui.loginFormDialog.dialog('destroy');
 
@@ -795,7 +795,9 @@
         loadCredential: _loadCredential,
         confirmDelete: _confirmDelete,
         deleteCredential: _deleteCredential,
-        options: _options
+        options: _options,
+        changePassword: _changePassword,
+        exportData: _exportData
     };
 
     return vault;
