@@ -183,6 +183,7 @@
     <Content Include="Content\Img\favicon.ico" />
     <Content Include="Content\Img\key.png" />
     <Content Include="Content\Img\view.png" />
+    <Content Include="Content\Js\handlebars-v1.3.0.js" />
     <Content Include="Content\Js\jquery.dataTables.min.js" />
     <Content Include="Content\Js\main.js" />
     <Content Include="Content\Js\passpack-v1.1.js" />
