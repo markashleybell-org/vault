@@ -1,5 +1,5 @@
 ﻿//////////////////////////////////////////////////////////////////////////////////
-// 
+// Vault client app code
 //////////////////////////////////////////////////////////////////////////////////
 
 var Vault = (function ($) {
@@ -24,7 +24,7 @@ var Vault = (function ($) {
             { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
         ]
     },
-    _cachedList = [],
+    _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
     _ui = {
         modalBackground: null,
         loginFormDialog: null,
@@ -52,7 +52,8 @@ var Vault = (function ($) {
         validationMessage: null
     };
 
-    function _insertCopyLink(text) {
+    // Insert the Flash-based 'Copy To Clipboard' icon next to credentials
+    var _insertCopyLink = function (text) {
 
         return '<span class="copy-link"><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' +
                '        width="14"' +
@@ -79,45 +80,49 @@ var Vault = (function ($) {
                '/>' +
                '</object></span>';
 
-    }
+    };
 
-    function _htmlEncode(value) {
+    // Use jQuery's tried and tested code to convert plain text to HTML-encoded text
+    var _htmlEncode = function (value) {
         return $('<div/>').text(value).html();
-    }
+    };
 
-    function _htmlDecode(value) {
+    // Do the same to convert HTML-encoded text to plain text
+    var _htmlDecode = function (value) {
         return $('<div/>').html(value).text();
-    }
+    };
 
     // Encrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
-    function _encryptObject(obj, masterKey, excludes) {
+    var _encryptObject = function (obj, masterKey, excludes) {
         for (var p in obj)
             if (!_contains(excludes, p))
                 obj[p] = Passpack.encode('AES', obj[p], _b64_to_utf8(masterKey));
         return obj;
-    }
+    };
 
     // Encrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
-    function _decryptObject(obj, masterKey, excludes) {
+    var _decryptObject = function (obj, masterKey, excludes) {
         for (var p in obj)
             if (!_contains(excludes, p))
                 obj[p] = Passpack.decode('AES', obj[p], _b64_to_utf8(masterKey));
         return obj;
-    }
+    };
 
-    function _removeFromList(id, list) {
+    // Remove the item with a specific ID from an array
+    var _removeFromList = function (id, list) {
         var i;
 
-        for (i = 0; i < list.length; i++) 
-            if (list[i].CredentialID == id) 
+        for (i = 0; i < list.length; i++)
+            if (list[i].CredentialID == id)
                 break;
 
         list.splice(i, 1);
-    }
+    };
 
-    function _updateDescription(id, description, userId, list) {
+    // Update the description of item with a specific ID in a list
+    var _updateDescription = function (id, description, userId, list) {
 
         for (var i = 0; i < list.length; i++) {
             if (list[i].CredentialID == id) {
@@ -128,22 +133,10 @@ var Vault = (function ($) {
 
         list.push({ CredentialID: id, Description: description, UserID: userId });
 
-    }
-
-    function _buildDataTable(data, callback, masterKey) {
-        var rows = [];
-
-        // Create a table row for each record and add it to the rows array
-        $.each(data, function (i, item) {
-            rows.push(_createCredentialTableRow(item, masterKey));
-        });
-
-        // Fire the callback and pass it the array of rows
-        callback(rows);
-    }
+    };
 
     // Load all records for a specific user
-    function _loadCredentials(userId, masterKey, callback) {
+    var _loadCredentials = function (userId, masterKey, callback) {
 
         if (_cachedList != null && _cachedList.length) {
 
@@ -181,10 +174,10 @@ var Vault = (function ($) {
 
         }
 
-    }
+    };
 
     // Show the read-only details dialog 
-    function _showDetail(credentialId, masterKey) {
+    var _showDetail = function (credentialId, masterKey) {
 
         $.ajax({
             url: '/Main/Load',
@@ -241,11 +234,11 @@ var Vault = (function ($) {
             }
         });
 
-    }
+    };
 
     // Load a record into the edit form
     // If null is passed as the credentialId, we set up the form for adding a new record
-    function _loadCredential(credentialId, masterKey, userId) {
+    var _loadCredential = function (credentialId, masterKey, userId) {
 
         if (credentialId != null) {
 
@@ -294,10 +287,10 @@ var Vault = (function ($) {
 
         }
 
-    }
+    };
 
     // Delete a record
-    function _deleteCredential(credentialId, userId, masterKey) {
+    var _deleteCredential = function (credentialId, userId, masterKey) {
 
         $.ajax({
             url: '/Main/Delete',
@@ -346,10 +339,10 @@ var Vault = (function ($) {
             }
         });
 
-    }
+    };
 
     // Show delete confirmation dialog
-    function _confirmDelete(id, userId) {
+    var _confirmDelete = function (id, userId) {
 
         var dialogHtml = '<p>Are you sure you want to delete this credential?</p>' +
                          '<form>' +
@@ -363,22 +356,21 @@ var Vault = (function ($) {
             minHeight: 50
         });
 
-    }
+    };
 
-    function _generatePasswordHash(password) {
-
+    // Generate standard hash for a password
+    var _generatePasswordHash = function (password) {
         return Passpack.utils.hashx(password);
+    };
 
-    }
-
-    // The hash is now a full 64 char string
-    function _generatePasswordHash64(password) {
-
+    // Generate 64-bit hash for a password
+    var _generatePasswordHash64 = function (password) {
+        // The hash is now a full 64 char string
         return Passpack.utils.hashx(password, false, true);
+    };
 
-    }
-
-    function _changePassword(userId, masterKey) {
+    // Change the password and re-encrypt all credentials with the new password
+    var _changePassword = function (userId, masterKey) {
 
         var newPassword = $('#NewPassword').val();
         var newPasswordConfirm = $('#NewPasswordConfirm').val();
@@ -472,9 +464,10 @@ var Vault = (function ($) {
 
         return false;
 
-    }
+    };
 
-    function _exportData(userId, masterKey) {
+    // Export all credential data as JSON
+    var _exportData = function (userId, masterKey) {
 
         // Show a spinner until complete because this can take some time!
         $('#export-button').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
@@ -515,9 +508,10 @@ var Vault = (function ($) {
 
         return false;
 
-    }
+    };
 
-    function _options() {
+    // Show the options dialog
+    var _options = function () {
 
         var dialogHtml = '<p>Change password:</p>' +
                          '<form>' +
@@ -534,9 +528,23 @@ var Vault = (function ($) {
             minHeight: 50
         });
 
-    }
+    };
 
-    function _createCredentialTable(rows) {
+    // Build the data table
+    var _buildDataTable = function (data, callback, masterKey) {
+        var rows = [];
+
+        // Create a table row for each record and add it to the rows array
+        $.each(data, function (i, item) {
+            rows.push(_createCredentialTableRow(item, masterKey));
+        });
+
+        // Fire the callback and pass it the array of rows
+        callback(rows);
+    };
+
+    // Create the credential table
+    var _createCredentialTable = function (rows) {
 
         return '<table id="records" class="display">' +
                '    <thead>' +
@@ -552,9 +560,10 @@ var Vault = (function ($) {
                '    </tbody>' +
                '</table>';
 
-    }
+    };
 
-    function _createCredentialTableRow(credential, masterKey) {
+    // Create a single table row for a credential
+    var _createCredentialTableRow = function (credential, masterKey) {
 
         var row = [];
 
@@ -576,9 +585,10 @@ var Vault = (function ($) {
 
         return row.join('');
 
-    }
+    };
 
-    function _validateRecord(f) {
+    // Validate a credential record form
+    var _validateRecord = function (f) {
 
         var errors = [];
 
@@ -601,7 +611,7 @@ var Vault = (function ($) {
 
         return errors;
 
-    }
+    };
 
     // Encode string to Base64
     var _utf8_to_b64 = function (str) {
