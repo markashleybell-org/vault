@@ -39,7 +39,7 @@ var Vault = (function ($) {
     },
     _templates = {
         copyLink: null,
-        detailTable: null,
+        detail: null,
         credentialForm: null,
         footerControls: null,
         clearFilterButton: null,
@@ -175,31 +175,22 @@ var Vault = (function ($) {
 
                 });
 
-                var details = [];
+                var detailHtml = _templates.detail({
+                    Url: data.Url,
+                    Username: data.Username,
+                    UsernameCopyLink: _insertCopyLink(data.Username),
+                    Password: data.Password,
+                    PasswordCopyLink: _insertCopyLink(data.Password),
+                    UserDefined1: data.UserDefined1,
+                    UserDefined1Label: data.UserDefined1Label,
+                    UserDefined1CopyLink: _insertCopyLink(data.UserDefined1),
+                    UserDefined2: data.UserDefined2,
+                    UserDefined2Label: data.UserDefined2Label,
+                    UserDefined2CopyLink: _insertCopyLink(data.UserDefined2),
+                    Notes: data.Notes.replace(/\r\n|\n|\r/gi, '<br />')
+                });
 
-                details.push('<table>');
-
-                if (data.Url != '')
-                    details.push('<tr><th>Url</th><td><a class="display-link" href="' + data.Url + '" onclick="window.open(this.href); return false;">' + _truncate(data.Url, 30) + '</a></td></tr>');
-
-                if (data.Username != '')
-                    details.push('<tr><th>Username ' + _insertCopyLink(data.Username) + '</th><td>' + data.Username + '</td></tr>');
-
-                if (data.Password != '')
-                    details.push('<tr><th>Password ' + _insertCopyLink(data.Password) + '</th><td>' + _htmlEncode(data.Password) + '</td></tr>');
-
-                if (data.UserDefined1 != '')
-                    details.push('<tr><th>' + data.UserDefined1Label + ' ' + _insertCopyLink(data.UserDefined1) + '</th><td>' + data.UserDefined1 + '</td></tr>');
-
-                if (data.UserDefined2 != '')
-                    details.push('<tr><th>' + data.UserDefined2Label + ' ' + _insertCopyLink(data.UserDefined2) + '</th><td>' + data.UserDefined2 + '</td></tr>');
-
-                if (data.Notes != '')
-                    details.push('<tr><th>Notes</th><td class="notes">' + data.Notes.replace(/\r\n|\n|\r/gi, '<br />') + '</td></tr>');
-
-                details.push('</table>');
-
-                _ui.modalDialog.html(details.join('')).dialog({ title: data.Description, width: 600, minHeight: 50, modal: true });
+                _ui.modalDialog.html(detailHtml).dialog({ title: data.Description, width: 600, minHeight: 50, modal: true });
 
             },
             error: function (request, status, error) {
@@ -625,7 +616,7 @@ var Vault = (function ($) {
         _ui.modalDialog = $('#modal-dialog');
 
         _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
-        //_templates.detailTable = Handlebars.compile($('#tmpl-copylink').html());
+        _templates.detail = Handlebars.compile($('#tmpl-detail').html());
         //_templates.credentialForm = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.footerControls = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.clearFilterButton = Handlebars.compile($('#tmpl-copylink').html());

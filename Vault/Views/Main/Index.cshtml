@@ -47,9 +47,48 @@
         </span>
     </script>
     
-    @*<script id="entry-template" type="text/x-handlebars-template">
-        template content
-    </script>*@
+    <script id="tmpl-detail" type="text/x-handlebars-template">
+        <table>
+            <tbody>
+                {{#if Url}}
+                <tr>
+                    <th>Url</th>
+                    <td><a class="display-link" href="{{Url}}" onclick="window.open(this.href); return false;">{{Url}}</a></td>
+                </tr>
+                {{/if}}
+                {{#if Username}}
+                <tr>
+                    <th>Username {{{UsernameCopyLink}}}</th>
+                    <td>{{Username}}</td>
+                </tr>
+                {{/if}}
+                {{#if Password}}
+                <tr>
+                    <th>Password {{{PasswordCopyLink}}}</th>
+                    <td>{{Password}}</td>
+                </tr>
+                {{/if}}
+                {{#if UserDefined1}}
+                <tr>
+                    <th>{{UserDefined1Label}} {{{UserDefined1CopyLink}}}</th>
+                    <td>{{UserDefined1}}</td>
+                </tr>
+                {{/if}}
+                {{#if UserDefined2}}
+                <tr>
+                    <th>{{UserDefined2Label}} {{{UserDefined2CopyLink}}}</th>
+                    <td>{{UserDefined2}}</td>
+                </tr>
+                {{/if}}
+                {{#if Notes}}
+                <tr>
+                    <th>Notes</th>
+                    <td>{{Notes}}</td>
+                </tr>
+                {{/if}}
+            </tbody>
+        </table>
+    </script>
 
 }
 
