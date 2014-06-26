@@ -54,32 +54,7 @@ var Vault = (function ($) {
 
     // Insert the Flash-based 'Copy To Clipboard' icon next to credentials
     var _insertCopyLink = function (text) {
-
-        return '<span class="copy-link"><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' +
-               '        width="14"' +
-               '        height="14">' +
-               '<param name="movie" value="/content/img/clippy.swf"/>' +
-               '<param name="allowScriptAccess" value="always" />' +
-               '<param name="quality" value="high" />' +
-               '<param name="scale" value="noscale" />' +
-               '<param name="FlashVars" value="text=' + encodeURIComponent(text) + '">' +
-               '<param name="bgcolor" value="#ffffff">' +
-               '<param name="wmode" value="opaque">' +
-               '<embed src="/content/img/clippy.swf"' +
-               '       width="14"' +
-               '       height="14"' +
-               '       wmode="opaque"' +
-               '       name="clippy"' +
-               '       quality="high"' +
-               '       scale="noscale"' +
-               '       allowScriptAccess="always"' +
-               '       type="application/x-shockwave-flash"' +
-               '       pluginspage="http://www.macromedia.com/go/getflashplayer"' +
-               '       FlashVars="text=' + encodeURIComponent(text) + '"' +
-               '       bgcolor="#ffffff"' +
-               '/>' +
-               '</object></span>';
-
+        return _templates.copyLink({ text: encodeURIComponent(text) })
     };
 
     // Use jQuery's tried and tested code to convert plain text to HTML-encoded text
@@ -648,6 +623,19 @@ var Vault = (function ($) {
         _ui.spinner = $('#spinner');
         _ui.recordsFilter = $('#records_filter');
         _ui.modalDialog = $('#modal-dialog');
+
+        _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.detailTable = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.credentialForm = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.footerControls = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.clearFilterButton = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.spinner = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.optionsDialog = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.exportedDataWindow = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.credentialTable = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.credentialTableRow = Handlebars.compile($('#tmpl-copylink').html());
+        //_templates.validationMessage = Handlebars.compile($('#tmpl-copylink').html());
 
         // Load the datatable stylesheet dynamically
         var tableStyles = $('<link rel="stylesheet" type="text/css" href="/content/css/datatables.css" />');

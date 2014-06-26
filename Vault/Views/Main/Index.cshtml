@@ -21,11 +21,42 @@
         $('#login-form-dialog').dialog({ title: 'Log In', width: 500, modal: true });
     </script>
 
+    <script id="tmpl-copylink" type="text/x-handlebars-template">
+        <span class="copy-link">
+            <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="14" height="14">
+               <param name="movie" value="/content/img/clippy.swf" />
+               <param name="allowScriptAccess" value="always" />
+               <param name="quality" value="high" />
+               <param name="scale" value="noscale" />
+               <param name="FlashVars" value="text={{text}}">
+               <param name="bgcolor" value="#ffffff">
+               <param name="wmode" value="opaque">
+               <embed src="/content/img/clippy.swf"
+                      width="14"
+                      height="14"
+                      wmode="opaque"
+                      name="clippy"
+                      quality="high"
+                      scale="noscale"
+                      allowscriptaccess="always"
+                      type="application/x-shockwave-flash"
+                      pluginspage="http://www.macromedia.com/go/getflashplayer"
+                      flashvars="text={{text}}"
+                      bgcolor="#ffffff" />
+            </object>
+        </span>
+    </script>
+    
+    @*<script id="entry-template" type="text/x-handlebars-template">
+        template content
+    </script>*@
+
 }
 
 @section endpage {
 
     <script type="text/javascript" src="/content/js/passpack-v1.1.min.js"></script>
     <script type="text/javascript" src="/content/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/content/js/handlebars-v1.3.0.js"></script>
 
 }
