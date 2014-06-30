@@ -90,6 +90,10 @@
         </table>
     </script>
 
+    <script id="tmpl-addlink" type="text/x-handlebars-template">
+        <p id="add-link"><button onclick="Vault.loadCredential(null, '{{masterkey}}', '{{userid}}'); return false;">Add Item</button> <button onclick="Vault.options(); return false;">Options</button></p>
+    </script>
+
 }
 
 @section endpage {

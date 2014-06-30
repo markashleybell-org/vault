@@ -40,6 +40,7 @@ var Vault = (function ($) {
     _templates = {
         copyLink: null,
         detail: null,
+        addLink: null,
         credentialForm: null,
         footerControls: null,
         clearFilterButton: null,
@@ -282,7 +283,7 @@ var Vault = (function ($) {
                         _ui.records = $('#records');
                         _dataTable = _ui.records.dataTable(_dataTableOptions);
 
-                        _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + masterKey + '\', \'' + userId + '\'); return false;">Add Item</button> <button onclick="Vault.options(); return false;">Options</button></p>');
+                        _ui.container.append(_templates.addLink({ masterkey: masterKey, userid: userId }));
 
                         _ui.modalDialog.dialog('destroy');
 
@@ -617,6 +618,7 @@ var Vault = (function ($) {
 
         _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
         _templates.detail = Handlebars.compile($('#tmpl-detail').html());
+        _templates.addLink = Handlebars.compile($('#tmpl-addlink').html());
         //_templates.credentialForm = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.footerControls = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.clearFilterButton = Handlebars.compile($('#tmpl-copylink').html());
@@ -667,7 +669,7 @@ var Vault = (function ($) {
                             _dataTable = _ui.records.dataTable(_dataTableOptions);
 
                             // Successfully logged in. Hide the login form
-                            _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button> <button onclick="Vault.options(); return false;">Options</button></p>');
+                            _ui.container.append(_templates.addLink({ masterkey: _masterKey, userid: _userId }));
                             _ui.loginForm.hide();
                             _ui.loginFormDialog.dialog('destroy');
 
@@ -755,7 +757,7 @@ var Vault = (function ($) {
                         _ui.records = $('#records');
                         _dataTable = _ui.records.dataTable(_dataTableOptions);
 
-                        _ui.container.append('<p id="add-link"><button onclick="Vault.loadCredential(null, \'' + _masterKey + '\', \'' + _userId + '\'); return false;">Add Item</button></p>');
+                        _ui.container.append(_templates.addLink({ masterkey: _masterKey, userid: _userId }));
 
                         _ui.spinner.remove();
 
