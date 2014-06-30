@@ -287,8 +287,10 @@ var Vault = (function ($) {
 
                         _ui.modalDialog.dialog('destroy');
 
+                        _ui.recordsFilter = $('#records_filter');
+
                         // Append the clear filter button
-                        _ui.recordsFilter.before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+                        _ui.recordsFilter.before(_templates.clearFilterButton());
 
                         _ui.recordsFilter.find('input:last').focus();
 
@@ -621,7 +623,7 @@ var Vault = (function ($) {
         _templates.addLink = Handlebars.compile($('#tmpl-addlink').html());
         //_templates.credentialForm = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.footerControls = Handlebars.compile($('#tmpl-copylink').html());
-        //_templates.clearFilterButton = Handlebars.compile($('#tmpl-copylink').html());
+        _templates.clearFilterButton = Handlebars.compile($('#tmpl-clearfilter').html());
         //_templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.spinner = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.optionsDialog = Handlebars.compile($('#tmpl-copylink').html());
@@ -673,8 +675,10 @@ var Vault = (function ($) {
                             _ui.loginForm.hide();
                             _ui.loginFormDialog.dialog('destroy');
 
+                            _ui.recordsFilter = $('#records_filter');
+
                             // Append the clear filter button
-                            _ui.recordsFilter.before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+                            _ui.recordsFilter.before(_templates.clearFilterButton());
 
                             _ui.recordsFilter.find('input:last').focus();
 
@@ -763,8 +767,10 @@ var Vault = (function ($) {
 
                         _ui.credentialFormDialog.dialog('destroy');
 
+                        _ui.recordsFilter = $('#records_filter');
+
                         // Append the clear filter button
-                        _ui.recordsFilter.before('<input type="button" style="float: right;" onclick="$(\'#records_filter input:last\').val(\'\');$(\'#records_filter input:last\').trigger(\'keyup\');" value="X"/>');
+                        _ui.recordsFilter.before(_templates.clearFilterButton());
 
                         _ui.recordsFilter.find('input:last').focus();
 

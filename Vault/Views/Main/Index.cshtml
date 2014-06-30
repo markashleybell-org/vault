@@ -94,6 +94,10 @@
         <p id="add-link"><button onclick="Vault.loadCredential(null, '{{masterkey}}', '{{userid}}'); return false;">Add Item</button> <button onclick="Vault.options(); return false;">Options</button></p>
     </script>
 
+    <script id="tmpl-clearfilter" type="text/x-handlebars-template">
+        <input type="button" style="float: right;" onclick="$('#records_filter input:last').val('');$('#records_filter input:last').trigger('keyup');" value="X" />
+    </script>
+
 }
 
 @section endpage {
