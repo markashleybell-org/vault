@@ -313,10 +313,11 @@ var Vault = (function ($) {
     // Show delete confirmation dialog
     var _confirmDelete = function (id, userId) {
 
-        var dialogHtml = '<p>Are you sure you want to delete this credential?</p>' +
-                         '<form>' +
-                         '<p><button onclick="$(\'#modal-dialog\').dialog(\'destroy\'); return false;">No</button> <button onclick="Vault.deleteCredential(\'' + id + '\', \'' + userId + '\', \'' + _utf8_to_b64(_masterKey) + '\'); return false;">Yes</button></p>' +
-                         '</form>';
+        var dialogHtml = _templates.deleteConfirmationDialog({
+            id: id,
+            userid: userId,
+            masterkey: _utf8_to_b64(_masterKey)
+        });
 
         _ui.modalDialog.html(dialogHtml).dialog({
             title: 'Delete Credential',
@@ -624,7 +625,7 @@ var Vault = (function ($) {
         //_templates.credentialForm = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.footerControls = Handlebars.compile($('#tmpl-copylink').html());
         _templates.clearFilterButton = Handlebars.compile($('#tmpl-clearfilter').html());
-        //_templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-copylink').html());
+        _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());
         //_templates.spinner = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.optionsDialog = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.exportedDataWindow = Handlebars.compile($('#tmpl-copylink').html());

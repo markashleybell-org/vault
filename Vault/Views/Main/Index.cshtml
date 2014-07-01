@@ -98,6 +98,16 @@
         <input type="button" style="float: right;" onclick="$('#records_filter input:last').val('');$('#records_filter input:last').trigger('keyup');" value="X" />
     </script>
 
+    <script id="tmpl-deleteconfirmationdialog" type="text/x-handlebars-template">
+        <p>Are you sure you want to delete this credential?</p>
+        <form>
+            <p>
+                <button onclick="$('#modal-dialog').dialog('destroy'); return false;">No</button> 
+                <button onclick="Vault.deleteCredential('{{id}}', '{{userid}}', '{{masterkey}}'); return false;">Yes</button>
+            </p>
+        </form>
+    </script>
+
 }
 
 @section endpage {
