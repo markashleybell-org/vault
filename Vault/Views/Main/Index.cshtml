@@ -108,6 +108,16 @@
         </form>
     </script>
 
+    <script id="tmpl-optionsdialog" type="text/x-handlebars-template">
+        <p>Change password:</p>
+        <form>
+            <p><label for="NewPassword">Password</label><input type="password" id="NewPassword" name="NewPassword" value="" /></p>
+            <p><label for="NewPasswordConfirm">Confirm</label><input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>
+            <p><button class="submit" id="change-password-button" onclick="Vault.changePassword('{{userid}}', '{{masterkey}}'); return false;">Change Password</button></p>
+            <p><button class="submit" id="export-button" onclick="Vault.exportData('{{userid}}', '{{masterkey}}'); return false;">Export</button></p>
+        </form>
+    </script>
+
 }
 
 @section endpage {

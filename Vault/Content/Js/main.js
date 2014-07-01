@@ -380,7 +380,7 @@ var Vault = (function ($) {
 
                 $.each(data, function (i, item) {
 
-                    newData.push(_encryptObject(_decryptObject(item, masterKey, excludes), newMasterKey, excludes));
+                    newData.push(_encryptObject(_decryptObject(item, _b64_to_utf8(masterKey), excludes), newMasterKey, excludes));
 
                 });
 
@@ -483,13 +483,10 @@ var Vault = (function ($) {
     // Show the options dialog
     var _options = function () {
 
-        var dialogHtml = '<p>Change password:</p>' +
-                         '<form>' +
-                         '<p><label for="NewPassword">Password</label><input type="password" id="NewPassword" name="NewPassword" value="" /></p>' +
-                         '<p><label for="NewPasswordConfirm">Confirm</label><input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>' +
-                         '<p><button class="submit" id=\"change-password-button\" onclick="Vault.changePassword(\'' + _userId + '\', \'' + _masterKey + '\'); return false;">Change Password</button></p>' +
-                         '<p><button class="submit" id=\"export-button\" onclick="Vault.exportData(\'' + _userId + '\', \'' + _masterKey + '\'); return false;">Export</button></p>' +
-                         '</form>';
+        var dialogHtml = _templates.optionsDialog({
+            userid: _userId,
+            masterkey: _utf8_to_b64(_masterKey)
+        });
 
         $('#modal-dialog').html(dialogHtml).dialog({
             title: 'Options',
@@ -627,7 +624,7 @@ var Vault = (function ($) {
         _templates.clearFilterButton = Handlebars.compile($('#tmpl-clearfilter').html());
         _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());
         //_templates.spinner = Handlebars.compile($('#tmpl-copylink').html());
-        //_templates.optionsDialog = Handlebars.compile($('#tmpl-copylink').html());
+        _templates.optionsDialog = Handlebars.compile($('#tmpl-optionsdialog').html());
         //_templates.exportedDataWindow = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.credentialTable = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.credentialTableRow = Handlebars.compile($('#tmpl-copylink').html());
