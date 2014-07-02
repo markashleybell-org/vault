@@ -129,6 +129,35 @@
     <script id="tmpl-validationmessage" type="text/x-handlebars-template">
         <div id="validation-message"><p>{{{errors}}}</p></div>
     </script>
+
+    <script id="tmpl-credentialtable" type="text/x-handlebars-template">
+        <table id="records" class="display">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Details</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each rows}}
+                    {{> credentialtablerow}}
+                {{/each}}
+            </tbody>
+        </table>
+    </script>
+
+    <script id="tmpl-credentialtablerow" type="text/x-handlebars-template">
+        <tr id="{{credentialid}}">
+            <td>
+                <a href="#" onclick="Vault.showDetail('{{credentialid}}', '{{masterkey}}'); return false;">{{description}}</a>
+            </td>
+            <td class="center"><a href="#" onclick="Vault.showDetail('{{credentialid}}', '{{masterkey}}'); return false;" title="View Details"><img src="/content/img/key.png" width="16" height="16" alt="View Details" /></a></td>
+            <td class="center"><a href="#" onclick="Vault.loadCredential('{{credentialid}}', '{{masterkey}}', '{{userid}}'); return false;" title="Edit Details"><img src="/content/img/edit.png" width="16" height="16" alt="Edit Details" /></a></td>
+            <td class="center"><a href="#" onclick="Vault.confirmDelete('{{credentialid}}', '{{userid}}'); return false;" title="Delete"><img src="/content/img/delete.png" width="16" height="16" alt="Delete" /></a></td>
+        </tr>
+    </script>
 }
 
 @section endpage {

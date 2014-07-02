@@ -519,44 +519,20 @@ var Vault = (function ($) {
     // Create the credential table
     var _createCredentialTable = function (rows) {
 
-        return '<table id="records" class="display">' +
-               '    <thead>' +
-               '        <tr>' +
-               '            <th>Description</th>' +
-               '            <th>Details</th>' +
-               '            <th>Edit</th>' +
-               '            <th>Delete</th>' +
-               '        </tr>' +
-               '    </thead>' +
-               '    <tbody>' +
-                       rows.join('') +
-               '    </tbody>' +
-               '</table>';
+        return _templates.credentialTable({ rows: rows });
 
     };
 
     // Create a single table row for a credential
     var _createCredentialTableRow = function (credential, masterKey) {
 
-        var row = [];
-
-        row.push('<tr id=\"' + credential.CredentialID + '\">');
-        row.push('<td>');
-        row.push();
-
-        // Only show the URL link if there's a URL
-        if (credential.Url != '')
-            row.push(' <a href="#" onclick="Vault.showDetail(\'' + credential.CredentialID + '\', \'' + masterKey + '\'); return false;">' + credential.Description + '</a>');
-        else
-            row.push(credential.Description);
-
-        row.push('</td>');
-        row.push('<td class="center"><a href="#" onclick="Vault.showDetail(\'' + credential.CredentialID + '\', \'' + masterKey + '\'); return false;" title="View Details"><img src="/content/img/key.png" width="16" height="16" alt="View Details" /></a></td>');
-        row.push('<td class="center"><a href="#" onclick="Vault.loadCredential(\'' + credential.CredentialID + '\', \'' + masterKey + '\', \'' + _userId + '\'); return false;" title="Edit Details"><img src="/content/img/edit.png" width="16" height="16" alt="Edit Details" /></a></td>');
-        row.push('<td class="center"><a href="#" onclick="Vault.confirmDelete(\'' + credential.CredentialID + '\', \'' + _userId + '\'); return false;" title="Delete"><img src="/content/img/delete.png" width="16" height="16" alt="Delete" /></a></td>');
-        row.push('</tr>');
-
-        return row.join('');
+        return {
+            credentialid: credential.CredentialID,
+            masterkey: masterKey,
+            userid: _userId,
+            description: credential.Description,
+            url: credential.Url
+        };
 
     };
 
@@ -632,8 +608,9 @@ var Vault = (function ($) {
         _templates.spinner = Handlebars.compile($('#tmpl-spinner').html());
         _templates.optionsDialog = Handlebars.compile($('#tmpl-optionsdialog').html());
         _templates.exportedDataWindow = Handlebars.compile($('#tmpl-exporteddatawindow').html());
-        //_templates.credentialTable = Handlebars.compile($('#tmpl-copylink').html());
-        //_templates.credentialTableRow = Handlebars.compile($('#tmpl-copylink').html());
+        _templates.credentialTable = Handlebars.compile($('#tmpl-credentialtable').html());
+        _templates.credentialTableRow = Handlebars.compile($('#tmpl-credentialtablerow').html());
+        Handlebars.registerPartial('credentialtablerow', _templates.credentialTableRow);
         _templates.validationMessage = Handlebars.compile($('#tmpl-validationmessage').html());
 
         // Load the datatable stylesheet dynamically
