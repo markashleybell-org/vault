@@ -58,6 +58,12 @@ var Vault = (function ($) {
         return _templates.copyLink({ text: encodeURIComponent(text) })
     };
 
+    var _insertSpinner = function () {
+        var spinner = $(_templates.spinner());
+        _ui.spinner = spinner;
+        return spinner;
+    };
+
     // Use jQuery's tried and tested code to convert plain text to HTML-encoded text
     var _htmlEncode = function (value) {
         return $('<div/>').text(value).html();
@@ -363,7 +369,7 @@ var Vault = (function ($) {
         var newMasterKey = _utf8_to_b64(Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1));
 
         // Show a spinner until complete because this can take some time!
-        $('#change-password-button').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+        $('#change-password-button').after(_insertSpinner());
 
         var newData = [];
 
@@ -440,7 +446,7 @@ var Vault = (function ($) {
     var _exportData = function (userId, masterKey) {
 
         // Show a spinner until complete because this can take some time!
-        $('#export-button').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+        $('#export-button').after(_insertSpinner());
 
         var exportItems = [];
 
@@ -455,7 +461,7 @@ var Vault = (function ($) {
                 var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
 
                 $.each(data, function (i, item) {
-                    exportItems.push(_decryptObject(item, masterKey, excludes));
+                    exportItems.push(_decryptObject(item, _b64_to_utf8(masterKey), excludes));
                 });
 
                 var exportWindow = window.open("", "EXPORT_WINDOW", "WIDTH=700, HEIGHT=600");
@@ -466,7 +472,7 @@ var Vault = (function ($) {
                     alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
                 }
 
-                $('#spinner').remove();
+                _ui.spinner.remove();
 
             },
             error: function (request, status, error) {
@@ -623,7 +629,7 @@ var Vault = (function ($) {
         //_templates.footerControls = Handlebars.compile($('#tmpl-copylink').html());
         _templates.clearFilterButton = Handlebars.compile($('#tmpl-clearfilter').html());
         _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());
-        //_templates.spinner = Handlebars.compile($('#tmpl-copylink').html());
+        _templates.spinner = Handlebars.compile($('#tmpl-spinner').html());
         _templates.optionsDialog = Handlebars.compile($('#tmpl-optionsdialog').html());
         //_templates.exportedDataWindow = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.credentialTable = Handlebars.compile($('#tmpl-copylink').html());
@@ -640,7 +646,7 @@ var Vault = (function ($) {
             var username = _ui.loginForm.find('#Username').val();
             var password = _ui.loginForm.find('#Password').val();
 
-            _ui.loginFormDialog.find('.submit').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+            _ui.loginFormDialog.find('.submit').after(_insertSpinner());
 
             $.ajax({
                 url: '/Main/Login',
@@ -722,7 +728,7 @@ var Vault = (function ($) {
 
             }
 
-            form.find('.submit').after('<img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />');
+            form.find('.submit').after(_insertSpinner());
 
             var credential = {};
 
