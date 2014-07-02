@@ -122,6 +122,13 @@
         <img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />
     </script>
 
+    <script id="tmpl-exporteddatawindow" type="text/x-handlebars-template">
+        <html><head><title>Exported Data</title></head><body style="margin: 0; padding: 0;"><textarea style="border: none; width: 100%; height: 600px;">{{json}}</textarea></body></html>
+    </script>
+
+    <script id="tmpl-validationmessage" type="text/x-handlebars-template">
+        <div id="validation-message"><p>{{{errors}}}</p></div>
+    </script>
 }
 
 @section endpage {

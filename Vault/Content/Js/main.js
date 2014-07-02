@@ -467,7 +467,7 @@ var Vault = (function ($) {
                 var exportWindow = window.open("", "EXPORT_WINDOW", "WIDTH=700, HEIGHT=600");
 
                 if (exportWindow && exportWindow.top) {
-                    exportWindow.document.write('<html><head><title>Exported Data</title></head><body style="margin: 0; padding: 0;"><textarea style="border: none; width: 100%; height: 600px;">' + JSON.stringify(exportItems, undefined, 4) + '</textarea></body>');
+                    exportWindow.document.write(_templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
                 } else {
                     alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
                 }
@@ -631,10 +631,10 @@ var Vault = (function ($) {
         _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());
         _templates.spinner = Handlebars.compile($('#tmpl-spinner').html());
         _templates.optionsDialog = Handlebars.compile($('#tmpl-optionsdialog').html());
-        //_templates.exportedDataWindow = Handlebars.compile($('#tmpl-copylink').html());
+        _templates.exportedDataWindow = Handlebars.compile($('#tmpl-exporteddatawindow').html());
         //_templates.credentialTable = Handlebars.compile($('#tmpl-copylink').html());
         //_templates.credentialTableRow = Handlebars.compile($('#tmpl-copylink').html());
-        //_templates.validationMessage = Handlebars.compile($('#tmpl-copylink').html());
+        _templates.validationMessage = Handlebars.compile($('#tmpl-validationmessage').html());
 
         // Load the datatable stylesheet dynamically
         var tableStyles = $('<link rel="stylesheet" type="text/css" href="/content/css/datatables.css" />');
@@ -723,7 +723,7 @@ var Vault = (function ($) {
                     errors[i].field.addClass('invalid');
                 }
 
-                form.prepend('<div id="validation-message"><p>' + errorMsg.join('<br />') + '</p></div>');
+                form.prepend(_templates.validationMessage({ errors: errorMsg.join('<br />') }));
                 return false;
 
             }
