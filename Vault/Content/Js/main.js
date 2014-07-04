@@ -41,8 +41,6 @@ var Vault = (function ($) {
         copyLink: null,
         detail: null,
         addLink: null,
-        credentialForm: null,
-        footerControls: null,
         clearFilterButton: null,
         deleteConfirmationDialog: null,
         spinner: null,
@@ -225,7 +223,7 @@ var Vault = (function ($) {
                     // CredentialID and UserID are not currently encrypted so don't try to decode them
                     data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
 
-                    var f = $('#credential-form');
+                    var f = _ui.credentialForm;
 
                     $('#CredentialID', f).val(data.CredentialID);
                     $('#Description', f).val(data.Description);
@@ -240,7 +238,7 @@ var Vault = (function ($) {
                     $('#Notes', f).val(data.Notes);
                     $('#UserID', f).val(data.UserID);
 
-                    $('#credential-form-dialog').dialog({ title: 'Edit Credential', width: 500, modal: true });
+                    _ui.credentialFormDialog.dialog({ title: 'Edit Credential', width: 500, modal: true });
 
                 },
                 error: function (request, status, error) {
@@ -253,10 +251,10 @@ var Vault = (function ($) {
         }
         else { // New record setup
 
-            $('#credential-form-dialog input:not(.submit), #credential-form-dialog textarea').val('');
-            $('#credential-form #UserID').val(userId);
+            _ui.credentialFormDialog.find('input:not(.submit), textarea').val('');
+            _ui.credentialForm.find('#UserID').val(userId);
 
-            $('#credential-form-dialog').dialog({ title: 'Edit Credential', width: 500, modal: true });
+            _ui.credentialFormDialog.dialog({ title: 'Edit Credential', width: 500, modal: true });
 
         }
 
@@ -601,8 +599,6 @@ var Vault = (function ($) {
         _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
         _templates.detail = Handlebars.compile($('#tmpl-detail').html());
         _templates.addLink = Handlebars.compile($('#tmpl-addlink').html());
-        //_templates.credentialForm = Handlebars.compile($('#tmpl-copylink').html());
-        //_templates.footerControls = Handlebars.compile($('#tmpl-copylink').html());
         _templates.clearFilterButton = Handlebars.compile($('#tmpl-clearfilter').html());
         _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());
         _templates.spinner = Handlebars.compile($('#tmpl-spinner').html());
