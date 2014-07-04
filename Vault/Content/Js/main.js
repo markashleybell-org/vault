@@ -56,6 +56,7 @@ var Vault = (function ($) {
         return _templates.copyLink({ text: encodeURIComponent(text) })
     };
 
+    // Insert an AJAX spinner GIF and cache the element selector
     var _insertSpinner = function () {
         var spinner = $(_templates.spinner());
         _ui.spinner = spinner;
