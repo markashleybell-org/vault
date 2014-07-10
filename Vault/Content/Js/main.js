@@ -8,6 +8,7 @@ var Vault = (function ($) {
     _username = '', // Current user's username
     _password = '', // Current user's password
     _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
+    _test = false, // Determine whether to expose all methods publically
     _dataTable = null, // Cache DataTable in memory
     _dataTableOptions = {
         'bJQueryUI': true,
@@ -584,7 +585,32 @@ var Vault = (function ($) {
     };
 
     // Initialise the app
-    var _init = function () {
+    var _init = function (test) {
+        // Determine whether we're testing or not
+        if (typeof test !== 'undefined' && test) {
+            var testMethods = {
+                insertCopyLink: _insertCopyLink,
+                insertSpinner: _insertSpinner,
+                htmlEncode: _htmlEncode,
+                htmlDecode: _htmlDecode,
+                encryptObject: _encryptObject,
+                decryptObject: _decryptObject,
+                removeFromList: _removeFromList,
+                updateDescription: _updateDescription,
+                loadCredentials: _loadCredentials,
+                generatePasswordHash: _generatePasswordHash,
+                generatePasswordHash64: _generatePasswordHash64,
+                buildDataTable: _buildDataTable,
+                createCredentialTable: _createCredentialTable,
+                createCredentialTableRow: _createCredentialTableRow,
+                validateRecord: _validateRecord,
+                utf8_to_b64: _utf8_to_b64,
+                b64_to_utf8: _b64_to_utf8,
+                contains: _contains,
+                truncate: _truncate
+            };
+            $.extend(vault, testMethods);
+        }
         // Add the modal dialog container
         $('body').append('<div id="modal-dialog"></div>');
         // Cache UI selectors
