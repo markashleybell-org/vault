@@ -188,8 +188,10 @@
     <Content Include="Content\Js\main.js" />
     <Content Include="Content\Js\passpack-v1.1.js" />
     <Content Include="Content\Js\passpack-v1.1.min.js" />
+    <Content Include="Content\Js\tests.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="tests.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
