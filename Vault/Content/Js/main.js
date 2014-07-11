@@ -120,7 +120,31 @@ var Vault = (function ($) {
         }
 
         list.push({ CredentialID: id, Description: description, UserID: userId });
+    };
 
+    var _defaultAjaxErrorCallback = function (request, status, error) {
+        alert('Http Error: ' + status + ' - ' + error);
+    };
+
+    var _ajaxPost = function (url, data, successCallback, errorCallback, contentType) {
+        if (typeof errorCallback === 'undefined' || errorCallback === null) {
+            errorCallback = _defaultAjaxErrorCallback;
+        }
+        var options = {
+            url: url,
+            data: data,
+            dataType: 'json',
+            type: 'POST',
+            success: successCallback,
+            error: errorCallback
+        };
+
+        if(typeof contentType !== 'undefined')
+        {
+            options.contentType = contentType;
+        }
+
+        $.ajax(options);
     };
 
     // Load all records for a specific user
@@ -132,32 +156,21 @@ var Vault = (function ($) {
 
         } else {
 
-            $.ajax({
-                url: '/Main/GetAll',
-                data: { userId: userId },
-                dataType: 'json',
-                type: 'POST',
-                success: function (data, status, request) {
+            _ajaxPost('/Main/GetAll', { userId: userId }, function (data, status, request) {
 
-                    var items = [];
-                    // At this point we only actually need to decrypt Description for display,
-                    // which speeds up client-side table construction time dramatically
-                    var excludes = ['CredentialID', 'UserID'];
+                var items = [];
+                // At this point we only actually need to decrypt Description for display,
+                // which speeds up client-side table construction time dramatically
+                var excludes = ['CredentialID', 'UserID'];
 
-                    $.each(data, function (i, item) {
-                        items.push(_decryptObject(item, masterKey, excludes));
-                    });
+                $.each(data, function (i, item) {
+                    items.push(_decryptObject(item, masterKey, excludes));
+                });
 
-                    // Cache the whole (decrypted) list on the client
-                    _cachedList = items;
-                    _buildDataTable(_cachedList, callback, masterKey);
+                // Cache the whole (decrypted) list on the client
+                _cachedList = items;
+                _buildDataTable(_cachedList, callback, masterKey);
 
-                },
-                error: function (request, status, error) {
-
-                    alert('Http Error: ' + status + ' - ' + error);
-
-                }
             });
 
         }
@@ -167,51 +180,40 @@ var Vault = (function ($) {
     // Show the read-only details dialog
     var _showDetail = function (credentialId, masterKey) {
 
-        $.ajax({
-            url: '/Main/Load',
-            data: { id: credentialId },
-            dataType: 'json',
-            type: 'POST',
-            success: function (data, status, request) {
+        _ajaxPost('/Main/Load', { id: credentialId }, function (data, status, request) {
 
-                // CredentialID and UserID are not currently encrypted so don't try to decode them
-                var excludeProperties = ['CredentialID', 'UserID'];
+            // CredentialID and UserID are not currently encrypted so don't try to decode them
+            var excludeProperties = ['CredentialID', 'UserID'];
 
-                data = _decryptObject(data, masterKey, excludeProperties);
+            data = _decryptObject(data, masterKey, excludeProperties);
 
-                // Loop through all the properties of the data object (except the excludes)
-                // and encode any HTML for display
-                $.each(data, function (name, value) {
+            // Loop through all the properties of the data object (except the excludes)
+            // and encode any HTML for display
+            $.each(data, function (name, value) {
 
-                    if (!_contains(excludeProperties, name) && name != 'Password') {
-                        data[name] = _htmlEncode(value);
-                    }
+                if (!_contains(excludeProperties, name) && name != 'Password') {
+                    data[name] = _htmlEncode(value);
+                }
 
-                });
+            });
 
-                var detailHtml = _templates.detail({
-                    Url: data.Url,
-                    Username: data.Username,
-                    UsernameCopyLink: _insertCopyLink(data.Username),
-                    Password: data.Password,
-                    PasswordCopyLink: _insertCopyLink(data.Password),
-                    UserDefined1: data.UserDefined1,
-                    UserDefined1Label: data.UserDefined1Label,
-                    UserDefined1CopyLink: _insertCopyLink(data.UserDefined1),
-                    UserDefined2: data.UserDefined2,
-                    UserDefined2Label: data.UserDefined2Label,
-                    UserDefined2CopyLink: _insertCopyLink(data.UserDefined2),
-                    Notes: data.Notes.replace(/\r\n|\n|\r/gi, '<br />')
-                });
+            var detailHtml = _templates.detail({
+                Url: data.Url,
+                Username: data.Username,
+                UsernameCopyLink: _insertCopyLink(data.Username),
+                Password: data.Password,
+                PasswordCopyLink: _insertCopyLink(data.Password),
+                UserDefined1: data.UserDefined1,
+                UserDefined1Label: data.UserDefined1Label,
+                UserDefined1CopyLink: _insertCopyLink(data.UserDefined1),
+                UserDefined2: data.UserDefined2,
+                UserDefined2Label: data.UserDefined2Label,
+                UserDefined2CopyLink: _insertCopyLink(data.UserDefined2),
+                Notes: data.Notes.replace(/\r\n|\n|\r/gi, '<br />')
+            });
 
-                _ui.modalDialog.html(detailHtml).dialog({ title: data.Description, width: 600, minHeight: 50, modal: true });
+            _ui.modalDialog.html(detailHtml).dialog({ title: data.Description, width: 600, minHeight: 50, modal: true });
 
-            },
-            error: function (request, status, error) {
-
-                alert('Http Error: ' + status + ' - ' + error);
-
-            }
         });
 
     };
@@ -222,39 +224,28 @@ var Vault = (function ($) {
 
         if (credentialId != null) {
 
-            $.ajax({
-                url: '/Main/Load',
-                data: { id: credentialId },
-                dataType: 'json',
-                type: 'POST',
-                success: function (data, status, request) {
+            _ajaxPost('/Main/Load', { id: credentialId }, function (data, status, request) {
 
-                    // CredentialID and UserID are not currently encrypted so don't try to decode them
-                    data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
+                // CredentialID and UserID are not currently encrypted so don't try to decode them
+                data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
 
-                    var f = _ui.credentialForm;
+                var f = _ui.credentialForm;
 
-                    $('#CredentialID', f).val(data.CredentialID);
-                    $('#Description', f).val(data.Description);
-                    $('#Username', f).val(data.Username);
-                    $('#Password', f).val(data.Password);
-                    $('#PasswordConfirmation', f).val(data.PasswordConfirmation);
-                    $('#Url', f).val(data.Url);
-                    $('#UserDefined1Label', f).val(data.UserDefined1Label);
-                    $('#UserDefined1', f).val(data.UserDefined1);
-                    $('#UserDefined2Label', f).val(data.UserDefined2Label);
-                    $('#UserDefined2', f).val(data.UserDefined2);
-                    $('#Notes', f).val(data.Notes);
-                    $('#UserID', f).val(data.UserID);
+                $('#CredentialID', f).val(data.CredentialID);
+                $('#Description', f).val(data.Description);
+                $('#Username', f).val(data.Username);
+                $('#Password', f).val(data.Password);
+                $('#PasswordConfirmation', f).val(data.PasswordConfirmation);
+                $('#Url', f).val(data.Url);
+                $('#UserDefined1Label', f).val(data.UserDefined1Label);
+                $('#UserDefined1', f).val(data.UserDefined1);
+                $('#UserDefined2Label', f).val(data.UserDefined2Label);
+                $('#UserDefined2', f).val(data.UserDefined2);
+                $('#Notes', f).val(data.Notes);
+                $('#UserID', f).val(data.UserID);
 
-                    _ui.credentialFormDialog.dialog({ title: 'Edit Credential', width: 500, modal: true });
+                _ui.credentialFormDialog.dialog({ title: 'Edit Credential', width: 500, modal: true });
 
-                },
-                error: function (request, status, error) {
-
-                    alert('Http Error: ' + status + ' - ' + error);
-
-                }
             });
 
         } else { // New record setup
@@ -271,53 +262,40 @@ var Vault = (function ($) {
     // Delete a record
     var _deleteCredential = function (credentialId, userId, masterKey) {
 
-        $.ajax({
-            url: '/Main/Delete',
-            data: { credentialId: credentialId, userId: userId },
-            dataType: 'json',
-            type: 'POST',
-            success: function (data, status, request) {
+        _ajaxPost('/Main/Delete', { credentialId: credentialId, userId: userId }, function (data, status, request) {
 
-                if (data.Success) {
+            if (data.Success) {
 
-                    // Completely destroy the existing DataTable and remove the table and add link from the DOM
-                    _dataTable.fnDestroy();
-                    $('#records, #add-link').remove();
+                // Completely destroy the existing DataTable and remove the table and add link from the DOM
+                _dataTable.fnDestroy();
+                $('#records, #add-link').remove();
 
-                    // Remove the deleted item from the cached list before reload
-                    _removeFromList(credentialId, _cachedList);
+                // Remove the deleted item from the cached list before reload
+                _removeFromList(credentialId, _cachedList);
 
-                    // For now we just reload the entire table in the background
-                    _loadCredentials(userId, _b64_to_utf8(masterKey), function (rows) {
+                // For now we just reload the entire table in the background
+                _loadCredentials(userId, _b64_to_utf8(masterKey), function (rows) {
 
-                        _ui.container.append(_createCredentialTable(rows));
+                    _ui.container.append(_createCredentialTable(rows));
 
-                        _ui.records = $('#records');
-                        _dataTable = _ui.records.dataTable(_dataTableOptions);
+                    _ui.records = $('#records');
+                    _dataTable = _ui.records.dataTable(_dataTableOptions);
 
-                        _ui.container.append(_templates.addLink({ masterkey: masterKey, userid: userId }));
+                    _ui.container.append(_templates.addLink({ masterkey: masterKey, userid: userId }));
 
-                        _ui.modalDialog.dialog('destroy');
+                    _ui.modalDialog.dialog('destroy');
 
-                        _ui.recordsFilter = $('#records_filter');
+                    _ui.recordsFilter = $('#records_filter');
 
-                        // Append the clear filter button
-                        _ui.recordsFilter.before(_templates.clearFilterButton());
+                    // Append the clear filter button
+                    _ui.recordsFilter.before(_templates.clearFilterButton());
 
-                        _ui.recordsFilter.find('input:last').focus();
+                    _ui.recordsFilter.find('input:last').focus();
 
-                    });
-
-                }
-
-            },
-            error: function (request, status, error) {
-
-                alert('Http Error: ' + status + ' - ' + error);
-
-                _ui.modalDialog.dialog('destroy');
+                });
 
             }
+
         });
 
     };
@@ -382,65 +360,31 @@ var Vault = (function ($) {
 
         // Get all the credentials, decrypt each with the old password
         // and re-encrypt it with the new one
-        $.ajax({
-            url: '/Main/GetAllComplete',
-            data: { userId: userId },
-            dataType: 'json',
-            type: 'POST',
-            success: function (data, status, request) {
+        _ajaxPost('/Main/GetAllComplete', { userId: userId }, function (data, status, request) {
 
-                var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
+            var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
 
-                $.each(data, function (i, item) {
+            $.each(data, function (i, item) {
 
-                    newData.push(_encryptObject(_decryptObject(item, _b64_to_utf8(masterKey), excludes), newMasterKey, excludes));
+                newData.push(_encryptObject(_decryptObject(item, _b64_to_utf8(masterKey), excludes), newMasterKey, excludes));
+
+            });
+
+            _ajaxPost('/Main/UpdateMultiple', Passpack.JSON.stringify(newData), function (data, status, request) {
+
+                // Store the new password in hashed form
+                _ajaxPost('/Main/UpdatePassword', {
+                    newHash: newPasswordHash,
+                    userid: userId,
+                    oldHash: Passpack.utils.hashx(_password)
+                }, function (data, status, request) {
+
+                    window.location.href = '/';
 
                 });
 
-                $.ajax({
-                    url: '/Main/UpdateMultiple',
-                    data: Passpack.JSON.stringify(newData),
-                    dataType: 'json',
-                    contentType: 'application/json; charset=utf-8',
-                    type: 'POST',
-                    success: function (data, status, request) {
+            }, 'application/json; charset=utf-8');
 
-                        // Store the new password in hashed form
-                        $.ajax({
-                            url: '/Main/UpdatePassword',
-                            data: {
-                                newHash: newPasswordHash,
-                                userid: userId,
-                                oldHash: Passpack.utils.hashx(_password)
-                            },
-                            dataType: 'json',
-                            type: 'POST',
-                            success: function (data, status, request) {
-
-                                window.location.href = '/';
-
-                            },
-                            error: function (request, status, error) {
-
-                                alert('Http Error: ' + status + ' - ' + error);
-
-                            }
-                        });
-
-                    },
-                    error: function (request, status, error) {
-
-                        alert('Http Error: ' + status + ' - ' + error);
-
-                    }
-                });
-
-            },
-            error: function (request, status, error) {
-
-                alert('Http Error: ' + status + ' - ' + error);
-
-            }
         });
 
         return false;
@@ -456,35 +400,24 @@ var Vault = (function ($) {
         var exportItems = [];
 
         // Get all the credentials, decrypt each one
-        $.ajax({
-            url: '/Main/GetAllComplete',
-            data: { userId: userId },
-            dataType: 'json',
-            type: 'POST',
-            success: function (data, status, request) {
+        _ajaxPost('/Main/GetAllComplete', { userId: userId }, function (data, status, request) {
 
-                var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
+            var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
 
-                $.each(data, function (i, item) {
-                    exportItems.push(_decryptObject(item, _b64_to_utf8(masterKey), excludes));
-                });
+            $.each(data, function (i, item) {
+                exportItems.push(_decryptObject(item, _b64_to_utf8(masterKey), excludes));
+            });
 
-                var exportWindow = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
+            var exportWindow = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
 
-                if (exportWindow && exportWindow.top) {
-                    exportWindow.document.write(_templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
-                } else {
-                    alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
-                }
-
-                _ui.spinner.remove();
-
-            },
-            error: function (request, status, error) {
-
-                alert('Http Error: ' + status + ' - ' + error);
-
+            if (exportWindow && exportWindow.top) {
+                exportWindow.document.write(_templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
+            } else {
+                alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
             }
+
+            _ui.spinner.remove();
+
         });
 
         return false;
@@ -567,12 +500,12 @@ var Vault = (function ($) {
 
     // Encode string to Base64
     var _utf8_to_b64 = function (str) {
-        return window.btoa(encodeURIComponent(escape(str)));
+        return window.btoa(encodeURIComponent(window.escape(str)));
     };
 
     // Decode Base64 string
     var _b64_to_utf8 = function (str) {
-        return unescape(decodeURIComponent(window.atob(str)));
+        return window.unescape(decodeURIComponent(window.atob(str)));
     };
 
     // Utility function to check a value exists in an array
@@ -657,58 +590,45 @@ var Vault = (function ($) {
 
                 _ui.loginFormDialog.find('.submit').after(_insertSpinner());
 
-                $.ajax({
-                    url: '/Main/Login',
-                    data: {
-                        Username: Passpack.utils.hashx(username),
-                        Password: Passpack.utils.hashx(password)
-                    },
-                    dataType: 'json',
-                    type: 'POST',
-                    success: function (data, status, request) {
+                _ajaxPost('/Main/Login', {
+                    Username: Passpack.utils.hashx(username),
+                    Password: Passpack.utils.hashx(password)
+                }, function (data, status, request) {
 
-                        // If the details were valid
-                        if (data.result == 1 && data.id != '') {
+                    // If the details were valid
+                    if (data.result == 1 && data.id != '') {
 
-                            // Set some private variables so that we can reuse them for encryption during this session
-                            _userId = data.id;
-                            _username = username;
-                            _password = password;
-                            _masterKey = _utf8_to_b64(window.Passpack.utils.hashx(_password + Passpack.utils.hashx(_password, 1, 1), 1, 1));
+                        // Set some private variables so that we can reuse them for encryption during this session
+                        _userId = data.id;
+                        _username = username;
+                        _password = password;
+                        _masterKey = _utf8_to_b64(window.Passpack.utils.hashx(_password + Passpack.utils.hashx(_password, 1, 1), 1, 1));
 
-                            _loadCredentials(_userId, _masterKey, function (rows) {
+                        _loadCredentials(_userId, _masterKey, function (rows) {
 
-                                _ui.container.append(_createCredentialTable(rows));
-                                // Cache the table selector
-                                _ui.records = $('#records');
-                                _dataTable = _ui.records.dataTable(_dataTableOptions);
+                            _ui.container.append(_createCredentialTable(rows));
+                            // Cache the table selector
+                            _ui.records = $('#records');
+                            _dataTable = _ui.records.dataTable(_dataTableOptions);
 
-                                // Successfully logged in. Hide the login form
-                                _ui.container.append(_templates.addLink({ masterkey: _masterKey, userid: _userId }));
-                                _ui.loginForm.hide();
-                                _ui.loginFormDialog.dialog('destroy');
+                            // Successfully logged in. Hide the login form
+                            _ui.container.append(_templates.addLink({ masterkey: _masterKey, userid: _userId }));
+                            _ui.loginForm.hide();
+                            _ui.loginFormDialog.dialog('destroy');
 
-                                _ui.recordsFilter = $('#records_filter');
+                            _ui.recordsFilter = $('#records_filter');
 
-                                // Append the clear filter button
-                                _ui.recordsFilter.before(_templates.clearFilterButton());
+                            // Append the clear filter button
+                            _ui.recordsFilter.before(_templates.clearFilterButton());
 
-                                _ui.recordsFilter.find('input:last').focus();
+                            _ui.recordsFilter.find('input:last').focus();
 
-                            });
-
-                        }
-
-                        _ui.spinner.remove();
-
-                    },
-                    error: function (request, status, error) {
-
-                        alert('Http Error: ' + status + ' - ' + error);
-
-                        _ui.spinner.remove();
+                        });
 
                     }
+
+                    _ui.spinner.remove();
+
                 });
 
                 return false;
@@ -752,51 +672,38 @@ var Vault = (function ($) {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 credential = _encryptObject(credential, _masterKey, ['CredentialID', 'UserID']);
 
-                $.ajax({
-                    url: '/Main/Update',
-                    data: credential,
-                    dataType: 'json',
-                    type: 'POST',
-                    success: function (data, status, request) {
+                _ajaxPost('/Main/Update', credential, function (data, status, request) {
 
-                        // Update the cached credential list with the new Description so it is correct when we rebuild
-                        _updateDescription(data.CredentialID, description, _userId, _cachedList);
+                    // Update the cached credential list with the new Description so it is correct when we rebuild
+                    _updateDescription(data.CredentialID, description, _userId, _cachedList);
 
-                        // Completely destroy the existing DataTable and remove the table and add link from the DOM
-                        _dataTable.fnDestroy();
-                        $('#records, #add-link').remove();
+                    // Completely destroy the existing DataTable and remove the table and add link from the DOM
+                    _dataTable.fnDestroy();
+                    $('#records, #add-link').remove();
 
-                        // For now we just reload the entire table in the background
-                        _loadCredentials(_userId, _masterKey, function (rows) {
+                    // For now we just reload the entire table in the background
+                    _loadCredentials(_userId, _masterKey, function (rows) {
 
-                            _ui.container.append(_createCredentialTable(rows));
+                        _ui.container.append(_createCredentialTable(rows));
 
-                            _ui.records = $('#records');
-                            _dataTable = _ui.records.dataTable(_dataTableOptions);
+                        _ui.records = $('#records');
+                        _dataTable = _ui.records.dataTable(_dataTableOptions);
 
-                            _ui.container.append(_templates.addLink({ masterkey: _masterKey, userid: _userId }));
-
-                            _ui.spinner.remove();
-
-                            _ui.credentialFormDialog.dialog('destroy');
-
-                            _ui.recordsFilter = $('#records_filter');
-
-                            // Append the clear filter button
-                            _ui.recordsFilter.before(_templates.clearFilterButton());
-
-                            _ui.recordsFilter.find('input:last').focus();
-
-                        });
-
-                    },
-                    error: function (request, status, error) {
-
-                        alert('Http Error: ' + status + ' - ' + error);
+                        _ui.container.append(_templates.addLink({ masterkey: _masterKey, userid: _userId }));
 
                         _ui.spinner.remove();
 
-                    }
+                        _ui.credentialFormDialog.dialog('destroy');
+
+                        _ui.recordsFilter = $('#records_filter');
+
+                        // Append the clear filter button
+                        _ui.recordsFilter.before(_templates.clearFilterButton());
+
+                        _ui.recordsFilter.find('input:last').focus();
+
+                    });
+
                 });
 
                 return false;

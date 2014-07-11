@@ -1,5 +1,4 @@
-﻿
-/*
+﻿/*
     var vault = {
         init: _init,
         showDetail: _showDetail,
@@ -50,17 +49,17 @@ QUnit.done(function () {
     console.log('end tests');
 });
 
-QUnit.test("Got Vault", function (assert) {
+QUnit.test('Got Vault', function (assert) {
     assert.ok(typeof Vault !== 'undefined');
 });
 
-QUnit.test("Test _htmlEncode", function (assert) {
+QUnit.test('Test _htmlEncode', function (assert) {
     var testString = '<a href="test.asp?q=1&r=2">This: Is a test\' link! + Symbols</a>';
     console.log(Vault.htmlEncode(testString));
     assert.ok(Vault.htmlEncode(testString) === '&lt;a href="test.asp?q=1&amp;r=2"&gt;This: Is a test\' link! + Symbols&lt;/a&gt;');
 });
 
-QUnit.test("Test _htmlDecode", function (assert) {
+QUnit.test('Test _htmlDecode', function (assert) {
     var testString = '&lt;a href=&quot;test.asp?q=1&amp;r=2&quot;&gt;This: Is a test\' link! + Symbols&lt;/a&gt;';
     assert.ok(Vault.htmlDecode(testString) === '<a href="test.asp?q=1&r=2">This: Is a test\' link! + Symbols</a>');
 });
