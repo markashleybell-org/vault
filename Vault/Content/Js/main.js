@@ -54,7 +54,7 @@ var Vault = (function ($) {
 
     // Insert the Flash-based 'Copy To Clipboard' icon next to credentials
     var _insertCopyLink = function (text) {
-        return _templates.copyLink({ text: encodeURIComponent(text) })
+        return _templates.copyLink({ text: encodeURIComponent(text) });
     };
 
     // Insert an AJAX spinner GIF and cache the element selector
@@ -77,18 +77,22 @@ var Vault = (function ($) {
     // Encrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
     var _encryptObject = function (obj, masterKey, excludes) {
-        for (var p in obj)
-            if (!_contains(excludes, p))
+        for (var p in obj) {
+            if (!_contains(excludes, p)) {
                 obj[p] = Passpack.encode('AES', obj[p], _b64_to_utf8(masterKey));
+            }
+        }
         return obj;
     };
 
     // Encrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
     var _decryptObject = function (obj, masterKey, excludes) {
-        for (var p in obj)
-            if (!_contains(excludes, p))
+        for (var p in obj) {
+            if (!_contains(excludes, p)) {
                 obj[p] = Passpack.decode('AES', obj[p], _b64_to_utf8(masterKey));
+            }
+        }
         return obj;
     };
 
@@ -96,9 +100,11 @@ var Vault = (function ($) {
     var _removeFromList = function (id, list) {
         var i;
 
-        for (i = 0; i < list.length; i++)
-            if (list[i].CredentialID == id)
+        for (i = 0; i < list.length; i++) {
+            if (list[i].CredentialID == id) {
                 break;
+            }
+        }
 
         list.splice(i, 1);
     };
@@ -134,7 +140,7 @@ var Vault = (function ($) {
                 success: function (data, status, request) {
 
                     var items = [];
-                    // At this point we only actually need to decrypt Description for display, 
+                    // At this point we only actually need to decrypt Description for display,
                     // which speeds up client-side table construction time dramatically
                     var excludes = ['CredentialID', 'UserID'];
 
@@ -158,7 +164,7 @@ var Vault = (function ($) {
 
     };
 
-    // Show the read-only details dialog 
+    // Show the read-only details dialog
     var _showDetail = function (credentialId, masterKey) {
 
         $.ajax({
@@ -177,8 +183,9 @@ var Vault = (function ($) {
                 // and encode any HTML for display
                 $.each(data, function (name, value) {
 
-                    if (!_contains(excludeProperties, name) && name != 'Password')
+                    if (!_contains(excludeProperties, name) && name != 'Password') {
                         data[name] = _htmlEncode(value);
+                    }
 
                 });
 
@@ -250,8 +257,7 @@ var Vault = (function ($) {
                 }
             });
 
-        }
-        else { // New record setup
+        } else { // New record setup
 
             _ui.credentialFormDialog.find('input:not(.submit), textarea').val('');
             _ui.credentialForm.find('#UserID').val(userId);
@@ -361,8 +367,9 @@ var Vault = (function ($) {
             return false;
         }
 
-        if (!confirm('When the password change is complete you will be logged out and will need to log back in.\n\nAre you sure you want to change the master password?'))
+        if (!confirm('When the password change is complete you will be logged out and will need to log back in.\n\nAre you sure you want to change the master password?')) {
             return false;
+        }
 
         var newPasswordHash = Passpack.utils.hashx(newPassword);
         // Convert the new master key to Base64 so that encryptObject() gets what it's expecting
@@ -373,7 +380,7 @@ var Vault = (function ($) {
 
         var newData = [];
 
-        // Get all the credentials, decrypt each with the old password 
+        // Get all the credentials, decrypt each with the old password
         // and re-encrypt it with the new one
         $.ajax({
             url: '/Main/GetAllComplete',
@@ -428,8 +435,6 @@ var Vault = (function ($) {
                     }
                 });
 
-
-
             },
             error: function (request, status, error) {
 
@@ -464,7 +469,7 @@ var Vault = (function ($) {
                     exportItems.push(_decryptObject(item, _b64_to_utf8(masterKey), excludes));
                 });
 
-                var exportWindow = window.open("", "EXPORT_WINDOW", "WIDTH=700, HEIGHT=600");
+                var exportWindow = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
 
                 if (exportWindow && exportWindow.top) {
                     exportWindow.document.write(_templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
@@ -547,16 +552,14 @@ var Vault = (function ($) {
         var password = $('#Password', f);
         var passwordConfirmation = $('#PasswordConfirmation', f);
 
-        if (description.val() == '')
+        if (description.val() == '') {
             errors.push({ field: description, msg: 'You must fill in a Description' });
-
-        // $('#Username', f).val(data.Username);
+        }
 
         // We don't mind if these are blank, but they must be the same!
-        if (password.val() != passwordConfirmation.val())
+        if (password.val() != passwordConfirmation.val()) {
             errors.push({ field: passwordConfirmation, msg: 'Password confirmation does not match' });
-
-        // $('#UserID', f).val(data.UserID);
+        }
 
         return errors;
 
@@ -574,8 +577,11 @@ var Vault = (function ($) {
 
     // Utility function to check a value exists in an array
     var _contains = function (arr, value) {
-        for (var i = 0; i < arr.length; i++)
-            if (arr[i] == value) return true;
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] == value) {
+                return true;
+            }
+        }
         return false;
     };
 
@@ -641,7 +647,7 @@ var Vault = (function ($) {
 
             // Load the datatable stylesheet dynamically
             var tableStyles = $('<link rel="stylesheet" type="text/css" href="/content/css/datatables.css" />');
-            $("head").append(tableStyles);
+            $('head').append(tableStyles);
 
             // Initialise globals and load data on correct login
             _ui.loginForm.on('submit', function () {
@@ -753,7 +759,7 @@ var Vault = (function ($) {
                     type: 'POST',
                     success: function (data, status, request) {
 
-                        // Update the cached credential list with the new Description so it is correct when we rebuild 
+                        // Update the cached credential list with the new Description so it is correct when we rebuild
                         _updateDescription(data.CredentialID, description, _userId, _cachedList);
 
                         // Completely destroy the existing DataTable and remove the table and add link from the DOM

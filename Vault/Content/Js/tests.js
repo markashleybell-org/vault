@@ -50,7 +50,6 @@ QUnit.done(function () {
     console.log('end tests');
 });
 
-
 QUnit.test("Got Vault", function (assert) {
     assert.ok(typeof Vault !== 'undefined');
 });
