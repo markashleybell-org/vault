@@ -85,7 +85,7 @@ var Vault = (function ($) {
         return obj;
     };
 
-    // Encrypt the properties of an object literal using Passpack
+    // Decrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
     var _decryptObject = function (obj, masterKey, excludes) {
         for (var p in obj) {
