@@ -383,7 +383,7 @@ var Vault = (function ($) {
 
                 });
 
-            }, 'application/json; charset=utf-8');
+            }, null, 'application/json; charset=utf-8');
 
         });
 
