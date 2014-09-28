@@ -548,6 +548,7 @@ var Vault = (function ($) {
 
     };
 
+    // Rate-limit calls to the supplied function
     var _debounce = function (func, wait, immediate) {
         var timeout;
         return function() {
