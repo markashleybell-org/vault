@@ -16,19 +16,20 @@ var Vault = (function ($) {
         loginForm: null,
         credentialForm: null,
         container: null,
-        spinner: null,
         controls: null,
         modalLarge: null,
         modalLargeContent: null,
         modalSmall: null,
         modalSmallContent: null,
-        records: null
+        records: null,
+        newButton: null,
+        adminButton: null,
+        clearSearchButton: null
     },
     _templates = {
         copyLink: null,
         detail: null,
         deleteConfirmationDialog: null,
-        spinner: null,
         optionsDialog: null,
         exportedDataWindow: null,
         credentialTable: null,
@@ -42,13 +43,6 @@ var Vault = (function ($) {
     // Insert the Flash-based 'Copy To Clipboard' icon next to credentials
     var _insertCopyLink = function (text) {
         return _templates.copyLink({ text: encodeURIComponent(text) });
-    };
-
-    // Insert an AJAX spinner GIF and cache the element selector
-    var _insertSpinner = function () {
-        var spinner = $(_templates.spinner());
-        _ui.spinner = spinner;
-        return spinner;
     };
 
     // Use jQuery's tried and tested code to convert plain text to HTML-encoded text
@@ -358,9 +352,6 @@ var Vault = (function ($) {
         // Convert the new master key to Base64 so that encryptObject() gets what it's expecting
         var newMasterKey = _utf8_to_b64(Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, 1, 1), 1, 1));
 
-        // Show a spinner until complete because this can take some time!
-        $('#change-password-button').after(_insertSpinner());
-
         var newData = [];
 
         // Get all the credentials, decrypt each with the old password
@@ -399,9 +390,6 @@ var Vault = (function ($) {
     // Export all credential data as JSON
     var _exportData = function (userId, masterKey) {
 
-        // Show a spinner until complete because this can take some time!
-        $('#export-button').after(_insertSpinner());
-
         var exportItems = [];
 
         // Get all the credentials, decrypt each one
@@ -420,8 +408,6 @@ var Vault = (function ($) {
             } else {
                 alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
             }
-
-            _ui.spinner.remove();
 
         });
 
@@ -533,7 +519,7 @@ var Vault = (function ($) {
         if (typeof test !== 'undefined' && test) {
             var testMethods = {
                 insertCopyLink: _insertCopyLink,
-                insertSpinner: _insertSpinner,
+                options: _options,
                 htmlEncode: _htmlEncode,
                 htmlDecode: _htmlDecode,
                 encryptObject: _encryptObject,
@@ -563,17 +549,18 @@ var Vault = (function ($) {
             _ui.loginForm = $('#login-form');
             _ui.credentialForm = $('#credential-form');
             _ui.container = $('#container');
-            _ui.spinner = $('#spinner');
             _ui.controls = $('#controls');
             _ui.modalLarge = $('#modal-lg');
             _ui.modalLargeContent = $('#modal-lg-content');
             _ui.modalSmall = $('#modal-sm');
             _ui.modalSmallContent = $('#modal-sm-content');
+            _ui.newButton = $('#new');
+            _ui.adminButton = $('#admin');
+            _ui.clearSearchButton = $('#clear-search');
 
             _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
             _templates.detail = Handlebars.compile($('#tmpl-detail').html());
             _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());
-            _templates.spinner = Handlebars.compile($('#tmpl-spinner').html());
             _templates.optionsDialog = Handlebars.compile($('#tmpl-optionsdialog').html());
             _templates.exportedDataWindow = Handlebars.compile($('#tmpl-exporteddatawindow').html());
             _templates.credentialTable = Handlebars.compile($('#tmpl-credentialtable').html());
@@ -588,13 +575,26 @@ var Vault = (function ($) {
             //var tableStyles = $('<link rel="stylesheet" type="text/css" href="/content/css/datatables.css" />');
             //$('head').append(tableStyles);
 
+            _ui.newButton.on('click', function (e) {
+                e.preventDefault();
+                _loadCredential(null, _masterKey, _userId);
+            });
+
+            _ui.adminButton.on('click', function (e) {
+                e.preventDefault();
+                _options();
+            });
+
+            _ui.clearSearchButton.on('click', function (e) {
+                e.preventDefault();
+                _options();
+            });
+
             // Initialise globals and load data on correct login
             _ui.loginForm.on('submit', function () {
 
                 var username = _ui.loginForm.find('#Username').val();
                 var password = _ui.loginForm.find('#Password').val();
-
-                _ui.loginFormDialog.find('.submit').after(_insertSpinner());
 
                 _ajaxPost('/Main/Login', {
                     Username: Passpack.utils.hashx(username),
@@ -626,8 +626,6 @@ var Vault = (function ($) {
 
                     }
 
-                    _ui.spinner.remove();
-
                 });
 
                 return false;
@@ -656,8 +654,6 @@ var Vault = (function ($) {
 
                 }
 
-                form.find('.submit').after(_insertSpinner());
-
                 var credential = {};
 
                 // Serialize the form inputs into an object
@@ -683,11 +679,7 @@ var Vault = (function ($) {
                     _loadCredentials(_userId, _masterKey, function (rows) {
 
                         _ui.container.append(_createCredentialTable(rows));
-
                         _ui.records = $('#records');
-
-                        _ui.spinner.remove();
-
                         _ui.credentialFormDialog.modal('hide');
 
                     });
@@ -707,7 +699,6 @@ var Vault = (function ($) {
         loadCredential: _loadCredential,
         confirmDelete: _confirmDelete,
         deleteCredential: _deleteCredential,
-        options: _options,
         changePassword: _changePassword,
         exportData: _exportData
     };

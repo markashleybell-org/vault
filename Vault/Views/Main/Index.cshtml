@@ -22,13 +22,13 @@
                 </div>
                 <div class="form-group">
                     <label class="sr-only" for="new">New Item</label>
-                    <button id="new" class="btn btn-primary btn-lg" onclick="Vault.loadCredential(null, '{{masterkey}}', '{{userid}}');">
+                    <button id="new" class="btn btn-primary btn-lg">
                         <span class="glyphicon glyphicon-plus"></span> New
                     </button>
                 </div>
                 <div class="form-group">
                     <label class="sr-only" for="admin">Admin</label>
-                    <button id="admin" class="btn btn-default btn-lg" onclick="Vault.options();">
+                    <button id="admin" class="btn btn-default btn-lg">
                         <span class="glyphicon glyphicon-cog"></span> Admin
                     </button>
                 </div>
@@ -179,10 +179,6 @@
                 </div>
             </div>
         </div>
-    </script>
-
-    <script id="tmpl-spinner" type="text/x-handlebars-template">
-        <img id="spinner" src="/content/img/ajax-loader.gif" width="16" height="16" />
     </script>
 
     <script id="tmpl-exporteddatawindow" type="text/x-handlebars-template">
