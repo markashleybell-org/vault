@@ -679,8 +679,7 @@ var Vault = (function ($) {
             _ui.credentialForm.on('submit', function () {
                 var form = $(this);
                 $('#validation-message').remove();
-                var inputs = form.find('input[class!=submit], textarea');
-                inputs.removeClass('invalid');
+                form.find('div.has-error').removeClass('has-error');
 
                 var errors = _validateRecord(form);
                 var errorMsg = [];
@@ -689,10 +688,10 @@ var Vault = (function ($) {
 
                     for (var i = 0; i < errors.length; i++) {
                         errorMsg.push(errors[i].msg);
-                        errors[i].field.addClass('invalid');
+                        errors[i].field.parent().parent().addClass('has-error');
                     }
 
-                    form.prepend(_templates.validationMessage({ errors: errorMsg.join('<br />') }));
+                    form.find('div.modal-body').prepend(_templates.validationMessage({ errors: errorMsg.join('<br />') }));
                     return false;
 
                 }

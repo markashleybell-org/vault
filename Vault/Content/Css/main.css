@@ -24,6 +24,11 @@
     padding: 3px 0 0 0;
 }
 
+#validation-message {
+    color: #a94442;
+    font-weight: bold;
+}
+
 @media (min-width: 992px) {
     .modal-lg {
         width: 600px;
