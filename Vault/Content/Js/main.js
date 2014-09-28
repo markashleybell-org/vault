@@ -268,7 +268,7 @@ var Vault = (function ($) {
                 _ui.credentialFormDialog.find('.btn-close').on('click', function (e) {
                     _ui.credentialFormDialog.modal('hide');
                     _ui.searchInput.focus();
-                })
+                });
 
             });
 
@@ -278,6 +278,10 @@ var Vault = (function ($) {
             _ui.credentialForm.find('#UserID').val(userId);
 
             _ui.credentialFormDialog.modal();
+            _ui.credentialFormDialog.find('.btn-close').on('click', function (e) {
+                _ui.credentialFormDialog.modal('hide');
+                _ui.searchInput.focus();
+            });
 
         }
 
