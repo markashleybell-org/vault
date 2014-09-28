@@ -231,7 +231,8 @@ var Vault = (function ($) {
         var modal = (size == 'sm') ? _ui.modalSmall : _ui.modalLarge;
 
         content.html(html);
-        modal.on('click', 'button.btn-primary', options.action || function () { modal.modal('hide'); })
+        modal.on('click', 'button.btn-action', options.action || function (e) { modal.modal('hide'); _ui.searchInput.focus(); });
+        modal.on('click', 'button.btn-close', function (e) { modal.modal('hide'); _ui.searchInput.focus(); });
         modal.modal();
 
     };
@@ -263,6 +264,10 @@ var Vault = (function ($) {
                 $('#UserID', f).val(data.UserID);
 
                 _ui.credentialFormDialog.modal();
+                _ui.credentialFormDialog.find('.btn-close').on('click', function (e) {
+                    _ui.credentialFormDialog.modal('hide');
+                    _ui.searchInput.focus();
+                })
 
             });
 
@@ -314,6 +319,7 @@ var Vault = (function ($) {
             content: _templates.deleteConfirmationDialog(),
             action: function (e) {
                 Vault.deleteCredential(id, userId, _masterKey);
+                _ui.searchInput.focus();
             }
         });
 
@@ -634,7 +640,7 @@ var Vault = (function ($) {
             _ui.clearSearchButton.on('click', function (e) {
                 e.preventDefault();
                 _search(null);
-                _ui.searchInput.val('');
+                _ui.searchInput.val('').focus();
             });
 
             _ui.searchInput.on('keyup', function () {
@@ -672,6 +678,8 @@ var Vault = (function ($) {
                             _ui.loginFormDialog.modal('hide');
 
                             _ui.controls.show();
+
+                            _ui.searchInput.focus();
 
                         });
 
@@ -733,6 +741,7 @@ var Vault = (function ($) {
                         _ui.container.append(_createCredentialTable(rows));
                         _ui.records = $('#records');
                         _ui.credentialFormDialog.modal('hide');
+                        _ui.searchInput.focus();
 
                     });
 
