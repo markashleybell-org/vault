@@ -154,13 +154,31 @@
     </script>
 
     <script id="tmpl-optionsdialog" type="text/x-handlebars-template">
-        <p>Change password:</p>
-        <form>
-            <p><label for="NewPassword">Password</label><input type="password" id="NewPassword" name="NewPassword" value="" /></p>
-            <p><label for="NewPasswordConfirm">Confirm</label><input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" value="" /></p>
-            <p><button class="submit" id="change-password-button" onclick="Vault.changePassword('{{userid}}', '{{masterkey}}'); return false;">Change Password</button></p>
-            <p><button class="submit" id="export-button" onclick="Vault.exportData('{{userid}}', '{{masterkey}}'); return false;">Export</button></p>
-        </form>
+        <p>Enter and confirm a new password:</p>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label for="NewPassword" class="col-sm-4 control-label">New Password</label>
+                <div class="col-sm-8">
+                    <input type="password" id="NewPassword" name="NewPassword" class="form-control" value="" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="NewPasswordConfirm" class="col-sm-4 control-label">Confirm New Password</label>
+                <div class="col-sm-8">
+                    <input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" class="form-control" value="" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-4 col-sm-8">
+                    <button class="btn btn-warning" id="change-password-button" onclick="Vault.changePassword('{{userid}}', '{{masterkey}}');">Change Password</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-4 col-sm-8">
+                    <button class="btn btn-default" id="export-button" onclick="Vault.exportData('{{userid}}', '{{masterkey}}');">Export Data</button>
+                </div>
+            </div>
+        </div>
     </script>
 
     <script id="tmpl-spinner" type="text/x-handlebars-template">
@@ -176,14 +194,7 @@
     </script>
 
     <script id="tmpl-credentialtable" type="text/x-handlebars-template">
-        <table id="records" class="table">
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                </tr>
-            </thead>
+        <table id="records" class="table table-condensed">
             <tbody>
                 {{#each rows}}
                 {{> credentialtablerow}}
