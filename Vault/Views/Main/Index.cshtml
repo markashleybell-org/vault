@@ -9,7 +9,7 @@
 
     <div class="row" id="controls">
         <div class="col-md-12">
-            <form class="form-inline">
+            <div class="form-inline">
                 <div class="form-group">
                     <label class="sr-only" for="search">Search</label>
                     <input type="text" id="search" name="search" class="form-control input-lg" placeholder="Search..." />
@@ -22,17 +22,17 @@
                 </div>
                 <div class="form-group">
                     <label class="sr-only" for="new">New Item</label>
-                    <button id="new" class="btn btn-primary btn-lg">
+                    <button id="new" class="btn btn-primary btn-lg" onclick="Vault.loadCredential(null, '{{masterkey}}', '{{userid}}');">
                         <span class="glyphicon glyphicon-plus"></span> New
                     </button>
                 </div>
                 <div class="form-group">
                     <label class="sr-only" for="admin">Admin</label>
-                    <button id="admin" class="btn btn-default btn-lg">
+                    <button id="admin" class="btn btn-default btn-lg" onclick="Vault.options();">
                         <span class="glyphicon glyphicon-cog"></span> Admin
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -147,14 +147,6 @@
                 {{/if}}
             </tbody>
         </table>
-    </script>
-
-    <script id="tmpl-addlink" type="text/x-handlebars-template">
-        <p id="add-link"><button onclick="Vault.loadCredential(null, '{{masterkey}}', '{{userid}}'); return false;">Add Item</button> <button onclick="Vault.options(); return false;">Options</button></p>
-    </script>
-
-    <script id="tmpl-clearfilter" type="text/x-handlebars-template">
-        <input type="button" style="float: right;" onclick="$('#records_filter input:last').val('');$('#records_filter input:last').trigger('keyup');" value="X" />
     </script>
 
     <script id="tmpl-deleteconfirmationdialog" type="text/x-handlebars-template">

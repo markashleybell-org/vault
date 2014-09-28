@@ -27,8 +27,6 @@ var Vault = (function ($) {
     _templates = {
         copyLink: null,
         detail: null,
-        addLink: null,
-        clearFilterButton: null,
         deleteConfirmationDialog: null,
         spinner: null,
         optionsDialog: null,
@@ -302,8 +300,6 @@ var Vault = (function ($) {
 
                     _ui.records = $('#records');
                     
-                    _ui.container.append(_templates.addLink({ masterkey: masterKey, userid: userId }));
-
                     _ui.modalDialog.modal('hide');
 
                 });
@@ -441,7 +437,11 @@ var Vault = (function ($) {
             masterkey: _utf8_to_b64(_masterKey)
         });
 
-        $('#modal-dialog').html(dialogHtml).modal();
+        _showModal({
+            title: 'Admin',
+            content: dialogHtml,
+            showClose: false
+        });
 
     };
 
@@ -572,8 +572,6 @@ var Vault = (function ($) {
 
             _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
             _templates.detail = Handlebars.compile($('#tmpl-detail').html());
-            _templates.addLink = Handlebars.compile($('#tmpl-addlink').html());
-            _templates.clearFilterButton = Handlebars.compile($('#tmpl-clearfilter').html());
             _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());
             _templates.spinner = Handlebars.compile($('#tmpl-spinner').html());
             _templates.optionsDialog = Handlebars.compile($('#tmpl-optionsdialog').html());
@@ -619,7 +617,6 @@ var Vault = (function ($) {
                             _ui.records = $('#records');
 
                             // Successfully logged in. Hide the login form
-                            _ui.container.append(_templates.addLink({ masterkey: _masterKey, userid: _userId }));
                             _ui.loginForm.hide();
                             _ui.loginFormDialog.modal('hide');
 
@@ -688,8 +685,6 @@ var Vault = (function ($) {
                         _ui.container.append(_createCredentialTable(rows));
 
                         _ui.records = $('#records');
-
-                        _ui.container.append(_templates.addLink({ masterkey: _masterKey, userid: _userId }));
 
                         _ui.spinner.remove();
 
