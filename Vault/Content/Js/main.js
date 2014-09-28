@@ -192,7 +192,7 @@ var Vault = (function ($) {
                 UserDefined2: data.UserDefined2,
                 UserDefined2Label: data.UserDefined2Label,
                 UserDefined2CopyLink: _insertCopyLink(data.UserDefined2),
-                Notes: data.Notes.replace(/\r\n|\n|\r/gi, '<br />')
+                Notes: data.Notes
             });
 
             _showModal({
@@ -610,6 +610,12 @@ var Vault = (function ($) {
             _templates.modalHeader = Handlebars.compile($('#tmpl-modalheader').html());
             _templates.modalBody = Handlebars.compile($('#tmpl-modalbody').html());
             _templates.modalFooter = Handlebars.compile($('#tmpl-modalfooter').html());
+
+            Handlebars.registerHelper('breaklines', function (text) {
+                text = Handlebars.Utils.escapeExpression(text);
+                text = text.replace(/(\r\n|\n|\r)/gm, '<br />');
+                return new Handlebars.SafeString(text);
+            });
 
             //// Load the datatable stylesheet dynamically
             //var tableStyles = $('<link rel="stylesheet" type="text/css" href="/content/css/datatables.css" />');

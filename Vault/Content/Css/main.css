@@ -15,6 +15,10 @@
     padding-top: 15px;
 }
 
+#controls div {
+    padding-bottom: 15px;
+}
+
 #records td {
     border: none;
     padding: 3px 0 0 3px;
@@ -28,6 +32,38 @@
     color: #a94442;
     font-weight: bold;
 }
+
+.table.detail th:first-child {
+    padding-left: 0;
+}
+
+.table.detail tr:first-child th, .table.detail tr:first-child td {
+    border-top: 0;
+}
+
+.relative-container {
+    position: relative;
+}
+
+#clear-search {
+    position: absolute;
+    right: 14px;
+    top: 0px;
+}
+
+.modal-body {
+    overflow: hidden;
+}
+
+.detail-label {
+    width: 120px;
+}
+
+.detail-copylink {
+    width: 20px;
+}
+
+
 
 @media (min-width: 992px) {
     .modal-lg {
