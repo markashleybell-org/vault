@@ -1,7 +1,7 @@
 ﻿@model dynamic
 
 @{
-    ViewBag.Title = "Generate Hash";
+    ViewBag.Title = "Generate Credentials";
     Layout = "~/Views/Shared/Main.cshtml";
 }
 
@@ -10,12 +10,14 @@
     <script type="text/javascript">
 
         function generatePassword() {
-            $('#Hashed').attr('value', Passpack.utils.hashx($('#Password').val()));
+            $('#HashedUsername').attr('value', Passpack.utils.hashx($('#Username').val()));
+            $('#HashedPassword').attr('value', Passpack.utils.hashx($('#Password').val()));
         }
 
         // The hash is now a full 64 char string
         function generatePassword64() {
-            $('#Hashed').attr('value', Passpack.utils.hashx($('#Password').val(), false, true));
+            $('#HashedUsername').attr('value', Passpack.utils.hashx($('#Username').val(), false, true));
+            $('#HashedPassword').attr('value', Passpack.utils.hashx($('#Password').val(), false, true));
         }
 
     </script>
@@ -24,18 +26,54 @@
 
 @section main {
 
-    <div id="generate-form-dialog">
-        <form id="generate-form" action="" method="post">
-            <p><label for="Password">Value</label> 
-            <input type="text" size="40" id="Password" name="Password" value="" /></p>
-            <p><label for="Hashed">Hashed</label> 
-            <input type="text" size="40" id="Hashed" name="Hashed" value="" /></p>
-            <p><input type="button" class="submit" onclick="generatePassword();" value="Generate" /></p>
-	    </form>
+    <div id="generate-form-dialog" class="modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="generate-form" action="" method="post" class="form-horizontal">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Generate Credentials</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Enter a username and password to hash:</p>
+                        <div class="form-group">
+                            <label for="Username" class="col-sm-4 control-label">Username</label>
+                            <div class="col-sm-8">
+                                <input type="text" size="40" id="Username" name="Username" value="" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Password" class="col-sm-4 control-label">Password</label>
+                            <div class="col-sm-8">
+                                <input type="text" size="40" id="Password" name="Password" value="" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="HashedUsername" class="col-sm-4 control-label">Hashed Username</label>
+                            <div class="col-sm-8">
+                                <input type="text" size="40" id="HashedUsername" name="HashedUsername" value="" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="HashedPassword" class="col-sm-4 control-label">Hashed Password</label>
+                            <div class="col-sm-8">
+                                <input type="text" size="40" id="HashedPassword" name="HashedPassword" value="" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" onclick="generatePassword(); return false;">Generate</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
+}
+
+@section foot {
+
     <script type="text/javascript">
-        $('#generate-form-dialog').dialog({ title: 'Generate', width: 500, modal: true });
+        $('#generate-form-dialog').modal();
     </script>
 
 }
