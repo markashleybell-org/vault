@@ -24,7 +24,8 @@ var Vault = (function ($) {
         records: null,
         newButton: null,
         adminButton: null,
-        clearSearchButton: null
+        clearSearchButton: null,
+        searchInput: null
     },
     _templates = {
         copyLink: null,
@@ -150,6 +151,7 @@ var Vault = (function ($) {
 
                 // Cache the whole (decrypted) list on the client
                 _cachedList = items;
+                _sortCredentials(_cachedList);
                 _buildDataTable(_cachedList, callback, masterKey);
 
             });
@@ -294,7 +296,7 @@ var Vault = (function ($) {
 
                     _ui.records = $('#records');
                     
-                    _ui.modalDialog.modal('hide');
+                    _ui.modalLarge.modal('hide');
 
                 });
 
@@ -513,6 +515,39 @@ var Vault = (function ($) {
         return (str.length > len) ? str.substring(0, (len - 3)) + '...' : str;
     };
 
+    // Hide credential rows which don't contain a particular string
+    var _search = function (query) {
+
+        var results = [];
+
+        if (query === null) {
+            results = _cachedList;
+        }
+        else
+        {
+            query = query.toLowerCase();
+            for (var i = 0; i < _cachedList.length; i++) {
+                if (_cachedList[i].Description.toLowerCase().indexOf(query) > -1)
+                    results.push(_cachedList[i]);
+            }
+        }
+
+        _buildDataTable(results, function (rows) {
+            _ui.container.html(_createCredentialTable(rows));
+            _ui.records = $('#records');
+        }, _masterKey);
+
+    };
+
+    // Sort credentials alphabetically by description
+    var _sortCredentials = function (credentials) {
+        credentials.sort(function(a, b) {
+            var desca = a.Description.toUpperCase();
+            var descb = b.Description.toUpperCase();
+            return (desca < descb) ? -1 : (desca > descb) ? 1 : 0;
+        });
+    };
+
     // Initialise the app
     var _init = function (test) {
         // Determine whether we're testing or not
@@ -536,7 +571,9 @@ var Vault = (function ($) {
                 utf8_to_b64: _utf8_to_b64,
                 b64_to_utf8: _b64_to_utf8,
                 contains: _contains,
-                truncate: _truncate
+                truncate: _truncate,
+                search: _search,
+                sortCredentials: _sortCredentials
             };
             $.extend(vault, testMethods);
         }
@@ -557,6 +594,7 @@ var Vault = (function ($) {
             _ui.newButton = $('#new');
             _ui.adminButton = $('#admin');
             _ui.clearSearchButton = $('#clear-search');
+            _ui.searchInput = $('#search');
 
             _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
             _templates.detail = Handlebars.compile($('#tmpl-detail').html());
@@ -587,7 +625,12 @@ var Vault = (function ($) {
 
             _ui.clearSearchButton.on('click', function (e) {
                 e.preventDefault();
-                _options();
+                _search(null);
+                _ui.searchInput.val('');
+            });
+
+            _ui.searchInput.on('keyup', function () {
+                _search(this.value);
             });
 
             // Initialise globals and load data on correct login
@@ -671,6 +714,8 @@ var Vault = (function ($) {
 
                     // Update the cached credential list with the new Description so it is correct when we rebuild
                     _updateDescription(data.CredentialID, description, _userId, _cachedList);
+                    // Re-sort the list in case the order should change
+                    _sortCredentials(_cachedList);
 
                     // Completely destroy the existing DataTable and remove the table and add link from the DOM
                     $('#records, #add-link').remove();

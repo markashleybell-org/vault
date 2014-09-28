@@ -5,7 +5,6 @@
         loadCredential: _loadCredential,
         confirmDelete: _confirmDelete,
         deleteCredential: _deleteCredential,
-        options: _options,
         changePassword: _changePassword,
         exportData: _exportData
     };
@@ -29,7 +28,9 @@
         utf8_to_b64: _utf8_to_b64,
         b64_to_utf8: _b64_to_utf8,
         contains: _contains,
-        truncate: _truncate
+        truncate: _truncate,
+        search: _search,
+        sortCredentials: _sortCredentials
     };
 */
 

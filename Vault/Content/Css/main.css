@@ -12,15 +12,16 @@
 
 #controls {
     display: none;
+    padding-top: 15px;
 }
 
 #records td {
     border: none;
-    padding: 0 0 0 3px;
+    padding: 3px 0 0 3px;
 }
 
 #records td:first-child {
-    padding: 0 0 0 0;
+    padding: 3px 0 0 0;
 }
 
 @media (min-width: 992px) {
