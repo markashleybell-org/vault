@@ -295,7 +295,7 @@ var Vault = (function ($) {
                 _removeFromList(credentialId, _cachedList);
 
                 // For now we just reload the entire table in the background
-                _loadCredentials(userId, _b64_to_utf8(masterKey), function (rows) {
+                _loadCredentials(userId, masterKey, function (rows) {
 
                     _ui.container.append(_createCredentialTable(rows));
 
