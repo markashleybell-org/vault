@@ -400,7 +400,9 @@ var Vault = (function ($) {
             var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
 
             $.each(data, function (i, item) {
-                exportItems.push(_decryptObject(item, _b64_to_utf8(masterKey), excludes));
+                var o = _decryptObject(item, _b64_to_utf8(masterKey), excludes);
+                delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
+                exportItems.push(o);
             });
 
             var exportWindow = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
@@ -699,7 +701,7 @@ var Vault = (function ($) {
                 var credential = {};
 
                 // Serialize the form inputs into an object
-                inputs.each(function () {
+                form.find('input[class!=submit], textarea').each(function () {
                     credential[this.name] = $(this).val();
                 });
 
