@@ -13,3 +13,9 @@
 #controls {
     display: none;
 }
+
+@media (min-width: 992px) {
+    .modal-lg {
+        width: 600px;
+    }
+}
