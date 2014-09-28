@@ -10,6 +10,7 @@ var Vault = (function ($) {
     _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
     _test = false, // Determine whether to expose all methods publically
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
+    _init = true, // Workaround for the fact that focusing an input triggers keyup event (!?)
     _ui = {
         loginFormDialog: null,
         credentialFormDialog: null,
@@ -547,6 +548,21 @@ var Vault = (function ($) {
 
     };
 
+    var _debounce = function (func, wait, immediate) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+    };
+
     // Sort credentials alphabetically by description
     var _sortCredentials = function (credentials) {
         credentials.sort(function(a, b) {
@@ -643,9 +659,11 @@ var Vault = (function ($) {
                 _ui.searchInput.val('').focus();
             });
 
-            _ui.searchInput.on('keyup', function () {
-                _search(this.value);
-            });
+            _ui.searchInput.on('keyup', _debounce(function () {
+                if (!_init)
+                    _search(this.value);
+                _init = false;
+            }, 200));
 
             // Initialise globals and load data on correct login
             _ui.loginForm.on('submit', function () {
@@ -669,9 +687,9 @@ var Vault = (function ($) {
 
                         _loadCredentials(_userId, _masterKey, function (rows) {
 
-                            _ui.container.append(_createCredentialTable(rows));
-                            // Cache the table selector
-                            _ui.records = $('#records');
+                            //_ui.container.append(_createCredentialTable(rows));
+                            //// Cache the table selector
+                            //_ui.records = $('#records');
 
                             // Successfully logged in. Hide the login form
                             _ui.loginForm.hide();
