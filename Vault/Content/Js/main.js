@@ -9,33 +9,19 @@ var Vault = (function ($) {
     _password = '', // Current user's password
     _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
     _test = false, // Determine whether to expose all methods publically
-    _dataTable = null, // Cache DataTable in memory
-    _dataTableOptions = {
-        'bJQueryUI': true,
-        'sPaginationType': 'full_numbers',
-        'bAutoWidth': false,
-        'bLengthChange': false,
-        'iDisplayLength': 20,
-        'sScrollY': 441,
-        'aaSorting': [[0, 'asc']],
-        'aoColumns': [
-            { 'sType': 'html' },
-            { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
-            { 'sTitle': '', 'sWidth': 20, 'bSortable': false },
-            { 'sTitle': '', 'sWidth': 20, 'bSortable': false }
-        ]
-    },
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
     _ui = {
-        modalBackground: null,
         loginFormDialog: null,
         credentialFormDialog: null,
         loginForm: null,
         credentialForm: null,
         container: null,
         spinner: null,
-        recordsFilter: null,
-        modalDialog: null,
+        controls: null,
+        modalLarge: null,
+        modalLargeContent: null,
+        modalSmall: null,
+        modalSmallContent: null,
         records: null
     },
     _templates = {
@@ -49,7 +35,10 @@ var Vault = (function ($) {
         exportedDataWindow: null,
         credentialTable: null,
         credentialTableRow: null,
-        validationMessage: null
+        validationMessage: null,
+        modalHeader: null,
+        modalBody: null,
+        modalFooter: null
     };
 
     // Insert the Flash-based 'Copy To Clipboard' icon next to credentials
@@ -212,9 +201,44 @@ var Vault = (function ($) {
                 Notes: data.Notes.replace(/\r\n|\n|\r/gi, '<br />')
             });
 
-            _ui.modalDialog.html(detailHtml).dialog({ title: data.Description, width: 600, minHeight: 50, modal: true });
+            _showModal({
+                title: data.Description,
+                content: detailHtml,
+                showClose: false
+            });
 
         });
+
+    };
+
+    // Show a Bootstrap modal with options as below
+    // var modalOptions = {
+    //     title: 'TEST',
+    //     content: '<p>TEST</p>',
+    //     hideFooter: false,
+    //     showClose: true,
+    //     buttonText: 'YES',
+    //     size: 'sm'
+    //     action: function() {}
+    // };
+    var _showModal = function (options) {
+
+        var showClose = options.showClose == false ? false : true;
+
+        var html = _templates.modalHeader({ title: options.title, showclose: showClose }) +
+                   _templates.modalBody({ content: options.content });
+
+        if (!options.hideFooter)
+            html += _templates.modalFooter({ button: options.buttonText || 'OK', showclose: showClose });
+
+        var size = options.size || 'lg';
+
+        var content = (size == 'sm') ? _ui.modalSmallContent : _ui.modalLargeContent;
+        var modal = (size == 'sm') ? _ui.modalSmall : _ui.modalLarge;
+
+        content.html(html);
+        modal.on('click', 'button.btn-primary', options.action || function () { modal.modal('hide'); })
+        modal.modal();
 
     };
 
@@ -244,7 +268,7 @@ var Vault = (function ($) {
                 $('#Notes', f).val(data.Notes);
                 $('#UserID', f).val(data.UserID);
 
-                _ui.credentialFormDialog.dialog({ title: 'Edit Credential', width: 500, modal: true });
+                _ui.credentialFormDialog.modal();
 
             });
 
@@ -253,7 +277,7 @@ var Vault = (function ($) {
             _ui.credentialFormDialog.find('input:not(.submit), textarea').val('');
             _ui.credentialForm.find('#UserID').val(userId);
 
-            _ui.credentialFormDialog.dialog({ title: 'Edit Credential', width: 500, modal: true });
+            _ui.credentialFormDialog.modal();
 
         }
 
@@ -266,8 +290,6 @@ var Vault = (function ($) {
 
             if (data.Success) {
 
-                // Completely destroy the existing DataTable and remove the table and add link from the DOM
-                _dataTable.fnDestroy();
                 $('#records, #add-link').remove();
 
                 // Remove the deleted item from the cached list before reload
@@ -279,18 +301,10 @@ var Vault = (function ($) {
                     _ui.container.append(_createCredentialTable(rows));
 
                     _ui.records = $('#records');
-                    _dataTable = _ui.records.dataTable(_dataTableOptions);
-
+                    
                     _ui.container.append(_templates.addLink({ masterkey: masterKey, userid: userId }));
 
-                    _ui.modalDialog.dialog('destroy');
-
-                    _ui.recordsFilter = $('#records_filter');
-
-                    // Append the clear filter button
-                    _ui.recordsFilter.before(_templates.clearFilterButton());
-
-                    _ui.recordsFilter.find('input:last').focus();
+                    _ui.modalDialog.modal('hide');
 
                 });
 
@@ -303,17 +317,12 @@ var Vault = (function ($) {
     // Show delete confirmation dialog
     var _confirmDelete = function (id, userId) {
 
-        var dialogHtml = _templates.deleteConfirmationDialog({
-            id: id,
-            userid: userId,
-            masterkey: _utf8_to_b64(_masterKey)
-        });
-
-        _ui.modalDialog.html(dialogHtml).dialog({
+        _showModal({
             title: 'Delete Credential',
-            width: 500,
-            modal: true,
-            minHeight: 50
+            content: _templates.deleteConfirmationDialog(),
+            action: function (e) {
+                Vault.deleteCredential(id, userId, _masterKey);
+            }
         });
 
     };
@@ -432,12 +441,7 @@ var Vault = (function ($) {
             masterkey: _utf8_to_b64(_masterKey)
         });
 
-        $('#modal-dialog').html(dialogHtml).dialog({
-            title: 'Options',
-            width: 500,
-            modal: true,
-            minHeight: 50
-        });
+        $('#modal-dialog').html(dialogHtml).modal();
 
     };
 
@@ -553,8 +557,6 @@ var Vault = (function ($) {
 
         if (typeof test === 'undefined' || !test) {
 
-            // Add the modal dialog container
-            $('body').append('<div id="modal-dialog"></div>');
             // Cache UI selectors
             _ui.loginFormDialog = $('#login-form-dialog');
             _ui.credentialFormDialog = $('#credential-form-dialog');
@@ -562,8 +564,11 @@ var Vault = (function ($) {
             _ui.credentialForm = $('#credential-form');
             _ui.container = $('#container');
             _ui.spinner = $('#spinner');
-            _ui.recordsFilter = $('#records_filter');
-            _ui.modalDialog = $('#modal-dialog');
+            _ui.controls = $('#controls');
+            _ui.modalLarge = $('#modal-lg');
+            _ui.modalLargeContent = $('#modal-lg-content');
+            _ui.modalSmall = $('#modal-sm');
+            _ui.modalSmallContent = $('#modal-sm-content');
 
             _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
             _templates.detail = Handlebars.compile($('#tmpl-detail').html());
@@ -577,10 +582,13 @@ var Vault = (function ($) {
             _templates.credentialTableRow = Handlebars.compile($('#tmpl-credentialtablerow').html());
             Handlebars.registerPartial('credentialtablerow', _templates.credentialTableRow);
             _templates.validationMessage = Handlebars.compile($('#tmpl-validationmessage').html());
+            _templates.modalHeader = Handlebars.compile($('#tmpl-modalheader').html());
+            _templates.modalBody = Handlebars.compile($('#tmpl-modalbody').html());
+            _templates.modalFooter = Handlebars.compile($('#tmpl-modalfooter').html());
 
-            // Load the datatable stylesheet dynamically
-            var tableStyles = $('<link rel="stylesheet" type="text/css" href="/content/css/datatables.css" />');
-            $('head').append(tableStyles);
+            //// Load the datatable stylesheet dynamically
+            //var tableStyles = $('<link rel="stylesheet" type="text/css" href="/content/css/datatables.css" />');
+            //$('head').append(tableStyles);
 
             // Initialise globals and load data on correct login
             _ui.loginForm.on('submit', function () {
@@ -609,19 +617,13 @@ var Vault = (function ($) {
                             _ui.container.append(_createCredentialTable(rows));
                             // Cache the table selector
                             _ui.records = $('#records');
-                            _dataTable = _ui.records.dataTable(_dataTableOptions);
 
                             // Successfully logged in. Hide the login form
                             _ui.container.append(_templates.addLink({ masterkey: _masterKey, userid: _userId }));
                             _ui.loginForm.hide();
-                            _ui.loginFormDialog.dialog('destroy');
+                            _ui.loginFormDialog.modal('hide');
 
-                            _ui.recordsFilter = $('#records_filter');
-
-                            // Append the clear filter button
-                            _ui.recordsFilter.before(_templates.clearFilterButton());
-
-                            _ui.recordsFilter.find('input:last').focus();
+                            _ui.controls.show();
 
                         });
 
@@ -678,7 +680,6 @@ var Vault = (function ($) {
                     _updateDescription(data.CredentialID, description, _userId, _cachedList);
 
                     // Completely destroy the existing DataTable and remove the table and add link from the DOM
-                    _dataTable.fnDestroy();
                     $('#records, #add-link').remove();
 
                     // For now we just reload the entire table in the background
@@ -687,20 +688,12 @@ var Vault = (function ($) {
                         _ui.container.append(_createCredentialTable(rows));
 
                         _ui.records = $('#records');
-                        _dataTable = _ui.records.dataTable(_dataTableOptions);
 
                         _ui.container.append(_templates.addLink({ masterkey: _masterKey, userid: _userId }));
 
                         _ui.spinner.remove();
 
-                        _ui.credentialFormDialog.dialog('destroy');
-
-                        _ui.recordsFilter = $('#records_filter');
-
-                        // Append the clear filter button
-                        _ui.recordsFilter.before(_templates.clearFilterButton());
-
-                        _ui.recordsFilter.find('input:last').focus();
+                        _ui.credentialFormDialog.modal('hide');
 
                     });
 

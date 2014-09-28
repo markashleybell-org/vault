@@ -67,15 +67,6 @@
     <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention">
       <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
     </Reference>
-    <Reference Include="MiniProfiler">
-      <HintPath>..\packages\MiniProfiler.3.0.11\lib\net40\MiniProfiler.dll</HintPath>
-    </Reference>
-    <Reference Include="MiniProfiler.EntityFramework6">
-      <HintPath>..\packages\MiniProfiler.EF6.3.0.11\lib\net40\MiniProfiler.EntityFramework6.dll</HintPath>
-    </Reference>
-    <Reference Include="MiniProfiler.Mvc">
-      <HintPath>..\packages\MiniProfiler.MVC4.3.0.11\lib\net40\MiniProfiler.Mvc.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -174,8 +165,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Css\datatables.css" />
-    <Content Include="Content\Css\screen.css" />
+    <Content Include="Content\Css\bootstrap.css" />
+    <Content Include="Content\Css\qunit-1.14.0.css" />
+    <Content Include="Content\Css\main.css" />
+    <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\clippy.swf" />
     <Content Include="Content\Img\delete.png" />
@@ -183,11 +176,11 @@
     <Content Include="Content\Img\favicon.ico" />
     <Content Include="Content\Img\key.png" />
     <Content Include="Content\Img\view.png" />
+    <Content Include="Content\Js\bootstrap.js" />
     <Content Include="Content\Js\handlebars-v1.3.0.js" />
-    <Content Include="Content\Js\jquery.dataTables.min.js" />
     <Content Include="Content\Js\main.js" />
     <Content Include="Content\Js\passpack-v1.1.js" />
-    <Content Include="Content\Js\passpack-v1.1.min.js" />
+    <Content Include="Content\Js\qunit-1.14.0.js" />
     <Content Include="Content\Js\tests.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -214,6 +207,11 @@
   <ItemGroup>
     <Content Include="Views\Main\Generate.cshtml" />
     <Content Include="Views\Main\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\Fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\Fonts\glyphicons-halflings-regular.woff" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

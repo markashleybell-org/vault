@@ -5,20 +5,16 @@ using System.Web;
 using System.Web.Mvc;
 using Vault.Models;
 using Dapper;
-using StackExchange.Profiling;
 
 namespace Vault.Controllers
 {
     public class MainController : Controller
     {
         private ConnectionFactoryBase _cf;
-        private MiniProfiler _profiler;
 
         public MainController(ConnectionFactoryBase cf)
         {
             _cf = cf;
-
-            _profiler = MiniProfiler.Current;
         }
 
         public ActionResult Index()
@@ -64,33 +60,17 @@ namespace Vault.Controllers
         {
             CredentialViewModel credential;
 
-            using (_profiler.Step("Connect And Query"))
+            using (var conn = _cf.GetConnection())
             {
-                using (var conn = _cf.GetConnection())
-                {
-                    using (_profiler.Step("Open Connection"))
-                    {
-                        conn.Open();
-                    }
-                    using (_profiler.Step("Query"))
-                    {
-                        credential = conn.Query<CredentialViewModel>("select * from tCredential where CredentialID = @CredentialID", new { CredentialID = id }).FirstOrDefault();
-                    }
-                }
+                conn.Open();
+                credential = conn.Query<CredentialViewModel>("select * from tCredential where CredentialID = @CredentialID", new { CredentialID = id }).FirstOrDefault();
             }
 
             // Fix for previous behaviour
             if (credential != null)
                 credential.PasswordConfirmation = credential.Password;
 
-            JsonResult result;
-
-            using (_profiler.Step("Serialize JSON"))
-            {
-                result = Json(credential);
-            }
-
-            return result;
+            return Json(credential);
         }
 
         [HttpPost]

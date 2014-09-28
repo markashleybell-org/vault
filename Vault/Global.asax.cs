@@ -7,7 +7,6 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Microsoft.Practices.Unity;
-using StackExchange.Profiling;
 using Vault.Models;
 
 namespace Vault
@@ -39,14 +38,10 @@ namespace Vault
 
         protected void Application_BeginRequest()
         {
-            if (profiling)
-                MiniProfiler.Start();
         }
 
         protected void Application_EndRequest()
         {
-            if (profiling)
-                MiniProfiler.Stop();
         }
     }
 }

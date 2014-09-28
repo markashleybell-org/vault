@@ -1,0 +1,15 @@
+﻿.btn-l {
+    text-align: left;
+}
+
+.btn-lg {
+    padding: 11px 16px 10px 16px;
+}
+
+.glyphicon {
+    top: 3px;
+}
+
+#controls {
+    display: none;
+}
