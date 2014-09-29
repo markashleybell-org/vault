@@ -17,10 +17,8 @@ var Vault = (function ($) {
         credentialForm: null,
         container: null,
         controls: null,
-        modalLarge: null,
-        modalLargeContent: null,
-        modalSmall: null,
-        modalSmallContent: null,
+        modal: null,
+        modalContent: null,
         records: null,
         newButton: null,
         adminButton: null,
@@ -202,7 +200,6 @@ var Vault = (function ($) {
     //     hideFooter: false,
     //     showClose: true,
     //     buttonText: 'YES',
-    //     size: 'sm'
     //     action: function() {}
     // };
     var _showModal = function (options) {
@@ -215,15 +212,10 @@ var Vault = (function ($) {
         if (!options.hideFooter)
             html += _templates.modalFooter({ button: options.buttonText || 'OK', showclose: showClose });
 
-        var size = options.size || 'lg';
-
-        var content = (size == 'sm') ? _ui.modalSmallContent : _ui.modalLargeContent;
-        var modal = (size == 'sm') ? _ui.modalSmall : _ui.modalLarge;
-
-        content.html(html);
-        modal.on('click', 'button.btn-action', options.action || function (e) { modal.modal('hide'); _ui.searchInput.focus(); });
-        modal.on('click', 'button.btn-close', function (e) { modal.modal('hide'); _ui.searchInput.focus(); });
-        modal.modal();
+        _ui.modalContent.html(html);
+        _ui.modal.on('click', 'button.btn-action', options.action || function (e) { modal.modal('hide'); _ui.searchInput.focus(); });
+        _ui.modal.on('click', 'button.btn-close', function (e) { modal.modal('hide'); _ui.searchInput.focus(); });
+        _ui.modal.modal();
 
     };
 
@@ -296,7 +288,7 @@ var Vault = (function ($) {
 
                     _ui.records = $('#records');
                     
-                    _ui.modalLarge.modal('hide');
+                    _ui.modal.modal('hide');
 
                 });
 
@@ -606,10 +598,8 @@ var Vault = (function ($) {
             _ui.credentialForm = $('#credential-form');
             _ui.container = $('#container');
             _ui.controls = $('#controls');
-            _ui.modalLarge = $('#modal-lg');
-            _ui.modalLargeContent = $('#modal-lg-content');
-            _ui.modalSmall = $('#modal-sm');
-            _ui.modalSmallContent = $('#modal-sm-content');
+            _ui.modal = $('#modal-lg');
+            _ui.modalContent = $('#modal-lg-content');
             _ui.newButton = $('#new');
             _ui.adminButton = $('#admin');
             _ui.clearSearchButton = $('#clear-search');
