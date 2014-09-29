@@ -111,7 +111,7 @@ var Vault = (function ($) {
 
         _ui.spinner.show();
 
-        setTimeout(function () {
+        //setTimeout(function () {
 
             if (typeof errorCallback === 'undefined' || errorCallback === null) {
                 errorCallback = _defaultAjaxErrorCallback;
@@ -131,7 +131,7 @@ var Vault = (function ($) {
 
             $.ajax(options);
 
-        }, 1000);
+        //}, 1000);
 
     };
 
