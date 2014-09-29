@@ -331,7 +331,6 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 _loadCredentials(userId, masterKey, function (rows) {
 
                     _ui.container.append(_createCredentialTable(rows));
-                    _ui.records = $('#records');
                     _ui.modal.modal('hide');
                     _ui.searchInput.focus();
 
@@ -571,7 +570,6 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
         _buildDataTable(results, function (rows) {
             _ui.container.html(_createCredentialTable(rows));
-            _ui.records = $('#records');
         }, _masterKey);
 
     };
@@ -782,7 +780,6 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                     _loadCredentials(_userId, _masterKey, function (rows) {
 
                         _ui.container.append(_createCredentialTable(rows));
-                        _ui.records = $('#records');
                         _ui.credentialFormDialog.modal('hide');
                         _ui.searchInput.focus();
 
