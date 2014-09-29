@@ -63,6 +63,17 @@
     width: 20px;
 }
 
+#spinner {
+    padding: 3px 5px 5px 5px; 
+    background-color: #000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    border-bottom-right-radius: 3px;
+    display: none;
+}
+
 @media (min-width: 992px) {
     .modal-lg {
         width: 600px;

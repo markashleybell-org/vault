@@ -23,7 +23,8 @@ var Vault = (function ($) {
         newButton: null,
         adminButton: null,
         clearSearchButton: null,
-        searchInput: null
+        searchInput: null,
+        spinner: null
     },
     _templates = {
         copyLink: null,
@@ -107,24 +108,31 @@ var Vault = (function ($) {
     };
 
     var _ajaxPost = function (url, data, successCallback, errorCallback, contentType) {
-        if (typeof errorCallback === 'undefined' || errorCallback === null) {
-            errorCallback = _defaultAjaxErrorCallback;
-        }
-        var options = {
-            url: url,
-            data: data,
-            dataType: 'json',
-            type: 'POST',
-            success: successCallback,
-            error: errorCallback
-        };
 
-        if(typeof contentType !== 'undefined')
-        {
-            options.contentType = contentType;
-        }
+        _ui.spinner.show();
 
-        $.ajax(options);
+        setTimeout(function () {
+
+            if (typeof errorCallback === 'undefined' || errorCallback === null) {
+                errorCallback = _defaultAjaxErrorCallback;
+            }
+            var options = {
+                url: url,
+                data: data,
+                dataType: 'json',
+                type: 'POST',
+                success: function (data, status, request) { _ui.spinner.hide(); successCallback(data, status, request); },
+                error: function (request, status, error) { _ui.spinner.hide(); errorCallback(request, status, error); }
+            };
+
+            if (typeof contentType !== 'undefined') {
+                options.contentType = contentType;
+            }
+
+            $.ajax(options);
+
+        }, 1000);
+
     };
 
     // Load all records for a specific user
@@ -617,6 +625,7 @@ var Vault = (function ($) {
             _ui.adminButton = $('#admin');
             _ui.clearSearchButton = $('#clear-search');
             _ui.searchInput = $('#search');
+            _ui.spinner = $('#spinner');
 
             _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
             _templates.detail = Handlebars.compile($('#tmpl-detail').html());
