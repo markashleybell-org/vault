@@ -2,13 +2,14 @@
 // Vault client app code
 //////////////////////////////////////////////////////////////////////////////////
 
-var Vault = (function ($) {
+var Vault = (function ($, Passpack, Handlebars, window, undefined) {
+    'use strict';
     // Private member variables
     var _userId = '', // GUID identifying logged-in user
     _username = '', // Current user's username
     _password = '', // Current user's password
     _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
-    _test = false, // Determine whether to expose all methods publically
+    _artificialAjaxDelay = true, // Introduce an artificial delay for AJAX calls so we can test loaders locally
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
     _ui = {
         loginFormDialog: null,
@@ -82,7 +83,7 @@ var Vault = (function ($) {
         var i;
 
         for (i = 0; i < list.length; i++) {
-            if (list[i].CredentialID == id) {
+            if (list[i].CredentialID === id) {
                 break;
             }
         }
@@ -94,7 +95,7 @@ var Vault = (function ($) {
     var _updateDescription = function (id, description, userId, list) {
 
         for (var i = 0; i < list.length; i++) {
-            if (list[i].CredentialID == id) {
+            if (list[i].CredentialID === id) {
                 list[i].Description = description;
                 return;
             }
@@ -111,34 +112,37 @@ var Vault = (function ($) {
 
         _ui.spinner.show();
 
-        //setTimeout(function () {
+        if (typeof errorCallback === 'undefined' || errorCallback === null) {
+            errorCallback = _defaultAjaxErrorCallback;
+        }
 
-            if (typeof errorCallback === 'undefined' || errorCallback === null) {
-                errorCallback = _defaultAjaxErrorCallback;
-            }
-            var options = {
-                url: url,
-                data: data,
-                dataType: 'json',
-                type: 'POST',
-                success: function (data, status, request) { _ui.spinner.hide(); successCallback(data, status, request); },
-                error: function (request, status, error) { _ui.spinner.hide(); errorCallback(request, status, error); }
-            };
+        var options = {
+            url: url,
+            data: data,
+            dataType: 'json',
+            type: 'POST',
+            success: function (data, status, request) { _ui.spinner.hide(); successCallback(data, status, request); },
+            error: function (request, status, error) { _ui.spinner.hide(); errorCallback(request, status, error); }
+        };
 
-            if (typeof contentType !== 'undefined') {
-                options.contentType = contentType;
-            }
+        if (typeof contentType !== 'undefined') {
+            options.contentType = contentType;
+        }
 
+        if (!_artificialAjaxDelay) {
             $.ajax(options);
-
-        //}, 1000);
+        } else {
+            setTimeout(function () {
+                $.ajax(options);
+            }, 500);
+        }
 
     };
 
     // Load all records for a specific user
     var _loadCredentials = function (userId, masterKey, callback) {
 
-        if (_cachedList != null && _cachedList.length) {
+        if (_cachedList !== null && _cachedList.length) {
 
             _buildDataTable(_cachedList, callback, masterKey);
 
@@ -194,7 +198,7 @@ var Vault = (function ($) {
             _showModal({
                 title: data.Description,
                 content: detailHtml,
-                hideFooter: true
+                showAccept: false
             });
 
         });
@@ -203,11 +207,14 @@ var Vault = (function ($) {
 
     // Default action for modal accept button
     var defaultAcceptAction = function (e) {
+        e.preventDefault();
         _ui.modal.modal('hide');
         _ui.searchInput.focus();
     };
 
+    // Default action for modal close button
     var defaultCloseAction = function (e) {
+        e.preventDefault();
         _ui.modal.modal('hide');
         _ui.searchInput.focus();
     };
@@ -216,7 +223,7 @@ var Vault = (function ($) {
     // var modalOptions = {
     //     title: 'TEST',
     //     content: '<p>TEST</p>',
-    //     hideFooter: false,
+    //     showAccept: true,
     //     showClose: true,
     //     acceptText: 'OK',
     //     accept: function() {}
@@ -225,17 +232,34 @@ var Vault = (function ($) {
     // };
     var _showModal = function (options) {
 
-        var showClose = options.showClose == false ? false : true;
+        var showAccept = options.showAccept === false ? false : true;
+        var showClose = options.showClose === false ? false : true;
 
-        var html = _templates.modalHeader({ title: options.title, showclose: showClose }) +
-                   _templates.modalBody({ content: options.content });
+        var html = _templates.modalHeader({
+            title: options.title,
+            closeText: options.closeText || 'Close',
+            showAccept: showAccept,
+            showClose: showClose
+        }) + _templates.modalBody({
+            content: options.content
+        });
 
-        if (!options.hideFooter)
-            html += _templates.modalFooter({ button: options.buttonText || 'OK', showclose: showClose });
+        if (showAccept || showClose) {
+            html += _templates.modalFooter({
+                acceptText: options.acceptText || 'OK',
+                closeText: options.closeText || 'Close',
+                showAccept: showAccept,
+                showClose: showClose
+            });
+        }
 
         _ui.modalContent.html(html);
+
+        _ui.modal.off('click', 'button.btn-action');
+        _ui.modal.off('click', 'button.btn-close');
         _ui.modal.on('click', 'button.btn-action', options.accept || defaultAcceptAction);
         _ui.modal.on('click', 'button.btn-close', options.close || defaultCloseAction);
+
         _ui.modal.modal();
 
     };
@@ -244,6 +268,7 @@ var Vault = (function ($) {
         _ui.credentialFormDialog.modal();
         _ui.credentialFormDialog.find('input[name=Description]').focus();
         _ui.credentialFormDialog.find('.btn-close').on('click', function (e) {
+            e.preventDefault();
             _ui.credentialFormDialog.modal('hide');
             _ui.searchInput.focus();
         });
@@ -253,7 +278,7 @@ var Vault = (function ($) {
     // If null is passed as the credentialId, we set up the form for adding a new record
     var _loadCredential = function (credentialId, masterKey, userId) {
 
-        if (credentialId != null) {
+        if (credentialId !== null) {
 
             _ajaxPost('/Main/Load', { id: credentialId }, function (data, status, request) {
 
@@ -306,10 +331,9 @@ var Vault = (function ($) {
                 _loadCredentials(userId, masterKey, function (rows) {
 
                     _ui.container.append(_createCredentialTable(rows));
-
                     _ui.records = $('#records');
-                    
                     _ui.modal.modal('hide');
+                    _ui.searchInput.focus();
 
                 });
 
@@ -325,9 +349,9 @@ var Vault = (function ($) {
         _showModal({
             title: 'Delete Credential',
             content: _templates.deleteConfirmationDialog(),
-            action: function (e) {
+            accept: function (e) {
+                e.preventDefault();
                 Vault.deleteCredential(id, userId, _masterKey);
-                _ui.searchInput.focus();
             }
         });
 
@@ -355,7 +379,7 @@ var Vault = (function ($) {
             return false;
         }
 
-        if (newPassword != newPasswordConfirm) {
+        if (newPassword !== newPasswordConfirm) {
             alert('Password confirmation does not match password.');
             return false;
         }
@@ -444,7 +468,7 @@ var Vault = (function ($) {
         _showModal({
             title: 'Admin',
             content: dialogHtml,
-            showClose: false
+            showAccept: false
         });
 
     };
@@ -493,12 +517,12 @@ var Vault = (function ($) {
         var password = $('#Password', f);
         var passwordConfirmation = $('#PasswordConfirmation', f);
 
-        if (description.val() == '') {
+        if (description.val() === '') {
             errors.push({ field: description, msg: 'You must fill in a Description' });
         }
 
         // We don't mind if these are blank, but they must be the same!
-        if (password.val() != passwordConfirmation.val()) {
+        if (password.val() !== passwordConfirmation.val()) {
             errors.push({ field: passwordConfirmation, msg: 'Password confirmation does not match' });
         }
 
@@ -519,7 +543,7 @@ var Vault = (function ($) {
     // Utility function to check a value exists in an array
     var _contains = function (arr, value) {
         for (var i = 0; i < arr.length; i++) {
-            if (arr[i] == value) {
+            if (arr[i] === value) {
                 return true;
             }
         }
@@ -543,8 +567,9 @@ var Vault = (function ($) {
         {
             query = query.toLowerCase();
             for (var i = 0; i < _cachedList.length; i++) {
-                if (_cachedList[i].Description.toLowerCase().indexOf(query) > -1)
+                if (_cachedList[i].Description.toLowerCase().indexOf(query) > -1) {
                     results.push(_cachedList[i]);
+                }
             }
         }
 
@@ -562,12 +587,16 @@ var Vault = (function ($) {
             var context = this, args = arguments;
             var later = function() {
                 timeout = null;
-                if (!immediate) func.apply(context, args);
+                if (!immediate) {
+                    func.apply(context, args);
+                }
             };
             var callNow = immediate && !timeout;
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
+            if (callNow) {
+                func.apply(context, args);
+            }
         };
     };
 
@@ -664,8 +693,9 @@ var Vault = (function ($) {
 
             _ui.searchInput.on('keyup', _debounce(function () {
                 var val = this.value;
-                if ($.trim(val) !== '')
+                if ($.trim(val) !== '') {
                     _search(val);
+                }
             }, 200));
 
             // Initialise globals and load data on correct login
@@ -680,7 +710,7 @@ var Vault = (function ($) {
                 }, function (data, status, request) {
 
                     // If the details were valid
-                    if (data.result == 1 && data.id != '') {
+                    if (data.result === 1 && data.id !== '') {
 
                         // Set some private variables so that we can reuse them for encryption during this session
                         _userId = data.id;
@@ -689,10 +719,6 @@ var Vault = (function ($) {
                         _masterKey = _utf8_to_b64(window.Passpack.utils.hashx(_password + Passpack.utils.hashx(_password, 1, 1), 1, 1));
 
                         _loadCredentials(_userId, _masterKey, function (rows) {
-
-                            //_ui.container.append(_createCredentialTable(rows));
-                            //// Cache the table selector
-                            //_ui.records = $('#records');
 
                             // Successfully logged in. Hide the login form
                             _ui.loginForm.hide();
@@ -787,4 +813,4 @@ var Vault = (function ($) {
 
     return vault;
 
-}(jQuery));
+}(jQuery, Passpack, Handlebars, window, undefined));
