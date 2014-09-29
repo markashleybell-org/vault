@@ -170,16 +170,6 @@ var Vault = (function ($) {
 
             data = _decryptObject(data, masterKey, excludeProperties);
 
-            // Loop through all the properties of the data object (except the excludes)
-            // and encode any HTML for display
-            $.each(data, function (name, value) {
-
-                if (!_contains(excludeProperties, name) && name != 'Password') {
-                    data[name] = _htmlEncode(value);
-                }
-
-            });
-
             var detailHtml = _templates.detail({
                 Url: data.Url,
                 Username: data.Username,
@@ -643,10 +633,6 @@ var Vault = (function ($) {
                 text = text.replace(/(\r\n|\n|\r)/gm, '<br />');
                 return new Handlebars.SafeString(text);
             });
-
-            //// Load the datatable stylesheet dynamically
-            //var tableStyles = $('<link rel="stylesheet" type="text/css" href="/content/css/datatables.css" />');
-            //$('head').append(tableStyles);
 
             _ui.newButton.on('click', function (e) {
                 e.preventDefault();
