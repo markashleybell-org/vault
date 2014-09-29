@@ -193,14 +193,27 @@ var Vault = (function ($) {
 
     };
 
+    // Default action for modal accept button
+    var defaultAcceptAction = function (e) {
+        _ui.modal.modal('hide');
+        _ui.searchInput.focus();
+    };
+
+    var defaultCloseAction = function (e) {
+        _ui.modal.modal('hide');
+        _ui.searchInput.focus();
+    };
+
     // Show a Bootstrap modal with options as below
     // var modalOptions = {
     //     title: 'TEST',
     //     content: '<p>TEST</p>',
     //     hideFooter: false,
     //     showClose: true,
-    //     buttonText: 'YES',
-    //     action: function() {}
+    //     acceptText: 'OK',
+    //     accept: function() {}
+    //     closeText: 'Close',
+    //     close: function() {}
     // };
     var _showModal = function (options) {
 
@@ -213,8 +226,8 @@ var Vault = (function ($) {
             html += _templates.modalFooter({ button: options.buttonText || 'OK', showclose: showClose });
 
         _ui.modalContent.html(html);
-        _ui.modal.on('click', 'button.btn-action', options.action || function (e) { modal.modal('hide'); _ui.searchInput.focus(); });
-        _ui.modal.on('click', 'button.btn-close', function (e) { modal.modal('hide'); _ui.searchInput.focus(); });
+        _ui.modal.on('click', 'button.btn-action', options.accept || defaultAcceptAction);
+        _ui.modal.on('click', 'button.btn-close', options.close || defaultCloseAction);
         _ui.modal.modal();
 
     };
