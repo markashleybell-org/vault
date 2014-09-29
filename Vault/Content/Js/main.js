@@ -188,7 +188,7 @@ var Vault = (function ($) {
             _showModal({
                 title: data.Description,
                 content: detailHtml,
-                showClose: false
+                hideFooter: true
             });
 
         });
