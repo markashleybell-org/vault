@@ -499,8 +499,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             credentialid: credential.CredentialID,
             masterkey: masterKey,
             userid: _userId,
-            description: credential.Description,
-            url: credential.Url
+            description: credential.Description
         };
 
     };
@@ -666,6 +665,12 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             Handlebars.registerHelper('breaklines', function (text) {
                 text = Handlebars.Utils.escapeExpression(text);
                 text = text.replace(/(\r\n|\n|\r)/gm, '<br />');
+                return new Handlebars.SafeString(text);
+            });
+
+            Handlebars.registerHelper('truncate', function (text, size) {
+                text = (text.length > size) ? text.substring(0, (size - 3)) + '...' : text
+                text = Handlebars.Utils.escapeExpression(text);
                 return new Handlebars.SafeString(text);
             });
 

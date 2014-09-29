@@ -78,6 +78,19 @@
     padding: 10px 8px 0 8px;
 }
 
+.full {
+    display: none;
+}
+
+@media (min-width: 500px) {
+    .full {
+        display: inline;
+    }
+    .truncated {
+        display: none;
+    }
+}
+
 @media (min-width: 992px) {
     .modal-lg {
         width: 600px;

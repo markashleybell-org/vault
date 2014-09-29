@@ -111,7 +111,7 @@
                 <tr>
                     <th>Url</th>
                     <td>&nbsp;</td>
-                    <td><a class="display-link" href="{{Url}}" onclick="window.open(this.href); return false;">{{Url}}</a></td>
+                    <td><a class="display-link" href="{{Url}}" onclick="window.open(this.href); return false;"><span class="full">{{Url}}</span><span class="truncated">{{truncate Url 26}}</span></a></td>
                 </tr>
                 {{/if}}
                 {{#if Username}}
@@ -206,7 +206,7 @@
     <script id="tmpl-credentialtablerow" type="text/x-handlebars-template">
         <tr id="{{credentialid}}">
             <td>
-                <button class="btn btn-default btn-block btn-l" onclick="Vault.showDetail('{{credentialid}}', '{{masterkey}}');">{{description}}</button>
+                <button class="btn btn-default btn-block btn-l" onclick="Vault.showDetail('{{credentialid}}', '{{masterkey}}');"><span class="full">{{description}}</span><span class="truncated">{{truncate description 31}}</span></button>
             </td>
             <td class="center">
                 <button class="btn btn-primary btn-block" onclick="Vault.loadCredential('{{credentialid}}', '{{masterkey}}', '{{userid}}');">
