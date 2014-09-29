@@ -237,6 +237,15 @@ var Vault = (function ($) {
 
     };
 
+    var _setUpCredentialEditModal = function () {
+        _ui.credentialFormDialog.modal();
+        _ui.credentialFormDialog.find('input[name=Description]').focus();
+        _ui.credentialFormDialog.find('.btn-close').on('click', function (e) {
+            _ui.credentialFormDialog.modal('hide');
+            _ui.searchInput.focus();
+        });
+    };
+
     // Load a record into the edit form
     // If null is passed as the credentialId, we set up the form for adding a new record
     var _loadCredential = function (credentialId, masterKey, userId) {
@@ -263,11 +272,7 @@ var Vault = (function ($) {
                 $('#Notes', f).val(data.Notes);
                 $('#UserID', f).val(data.UserID);
 
-                _ui.credentialFormDialog.modal();
-                _ui.credentialFormDialog.find('.btn-close').on('click', function (e) {
-                    _ui.credentialFormDialog.modal('hide');
-                    _ui.searchInput.focus();
-                });
+                _setUpCredentialEditModal();
 
             });
 
@@ -276,11 +281,7 @@ var Vault = (function ($) {
             _ui.credentialFormDialog.find('input:not(.submit), textarea').val('');
             _ui.credentialForm.find('#UserID').val(userId);
 
-            _ui.credentialFormDialog.modal();
-            _ui.credentialFormDialog.find('.btn-close').on('click', function (e) {
-                _ui.credentialFormDialog.modal('hide');
-                _ui.searchInput.focus();
-            });
+            _setUpCredentialEditModal();
 
         }
 
