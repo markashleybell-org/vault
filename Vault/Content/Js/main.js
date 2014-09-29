@@ -10,7 +10,6 @@ var Vault = (function ($) {
     _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
     _test = false, // Determine whether to expose all methods publically
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
-    _init = true, // Workaround for the fact that focusing an input triggers keyup event (!?)
     _ui = {
         loginFormDialog: null,
         credentialFormDialog: null,
@@ -665,9 +664,9 @@ var Vault = (function ($) {
             });
 
             _ui.searchInput.on('keyup', _debounce(function () {
-                if (!_init)
-                    _search(this.value);
-                _init = false;
+                var val = this.value;
+                if ($.trim(val) !== '')
+                    _search(val);
             }, 200));
 
             // Initialise globals and load data on correct login
