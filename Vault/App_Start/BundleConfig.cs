@@ -8,13 +8,13 @@ namespace Vault
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
-            bundles.Add(new ScriptBundle("~/Content/Js").Include(
+            bundles.Add(new ScriptBundle("~/Content/Js/bundle").Include(
                       "~/Content/Js/bootstrap.js",
                       "~/Content/Js/passpack-v1.1.js",
                       "~/Content/Js/handlebars-v1.3.0.js",
                       "~/Content/Js/main.js"));
 
-            bundles.Add(new StyleBundle("~/Content/Css").Include(
+            bundles.Add(new StyleBundle("~/Content/Css/bundle").Include(
                       "~/Content/Css/bootstrap.css",
                       "~/Content/Css/main.css"));
         }

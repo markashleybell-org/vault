@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>@ViewBag.Title</title>
         <link rel="shortcut icon" href="/content/img/favicon.ico" />
-        @Styles.Render("~/Content/Css")
+        @Styles.Render("~/Content/Css/bundle")
         @RenderSection("head", false)
     </head>
     <body>
@@ -14,7 +14,7 @@
             @RenderSection("main")
         </div>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        @Scripts.Render("~/Content/Js")
+        @Scripts.Render("~/Content/Js/bundle")
         @RenderSection("foot", false)
     </body>
 </html>
