@@ -70,15 +70,11 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
     // Remove the item with a specific ID from an array
     var _removeFromList = function (id, list) {
-        var i;
-
-        for (i = 0; i < list.length; i++) {
+        for (var i = 0; i < list.length; i++) {
             if (list[i].CredentialID === id) {
-                break;
+                list.splice(i, 1);
             }
         }
-
-        list.splice(i, 1);
     };
 
     // Update the description of item with a specific ID in a list

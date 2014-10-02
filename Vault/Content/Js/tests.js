@@ -127,7 +127,20 @@ QUnit.test('Test _decryptObject', function (assert) {
     assert.ok(decrypted.Username === '_testuser123');
 });
 
-QUnit.test('Test _removeFromList', function (assert) { });
+QUnit.test('Test _removeFromList', function (assert) {
+    var list = [
+        { CredentialID: 1, Description: 'ITEM1' },
+        { CredentialID: 2, Description: 'ITEM2' },
+        { CredentialID: 3, Description: 'ITEM3' }
+    ];
+
+    Vault.removeFromList(2, list);
+
+    assert.ok(list.length === 2);
+    assert.ok(list[0].Description === 'ITEM1');
+    assert.ok(list[1].Description === 'ITEM3');
+});
+
 QUnit.test('Test _updateDescription', function (assert) { });
 QUnit.test('Test _defaultAjaxErrorCallback', function (assert) { });
 QUnit.test('Test _ajaxPost', function (assert) { });
