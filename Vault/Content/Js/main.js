@@ -78,7 +78,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     };
 
     // Update the description of item with a specific ID in a list
-    var _updateDescription = function (id, description, userId, list) {
+    var _addOrUpdateDescription = function (id, description, userId, list) {
 
         for (var i = 0; i < list.length; i++) {
             if (list[i].CredentialID === id) {
@@ -597,7 +597,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,
                 removeFromList: _removeFromList,
-                updateDescription: _updateDescription,
+                addOrUpdateDescription: _addOrUpdateDescription,
                 defaultAjaxErrorCallback: _defaultAjaxErrorCallback,
                 ajaxPost: _ajaxPost,
                 loadCredentials: _loadCredentials,
@@ -768,7 +768,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 _ajaxPost('/Main/Update', credential, function (data, status, request) {
 
                     // Update the cached credential list with the new Description so it is correct when we rebuild
-                    _updateDescription(data.CredentialID, description, _userId, _cachedList);
+                    _addOrUpdateDescription(data.CredentialID, description, _userId, _cachedList);
                     // Re-sort the list in case the order should change
                     _sortCredentials(_cachedList);
 

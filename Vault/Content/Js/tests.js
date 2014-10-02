@@ -141,7 +141,23 @@ QUnit.test('Test _removeFromList', function (assert) {
     assert.ok(list[1].Description === 'ITEM3');
 });
 
-QUnit.test('Test _updateDescription', function (assert) { });
+QUnit.test('Test _addOrUpdateDescription', function (assert) {
+    var list = [
+        { CredentialID: 1, Description: 'ITEM1', UserID: '1' },
+        { CredentialID: 2, Description: 'ITEM2', UserID: '1' },
+        { CredentialID: 3, Description: 'ITEM3', UserID: '1' }
+    ];
+    var userId = 1;
+    Vault.addOrUpdateDescription(2, 'ITEM2UPDATE', userId, list);
+    Vault.addOrUpdateDescription(0, 'ITEM4', userId, list);
+
+    assert.ok(list[1].Description === 'ITEM2UPDATE');
+    assert.ok(list.length === 4);
+    assert.ok(list[3].CredentialID === 0);
+    assert.ok(list[3].Description == 'ITEM4');
+    assert.ok(list[3].UserID === 1);
+});
+
 QUnit.test('Test _defaultAjaxErrorCallback', function (assert) { });
 QUnit.test('Test _ajaxPost', function (assert) { });
 QUnit.test('Test _loadCredentials', function (assert) { });
