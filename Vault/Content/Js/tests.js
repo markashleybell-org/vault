@@ -179,19 +179,61 @@ QUnit.test('Test _setUpCredentialEditModal', function (assert) { });
 QUnit.test('Test _loadCredential', function (assert) { });
 QUnit.test('Test _deleteCredential', function (assert) { });
 QUnit.test('Test _confirmDelete', function (assert) { });
-QUnit.test('Test _generatePasswordHash', function (assert) { });
-QUnit.test('Test _generatePasswordHash64', function (assert) { });
+
+QUnit.test('Test _generatePasswordHash', function (assert) {
+    var hash = Vault.generatePasswordHash('TEST');
+    assert.ok(hash === '94053587014b06e04fa78bc6fd5af62c');
+});
+
+QUnit.test('Test _generatePasswordHash64', function (assert) {
+    var hash = Vault.generatePasswordHash64('TEST');
+    assert.ok(hash === '94ee059335e587e501cc4bf90613e0814f00a7b08bc7c648fd865a2af6a22cc2');
+});
+
 QUnit.test('Test _changePassword', function (assert) { });
 QUnit.test('Test _exportData', function (assert) { });
 QUnit.test('Test _options', function (assert) { });
 QUnit.test('Test _buildDataTable', function (assert) { });
 QUnit.test('Test _createCredentialTable', function (assert) { });
 QUnit.test('Test _createCredentialTableRow', function (assert) { });
-QUnit.test('Test _validateRecord', function (assert) { });
-QUnit.test('Test _utf8_to_b64', function (assert) { });
-QUnit.test('Test _b64_to_utf8', function (assert) { });
-QUnit.test('Test _contains', function (assert) { });
-QUnit.test('Test _truncate', function (assert) { });
+
+QUnit.test('Test _validateRecord', function (assert) {
+    var form = $('<form><input id="Description" name="Description" />' +
+                 '<input id="Password" name="Password" />' + 
+                 '<input id="PasswordConfirmation" name="PasswordConfirmation" /></form>');
+    form.find('#Password').val('A');
+    var noDescription = Vault.validateRecord(form);
+    form.find('#Description').val('A');
+    var passwordNoMatch = Vault.validateRecord(form);
+    form.find('#PasswordConfirmation').val('A');
+    var valid = Vault.validateRecord(form);
+    assert.ok(noDescription.length === 2 && noDescription[0].field.attr('id') == 'Description' && noDescription[1].field.attr('id') == 'PasswordConfirmation');
+    assert.ok(passwordNoMatch.length === 1 && passwordNoMatch[0].field.attr('id') == 'PasswordConfirmation');
+    assert.ok(valid.length === 0);
+});
+
+QUnit.test('Test _utf8_to_b64', function (assert) {
+    var b64 = Vault.utf8_to_b64('TEST');
+    assert.ok(b64 === 'VEVTVA==');
+});
+
+QUnit.test('Test _b64_to_utf8', function (assert) {
+    var utf8 = Vault.b64_to_utf8('VEVTVA==');
+    assert.ok(utf8 === 'TEST');
+});
+
+QUnit.test('Test _contains', function (assert) {
+    var list = [1, 2, 3];
+    assert.ok(Vault.contains(list, 2) === true);
+    assert.ok(Vault.contains(list, 4) === false);
+});
+
+QUnit.test('Test _truncate', function (assert) {
+    var testString = 'This Is A Test';
+    assert.ok(Vault.truncate(testString, 10) === 'This Is...');
+    assert.ok(Vault.truncate(testString, 20) === 'This Is A Test');
+});
+
 QUnit.test('Test _search', function (assert) { });
 QUnit.test('Test _debounce', function (assert) { });
 QUnit.test('Test _sortCredentials', function (assert) { });
