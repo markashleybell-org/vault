@@ -158,7 +158,17 @@ QUnit.test('Test _addOrUpdateDescription', function (assert) {
     assert.ok(list[3].UserID === 1);
 });
 
-QUnit.test('Test _defaultAjaxErrorCallback', function (assert) { });
+QUnit.test('Test _defaultAjaxErrorCallback', function (assert) {
+
+    var originalAlert = window.alert;
+    window.alert = function (msg) { return msg; };
+    var alertResult = Vault.defaultAjaxErrorCallback(null, 'STATUS', 'ERROR');
+    window.alert = originalAlert;
+
+    assert.ok(alertResult === 'Http Error: STATUS - ERROR');
+
+});
+
 QUnit.test('Test _ajaxPost', function (assert) { });
 QUnit.test('Test _loadCredentials', function (assert) { });
 QUnit.test('Test _showDetail', function (assert) { });

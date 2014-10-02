@@ -91,7 +91,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     };
 
     var _defaultAjaxErrorCallback = function (request, status, error) {
-        alert('Http Error: ' + status + ' - ' + error);
+        return alert('Http Error: ' + status + ' - ' + error);
     };
 
     var _ajaxPost = function (url, data, successCallback, errorCallback, contentType) {
