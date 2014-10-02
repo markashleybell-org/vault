@@ -188,7 +188,21 @@ QUnit.test('Test _changePassword', function (assert) { });
 QUnit.test('Test _exportData', function (assert) { });
 QUnit.test('Test _options', function (assert) { });
 QUnit.test('Test _buildDataTable', function (assert) { });
-QUnit.test('Test _createCredentialTable', function (assert) { });
+
+QUnit.test('Test _createCredentialTable', function (assert) {
+    var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
+    var data = [
+        { credentialid: 1, masterkey: masterKey, userid: 1, description: 'ITEM1' },
+        { credentialid: 2, masterkey: masterKey, userid: 1, description: 'ITEM2' },
+        { credentialid: 3, masterkey: masterKey, userid: 1, description: 'ITEM3' },
+    ];
+    var table = $(Vault.createCredentialTable(data));
+    var rows = table.find('tr');
+    assert.ok(rows.length === 3);
+    assert.ok($(rows[0]).attr('id') === '1');
+    assert.ok($(rows[1]).find('td:first span.full').html() === 'ITEM2');
+});
+
 QUnit.test('Test _createCredentialDisplayData', function (assert) {
     // base64encode('test123' + passpackhash('test123'))
     var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
