@@ -253,5 +253,19 @@ QUnit.test('Test _truncate', function (assert) {
 
 QUnit.test('Test _search', function (assert) { });
 QUnit.test('Test _debounce', function (assert) { });
-QUnit.test('Test _sortCredentials', function (assert) { });
+
+QUnit.test('Test _sortCredentials', function (assert) {
+    var list = [
+        { CredentialID: 1, Description: 'BBB', UserID: '1' },
+        { CredentialID: 2, Description: 'AAA', UserID: '1' },
+        { CredentialID: 3, Description: 'DDD', UserID: '1' },
+        { CredentialID: 4, Description: 'CCC', UserID: '1' }
+    ];
+    Vault.sortCredentials(list);
+    assert.ok(list[0].Description === 'AAA');
+    assert.ok(list[1].Description === 'BBB');
+    assert.ok(list[2].Description === 'CCC');
+    assert.ok(list[3].Description === 'DDD');
+});
+
 QUnit.test('Test _init', function (assert) { });
