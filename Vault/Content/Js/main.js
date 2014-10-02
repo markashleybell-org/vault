@@ -598,14 +598,26 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         if (typeof test !== 'undefined' && test) {
             var testMethods = {
                 insertCopyLink: _insertCopyLink,
-                options: _options,
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,
                 removeFromList: _removeFromList,
                 updateDescription: _updateDescription,
+                defaultAjaxErrorCallback: _defaultAjaxErrorCallback,
+                ajaxPost: _ajaxPost,
                 loadCredentials: _loadCredentials,
+                showDetail: _showDetail,
+                defaultAcceptAction: _defaultAcceptAction,
+                defaultCloseAction: _defaultCloseAction,
+                showModal: _showModal,
+                setUpCredentialEditModal: _setUpCredentialEditModal,
+                loadCredential: _loadCredential,
+                deleteCredential: _deleteCredential,
+                confirmDelete: _confirmDelete,
                 generatePasswordHash: _generatePasswordHash,
                 generatePasswordHash64: _generatePasswordHash64,
+                changePassword: _changePassword,
+                exportData: _exportData,
+                options: _options,
                 buildDataTable: _buildDataTable,
                 createCredentialTable: _createCredentialTable,
                 createCredentialTableRow: _createCredentialTableRow,
@@ -615,7 +627,9 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 contains: _contains,
                 truncate: _truncate,
                 search: _search,
-                sortCredentials: _sortCredentials
+                debounce: _debounce,
+                sortCredentials: _sortCredentials,
+                init: _init
             };
             $.extend(vault, testMethods);
         }
