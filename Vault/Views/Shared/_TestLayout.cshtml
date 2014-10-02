@@ -17,6 +17,9 @@
         </div>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         @Scripts.Render("~/Content/Js/bundle")
+        <script type="text/javascript">
+            $('script[src="/Content/Js/main.js"]').attr('data-cover', '');
+        </script>
         @Scripts.Render("~/Content/Js/test")
         @RenderSection("foot", false)
     </body>

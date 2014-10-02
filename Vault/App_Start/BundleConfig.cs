@@ -16,6 +16,7 @@ namespace Vault
 
             bundles.Add(new ScriptBundle("~/Content/Js/test").Include(
                       "~/Content/Js/qunit-1.15.0.js",
+                      "~/Content/Js/blanket.js",
                       "~/Content/Js/tests.js"));
 
             bundles.Add(new StyleBundle("~/Content/Css/bundle").Include(
