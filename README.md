@@ -10,7 +10,5 @@ Although all data is encrypted before transmission over HTTP, as an extra precau
 External Libraries/Dependencies
 ========================
 
-* Vault uses [jQuery](http://jquery.com/), [jQuery UI](http://jqueryui.com/) and images/CSS from the 'Flick' theme found at [ThemeRoller](http://jqueryui.com/themeroller/). 
-* Icons are from the excellent [Silk](http://www.famfamfam.com/lab/icons/silk/) collection by [Mark James](http://www.famfamfam.com/). 
-* Table sort/filter/pagination courtesy of the [DataTables](http://www.datatables.net/) jQuery plugin by [Allan Jardine](http://www.sprymedia.co.uk/).
+* Vault uses the [jQuery](http://jquery.com/) library, [Handlebars.js](http://handlebarsjs.com/) for client-side templating and [Bootstrap](http://getbootstrap.com/) for layout and UI widgets. 
 * Encryption is handled by the [Passpack Host-Proof Hosting package](http://code.google.com/p/passpack/).
