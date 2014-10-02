@@ -23,7 +23,7 @@ var testMethods = {
     options: _options,
     buildDataTable: _buildDataTable,
     createCredentialTable: _createCredentialTable,
-    createCredentialTableRow: _createCredentialTableRow,
+    createCredentialDisplayData: _createCredentialDisplayData,
     validateRecord: _validateRecord,
     utf8_to_b64: _utf8_to_b64,
     b64_to_utf8: _b64_to_utf8,
@@ -133,9 +133,7 @@ QUnit.test('Test _removeFromList', function (assert) {
         { CredentialID: 2, Description: 'ITEM2' },
         { CredentialID: 3, Description: 'ITEM3' }
     ];
-
     Vault.removeFromList(2, list);
-
     assert.ok(list.length === 2);
     assert.ok(list[0].Description === 'ITEM1');
     assert.ok(list[1].Description === 'ITEM3');
@@ -150,7 +148,6 @@ QUnit.test('Test _addOrUpdateDescription', function (assert) {
     var userId = 1;
     Vault.addOrUpdateDescription(2, 'ITEM2UPDATE', userId, list);
     Vault.addOrUpdateDescription(0, 'ITEM4', userId, list);
-
     assert.ok(list[1].Description === 'ITEM2UPDATE');
     assert.ok(list.length === 4);
     assert.ok(list[3].CredentialID === 0);
@@ -159,14 +156,11 @@ QUnit.test('Test _addOrUpdateDescription', function (assert) {
 });
 
 QUnit.test('Test _defaultAjaxErrorCallback', function (assert) {
-
     var originalAlert = window.alert;
     window.alert = function (msg) { return msg; };
     var alertResult = Vault.defaultAjaxErrorCallback(null, 'STATUS', 'ERROR');
     window.alert = originalAlert;
-
     assert.ok(alertResult === 'Http Error: STATUS - ERROR');
-
 });
 
 QUnit.test('Test _ajaxPost', function (assert) { });
@@ -195,7 +189,16 @@ QUnit.test('Test _exportData', function (assert) { });
 QUnit.test('Test _options', function (assert) { });
 QUnit.test('Test _buildDataTable', function (assert) { });
 QUnit.test('Test _createCredentialTable', function (assert) { });
-QUnit.test('Test _createCredentialTableRow', function (assert) { });
+QUnit.test('Test _createCredentialDisplayData', function (assert) {
+    // base64encode('test123' + passpackhash('test123'))
+    var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
+    var credential = { CredentialID: 1, Description: 'ITEM1' };
+    var data = Vault.createCredentialDisplayData(credential, masterKey, 5);
+    assert.ok(data.credentialid === 1);
+    assert.ok(data.description === 'ITEM1');
+    assert.ok(data.userid === 5);
+    assert.ok(data.masterkey === masterKey);
+});
 
 QUnit.test('Test _validateRecord', function (assert) {
     var form = $('<form><input id="Description" name="Description" />' +

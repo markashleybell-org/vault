@@ -130,7 +130,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
         if (_cachedList !== null && _cachedList.length) {
 
-            _buildDataTable(_cachedList, callback, masterKey);
+            _buildDataTable(_cachedList, callback, masterKey, userId);
 
         } else {
 
@@ -148,7 +148,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 // Cache the whole (decrypted) list on the client
                 _cachedList = items;
                 _sortCredentials(_cachedList);
-                _buildDataTable(_cachedList, callback, masterKey);
+                _buildDataTable(_cachedList, callback, masterKey, userId);
 
             });
 
@@ -459,12 +459,12 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     };
 
     // Build the data table
-    var _buildDataTable = function (data, callback, masterKey) {
+    var _buildDataTable = function (data, callback, masterKey, userId) {
         var rows = [];
 
         // Create a table row for each record and add it to the rows array
         $.each(data, function (i, item) {
-            rows.push(_createCredentialTableRow(item, masterKey));
+            rows.push(_createCredentialDisplayData(item, masterKey, userId));
         });
 
         // Fire the callback and pass it the array of rows
@@ -479,12 +479,12 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     };
 
     // Create a single table row for a credential
-    var _createCredentialTableRow = function (credential, masterKey) {
+    var _createCredentialDisplayData = function (credential, masterKey, userId) {
 
         return {
             credentialid: credential.CredentialID,
             masterkey: masterKey,
-            userid: _userId,
+            userid: userId,
             description: credential.Description
         };
 
@@ -555,7 +555,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
         _buildDataTable(results, function (rows) {
             _ui.container.html(_createCredentialTable(rows));
-        }, _masterKey);
+        }, _masterKey, _userId);
 
     };
 
@@ -616,7 +616,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 options: _options,
                 buildDataTable: _buildDataTable,
                 createCredentialTable: _createCredentialTable,
-                createCredentialTableRow: _createCredentialTableRow,
+                createCredentialDisplayData: _createCredentialDisplayData,
                 validateRecord: _validateRecord,
                 utf8_to_b64: _utf8_to_b64,
                 b64_to_utf8: _b64_to_utf8,
