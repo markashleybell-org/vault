@@ -252,7 +252,20 @@ QUnit.test('Test _truncate', function (assert) {
 });
 
 QUnit.test('Test _search', function (assert) { });
-QUnit.test('Test _debounce', function (assert) { });
+
+QUnit.asyncTest('Test _debounce', function (assert) {
+    expect(2);
+    var flag = false;
+    var func = Vault.debounce(function () {
+        flag = true;
+    }, 100);
+    func();
+    assert.ok(flag === false);
+    setTimeout(function () {
+        assert.ok(flag === true);
+        QUnit.start();
+    }, 110);
+});
 
 QUnit.test('Test _sortCredentials', function (assert) {
     var list = [
