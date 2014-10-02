@@ -1,4 +1,4 @@
-﻿@model dynamic
+﻿@model Vault.Models.GenerateViewModel
 
 @{
     ViewBag.Title = "Generate Credentials";
@@ -34,6 +34,12 @@
                         <h4 class="modal-title">Generate Credentials</h4>
                     </div>
                     <div class="modal-body">
+                        <div class="form-group">
+                            <label for="GUID" class="col-sm-4 control-label">GUID</label>
+                            <div class="col-sm-8">
+                                <input type="text" size="40" id="GUID" name="GUID" value="@Model.GUID" class="form-control" />
+                            </div>
+                        </div>
                         <p>Enter a username and password to hash:</p>
                         <div class="form-group">
                             <label for="Username" class="col-sm-4 control-label">Username</label>

@@ -156,6 +156,7 @@
     <Compile Include="Models\ConnectionFactoryBase.cs" />
     <Compile Include="Models\CredentialListViewModel.cs" />
     <Compile Include="Models\CredentialViewModel.cs" />
+    <Compile Include="Models\GenerateViewModel.cs" />
     <Compile Include="Models\HttpContextLifetimeManager.cs" />
     <Compile Include="Models\IConnectionFactory.cs" />
     <Compile Include="Models\LoginViewModel.cs" />

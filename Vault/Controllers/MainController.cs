@@ -24,7 +24,9 @@ namespace Vault.Controllers
 
         public ActionResult Generate()
         {
-            return View();
+            return View(new GenerateViewModel {
+                GUID = Guid.NewGuid().ToString()
+            });
         }
 
         [HttpPost]
