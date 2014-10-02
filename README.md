@@ -10,5 +10,5 @@ Although all data is encrypted before transmission over HTTP, as an extra precau
 External Libraries/Dependencies
 ========================
 
-* Vault uses the [jQuery](http://jquery.com/) library, [Handlebars.js](http://handlebarsjs.com/) for client-side templating and [Bootstrap](http://getbootstrap.com/) for layout and UI widgets. 
+* Vault uses [jQuery](http://jquery.com/), [Handlebars.js](http://handlebarsjs.com/) for client-side templating and [Bootstrap](http://getbootstrap.com/) for layout/UI widgets. 
 * Encryption is handled by the [Passpack Host-Proof Hosting package](http://code.google.com/p/passpack/).
