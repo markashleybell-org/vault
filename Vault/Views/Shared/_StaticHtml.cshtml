@@ -1,0 +1,35 @@
+﻿<div id="spinner">
+    <img src="~/Content/Img/ajax-loader.gif" />
+</div>
+
+<div class="row" id="controls">
+    <div class="col-md-8" class="relative-container">
+        <label class="sr-only" for="search">Search</label>
+        <input type="text" id="search" name="search" class="form-control" placeholder="Search..." />
+        <button id="clear-search" class="btn btn-link">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
+    </div>
+    <div class="col-md-2">
+        <label class="sr-only" for="new">New Item</label>
+        <button id="new" class="btn btn-primary btn-block">
+            <span class="glyphicon glyphicon-plus"></span> New
+        </button>
+    </div>
+    <div class="col-md-2">
+        <label class="sr-only" for="admin">Admin</label>
+        <button id="admin" class="btn btn-default btn-block">
+            <span class="glyphicon glyphicon-cog"></span> Admin
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12" id="container"></div>
+</div>
+
+<div id="modal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="modal-content"></div>
+    </div>
+</div>

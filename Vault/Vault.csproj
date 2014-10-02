@@ -166,8 +166,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Css\bootstrap.css" />
-    <Content Include="Content\Css\qunit-1.14.0.css" />
     <Content Include="Content\Css\main.css" />
+    <Content Include="Content\Css\qunit-1.15.0.css" />
     <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\clippy.swf" />
@@ -176,7 +176,7 @@
     <Content Include="Content\Js\handlebars-v1.3.0.js" />
     <Content Include="Content\Js\main.js" />
     <Content Include="Content\Js\passpack-v1.1.js" />
-    <Content Include="Content\Js\qunit-1.14.0.js" />
+    <Content Include="Content\Js\qunit-1.15.0.js" />
     <Content Include="Content\Js\tests.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -193,8 +193,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Shared\Credential.cshtml" />
-    <Content Include="Views\Shared\Login.cshtml" />
+    <Content Include="Views\Shared\_CredentialForm.cshtml" />
+    <Content Include="Views\Shared\_LoginForm.cshtml" />
     <Content Include="Views\Shared\Main.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +208,12 @@
     <Content Include="Content\Fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\Fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\Fonts\glyphicons-halflings-regular.woff" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_StaticHtml.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_ClientTemplates.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
