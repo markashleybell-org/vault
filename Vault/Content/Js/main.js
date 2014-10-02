@@ -46,16 +46,6 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         return _templates.copyLink({ text: encodeURIComponent(text) });
     };
 
-    // Use jQuery's tried and tested code to convert plain text to HTML-encoded text
-    var _htmlEncode = function (value) {
-        return $('<div/>').text(value).html();
-    };
-
-    // Do the same to convert HTML-encoded text to plain text
-    var _htmlDecode = function (value) {
-        return $('<div/>').html(value).text();
-    };
-
     // Encrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
     var _encryptObject = function (obj, masterKey, excludes) {
@@ -206,14 +196,14 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     };
 
     // Default action for modal accept button
-    var defaultAcceptAction = function (e) {
+    var _defaultAcceptAction = function (e) {
         e.preventDefault();
         _ui.modal.modal('hide');
         _ui.searchInput.focus();
     };
 
     // Default action for modal close button
-    var defaultCloseAction = function (e) {
+    var _defaultCloseAction = function (e) {
         e.preventDefault();
         _ui.modal.modal('hide');
         _ui.searchInput.focus();
@@ -257,8 +247,8 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
         _ui.modal.off('click', 'button.btn-action');
         _ui.modal.off('click', 'button.btn-close');
-        _ui.modal.on('click', 'button.btn-action', options.accept || defaultAcceptAction);
-        _ui.modal.on('click', 'button.btn-close', options.close || defaultCloseAction);
+        _ui.modal.on('click', 'button.btn-action', options.accept || _defaultAcceptAction);
+        _ui.modal.on('click', 'button.btn-close', options.close || _defaultCloseAction);
 
         _ui.modal.modal();
 
@@ -609,8 +599,6 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             var testMethods = {
                 insertCopyLink: _insertCopyLink,
                 options: _options,
-                htmlEncode: _htmlEncode,
-                htmlDecode: _htmlDecode,
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,
                 removeFromList: _removeFromList,

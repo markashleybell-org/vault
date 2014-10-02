@@ -11,9 +11,7 @@
 
     var testMethods = {
         insertCopyLink: _insertCopyLink,
-        insertSpinner: _insertSpinner,
-        htmlEncode: _htmlEncode,
-        htmlDecode: _htmlDecode,
+        options: _options,
         encryptObject: _encryptObject,
         decryptObject: _decryptObject,
         removeFromList: _removeFromList,
