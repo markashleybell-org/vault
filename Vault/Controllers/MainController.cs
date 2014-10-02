@@ -152,5 +152,10 @@ namespace Vault.Controllers
 
             return Json(new { result = ((!string.IsNullOrEmpty(userId)) ? 1 : 0), id = userId });
         }
+
+        public ActionResult Tests()
+        {
+            return View();
+        }
     }
 }

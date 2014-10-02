@@ -634,48 +634,47 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             $.extend(vault, testMethods);
         }
 
+        // Cache UI selectors
+        _ui.loginFormDialog = $('#login-form-dialog');
+        _ui.credentialFormDialog = $('#credential-form-dialog');
+        _ui.loginForm = $('#login-form');
+        _ui.credentialForm = $('#credential-form');
+        _ui.container = $('#container');
+        _ui.controls = $('#controls');
+        _ui.modal = $('#modal');
+        _ui.modalContent = $('#modal-content');
+        _ui.newButton = $('#new');
+        _ui.adminButton = $('#admin');
+        _ui.clearSearchButton = $('#clear-search');
+        _ui.searchInput = $('#search');
+        _ui.spinner = $('#spinner');
+
+        _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
+        _templates.detail = Handlebars.compile($('#tmpl-detail').html());
+        _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());
+        _templates.optionsDialog = Handlebars.compile($('#tmpl-optionsdialog').html());
+        _templates.exportedDataWindow = Handlebars.compile($('#tmpl-exporteddatawindow').html());
+        _templates.credentialTable = Handlebars.compile($('#tmpl-credentialtable').html());
+        _templates.credentialTableRow = Handlebars.compile($('#tmpl-credentialtablerow').html());
+        Handlebars.registerPartial('credentialtablerow', _templates.credentialTableRow);
+        _templates.validationMessage = Handlebars.compile($('#tmpl-validationmessage').html());
+        _templates.modalHeader = Handlebars.compile($('#tmpl-modalheader').html());
+        _templates.modalBody = Handlebars.compile($('#tmpl-modalbody').html());
+        _templates.modalFooter = Handlebars.compile($('#tmpl-modalfooter').html());
+
+        Handlebars.registerHelper('breaklines', function (text) {
+            text = Handlebars.Utils.escapeExpression(text);
+            text = text.replace(/(\r\n|\n|\r)/gm, '<br />');
+            return new Handlebars.SafeString(text);
+        });
+
+        Handlebars.registerHelper('truncate', function (text, size) {
+            text = (text.length > size) ? text.substring(0, (size - 3)) + '...' : text
+            text = Handlebars.Utils.escapeExpression(text);
+            return new Handlebars.SafeString(text);
+        });
+
         if (typeof test === 'undefined' || !test) {
-
-            // Cache UI selectors
-            _ui.loginFormDialog = $('#login-form-dialog');
-            _ui.credentialFormDialog = $('#credential-form-dialog');
-            _ui.loginForm = $('#login-form');
-            _ui.credentialForm = $('#credential-form');
-            _ui.container = $('#container');
-            _ui.controls = $('#controls');
-            _ui.modal = $('#modal');
-            _ui.modalContent = $('#modal-content');
-            _ui.newButton = $('#new');
-            _ui.adminButton = $('#admin');
-            _ui.clearSearchButton = $('#clear-search');
-            _ui.searchInput = $('#search');
-            _ui.spinner = $('#spinner');
-
-            _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
-            _templates.detail = Handlebars.compile($('#tmpl-detail').html());
-            _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());
-            _templates.optionsDialog = Handlebars.compile($('#tmpl-optionsdialog').html());
-            _templates.exportedDataWindow = Handlebars.compile($('#tmpl-exporteddatawindow').html());
-            _templates.credentialTable = Handlebars.compile($('#tmpl-credentialtable').html());
-            _templates.credentialTableRow = Handlebars.compile($('#tmpl-credentialtablerow').html());
-            Handlebars.registerPartial('credentialtablerow', _templates.credentialTableRow);
-            _templates.validationMessage = Handlebars.compile($('#tmpl-validationmessage').html());
-            _templates.modalHeader = Handlebars.compile($('#tmpl-modalheader').html());
-            _templates.modalBody = Handlebars.compile($('#tmpl-modalbody').html());
-            _templates.modalFooter = Handlebars.compile($('#tmpl-modalfooter').html());
-
-            Handlebars.registerHelper('breaklines', function (text) {
-                text = Handlebars.Utils.escapeExpression(text);
-                text = text.replace(/(\r\n|\n|\r)/gm, '<br />');
-                return new Handlebars.SafeString(text);
-            });
-
-            Handlebars.registerHelper('truncate', function (text, size) {
-                text = (text.length > size) ? text.substring(0, (size - 3)) + '...' : text
-                text = Handlebars.Utils.escapeExpression(text);
-                return new Handlebars.SafeString(text);
-            });
-
             _ui.newButton.on('click', function (e) {
                 e.preventDefault();
                 _loadCredential(null, _masterKey, _userId);

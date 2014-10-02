@@ -1,0 +1,25 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_TestLayout.cshtml";
+}
+
+@section tests {
+
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+
+}
+
+@section main {
+
+    @{Html.RenderPartial("_CredentialForm", new CredentialViewModel());}
+
+    @{Html.RenderPartial("_LoginForm", new LoginViewModel());}
+
+    @{Html.RenderPartial("_StaticHtml");}
+    
+    @{Html.RenderPartial("_ClientTemplates");}
+
+}

@@ -195,7 +195,7 @@
   <ItemGroup>
     <Content Include="Views\Shared\_CredentialForm.cshtml" />
     <Content Include="Views\Shared\_LoginForm.cshtml" />
-    <Content Include="Views\Shared\Main.cshtml" />
+    <Content Include="Views\Shared\_MainLayout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -214,6 +214,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_ClientTemplates.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Main\Tests.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_TestLayout.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
