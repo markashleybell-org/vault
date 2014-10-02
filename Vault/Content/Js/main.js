@@ -544,7 +544,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
         var results = [];
 
-        if (query !== null) {
+        if (query !== null && $.trim(query) !== '') {
             query = query.toLowerCase();
             for (var i = 0; i < _cachedList.length; i++) {
                 if (_cachedList[i].Description.toLowerCase().indexOf(query) > -1) {
@@ -688,10 +688,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             });
 
             _ui.searchInput.on('keyup', _debounce(function () {
-                var val = this.value;
-                if ($.trim(val) !== '') {
-                    _search(val);
-                }
+                _search(this.value);
             }, 200));
 
             // Initialise globals and load data on correct login
