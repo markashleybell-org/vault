@@ -164,15 +164,17 @@
 <script id="tmpl-credentialtablerow" type="text/x-handlebars-template">
     <tr id="{{credentialid}}">
         <td>
-            <button class="btn btn-default btn-block btn-l" onclick="Vault.showDetail('{{credentialid}}', '{{masterkey}}');"><span class="full">{{description}}</span><span class="truncated">{{truncate description 31}}</span></button>
+            <button class="btn btn-default btn-block btn-l btn-credential-show-detail">
+                <span class="full">{{description}}</span><span class="truncated">{{truncate description 31}}</span>
+            </button>
         </td>
         <td class="center">
-            <button class="btn btn-primary btn-block" onclick="Vault.loadCredential('{{credentialid}}', '{{masterkey}}', '{{userid}}');">
+            <button class="btn btn-primary btn-block btn-credential-edit">
                 <span class="glyphicon glyphicon-pencil"></span>
             </button>
         </td>
         <td class="center">
-            <button class="btn btn-danger btn-block" onclick="Vault.confirmDelete('{{credentialid}}', '{{userid}}');">
+            <button class="btn btn-danger btn-block btn-credential-delete">
                 <span class="glyphicon glyphicon-trash"></span>
             </button>
         </td>

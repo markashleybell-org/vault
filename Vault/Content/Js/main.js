@@ -590,6 +590,24 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         });
 
         if (typeof test === 'undefined' || !test) {
+            _ui.container.on('click', '.btn-credential-show-detail', function (e) {
+                e.preventDefault();
+                var id = $(this).parent().parent().attr('id');
+                _showDetail(id, _masterKey);
+            });
+
+            _ui.container.on('click', '.btn-credential-edit', function (e) {
+                e.preventDefault();
+                var id = $(this).parent().parent().attr('id');
+                _loadCredential(id, _masterKey, _userId);
+            });
+
+            _ui.container.on('click', '.btn-credential-delete', function (e) {
+                e.preventDefault();
+                var id = $(this).parent().parent().attr('id');
+                _confirmDelete(id, _userId);
+            });
+
             _ui.newButton.on('click', function (e) {
                 e.preventDefault();
                 _loadCredential(null, _masterKey, _userId);
@@ -707,10 +725,6 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     // Expose public methods
     var vault = {
         init: _init,
-        showDetail: _showDetail,
-        loadCredential: _loadCredential,
-        confirmDelete: _confirmDelete,
-        deleteCredential: _deleteCredential,
         changePassword: _changePassword,
         exportData: _exportData
     };
