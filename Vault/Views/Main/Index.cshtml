@@ -19,7 +19,7 @@
 
     <script type="text/javascript">
         var loginDialog = $('#login-form-dialog');
-        loginDialog.modal();
+        loginDialog.modal({ keyboard: false, backdrop: 'static' });
         loginDialog.find('input[name="Username"]').focus();
 
         $(function () {
