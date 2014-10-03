@@ -303,29 +303,21 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
     // Delete a record
     var _deleteCredential = function (credentialId, userId, masterKey) {
-
         _ajaxPost('/Main/Delete', { credentialId: credentialId, userId: userId }, function (data, status, request) {
-
             if (data.Success) {
-
-                $('#records, #add-link').remove();
-
                 // Remove the deleted item from the cached list before reload
                 _removeFromList(credentialId, _cachedList);
-
                 // For now we just reload the entire table in the background
                 _loadCredentials(userId, masterKey, function (rows) {
-
-                    _ui.container.append(_createCredentialTable(rows));
                     _ui.modal.modal('hide');
-                    _ui.searchInput.focus();
-
+                    var results = _search(_ui.searchInput.val(), _cachedList);
+                    _buildDataTable(results, function (rows) {
+                        _ui.container.html(_createCredentialTable(rows));
+                        _ui.searchInput.focus();
+                    }, _masterKey, _userId);
                 });
-
             }
-
         });
-
     };
 
     // Show delete confirmation dialog
@@ -771,9 +763,6 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                     _addOrUpdateDescription(data.CredentialID, description, _userId, _cachedList);
                     // Re-sort the list in case the order should change
                     _sortCredentials(_cachedList);
-
-                    // Completely destroy the existing DataTable and remove the table and add link from the DOM
-                    $('#records, #add-link').remove();
 
                     // For now we just reload the entire table in the background
                     _loadCredentials(_userId, _masterKey, function (rows) {
