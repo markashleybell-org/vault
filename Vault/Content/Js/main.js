@@ -287,13 +287,13 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     };
 
     // Show delete confirmation dialog
-    var _confirmDelete = function (id, userId) {
+    var _confirmDelete = function (id, masterKey, userId) {
         _showModal({
             title: 'Delete Credential',
             content: _templates.deleteConfirmationDialog(),
             accept: function (e) {
                 e.preventDefault();
-                Vault.deleteCredential(id, userId, _masterKey);
+                _deleteCredential(id, userId, masterKey);
             }
         });
     };
@@ -605,7 +605,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             _ui.container.on('click', '.btn-credential-delete', function (e) {
                 e.preventDefault();
                 var id = $(this).parent().parent().attr('id');
-                _confirmDelete(id, _userId);
+                _confirmDelete(id, _masterKey, _userId);
             });
 
             _ui.newButton.on('click', function (e) {
