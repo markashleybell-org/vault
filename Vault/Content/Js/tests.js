@@ -251,7 +251,19 @@ QUnit.test('Test _truncate', function (assert) {
     assert.ok(Vault.truncate(testString, 20) === 'This Is A Test');
 });
 
-QUnit.test('Test _search', function (assert) { });
+QUnit.test('Test _search', function (assert) {
+    var list = [
+        { CredentialID: 1, Description: 'Cat', UserID: '1' },
+        { CredentialID: 2, Description: 'Dog', UserID: '1' },
+        { CredentialID: 3, Description: 'Fish', UserID: '1' },
+        { CredentialID: 3, Description: 'Catfish', UserID: '1' },
+        { CredentialID: 3, Description: 'Dogfish', UserID: '1' }
+    ];
+    var results = Vault.search('do', list);
+    assert.ok(results.length === 2);
+    assert.ok(results[0].Description === 'Dog');
+    assert.ok(results[1].Description === 'Dogfish');
+});
 
 QUnit.asyncTest('Test _debounce', function (assert) {
     expect(2);

@@ -540,23 +540,17 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     };
 
     // Hide credential rows which don't contain a particular string
-    var _search = function (query) {
-
+    var _search = function (query, list) {
         var results = [];
-
         if (query !== null && $.trim(query) !== '') {
             query = query.toLowerCase();
-            for (var i = 0; i < _cachedList.length; i++) {
-                if (_cachedList[i].Description.toLowerCase().indexOf(query) > -1) {
-                    results.push(_cachedList[i]);
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].Description.toLowerCase().indexOf(query) > -1) {
+                    results.push(list[i]);
                 }
             }
         }
-
-        _buildDataTable(results, function (rows) {
-            _ui.container.html(_createCredentialTable(rows));
-        }, _masterKey, _userId);
-
+        return results;
     };
 
     // Rate-limit calls to the supplied function
@@ -683,12 +677,18 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
             _ui.clearSearchButton.on('click', function (e) {
                 e.preventDefault();
-                _search(null);
+                var results = _search(null, _cachedList);
+                _buildDataTable(results, function (rows) {
+                    _ui.container.html(_createCredentialTable(rows));
+                }, _masterKey, _userId);
                 _ui.searchInput.val('').focus();
             });
 
             _ui.searchInput.on('keyup', _debounce(function () {
-                _search(this.value);
+                var results = _search(this.value, _cachedList);
+                _buildDataTable(results, function (rows) {
+                    _ui.container.html(_createCredentialTable(rows));
+                }, _masterKey, _userId);
             }, 200));
 
             // Initialise globals and load data on correct login
