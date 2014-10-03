@@ -12,7 +12,6 @@ var testMethods = {
     defaultAcceptAction: _defaultAcceptAction,
     defaultCloseAction: _defaultCloseAction,
     showModal: _showModal,
-    setUpCredentialEditModal: _setUpCredentialEditModal,
     loadCredential: _loadCredential,
     deleteCredential: _deleteCredential,
     confirmDelete: _confirmDelete,
@@ -169,7 +168,6 @@ QUnit.test('Test _showDetail', function (assert) { });
 QUnit.test('Test _defaultAcceptAction', function (assert) { });
 QUnit.test('Test _defaultCloseAction', function (assert) { });
 QUnit.test('Test _showModal', function (assert) { });
-QUnit.test('Test _setUpCredentialEditModal', function (assert) { });
 QUnit.test('Test _loadCredential', function (assert) { });
 QUnit.test('Test _deleteCredential', function (assert) { });
 QUnit.test('Test _confirmDelete', function (assert) { });

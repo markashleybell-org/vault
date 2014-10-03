@@ -510,7 +510,6 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 defaultAcceptAction: _defaultAcceptAction,
                 defaultCloseAction: _defaultCloseAction,
                 showModal: _showModal,
-                setUpCredentialEditModal: _setUpCredentialEditModal,
                 loadCredential: _loadCredential,
                 deleteCredential: _deleteCredential,
                 confirmDelete: _confirmDelete,
