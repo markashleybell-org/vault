@@ -104,6 +104,10 @@
     </table>
 </script>
 
+<script id="tmpl-credentialform" type="text/x-handlebars-template">
+    @{Html.RenderPartial("_CredentialForm", new CredentialViewModel());}
+</script>
+
 <script id="tmpl-deleteconfirmationdialog" type="text/x-handlebars-template">
     <p>Are you sure you want to delete this credential?</p>
 </script>

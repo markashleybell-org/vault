@@ -13,9 +13,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
     _ui = {
         loginFormDialog: null,
-        credentialFormDialog: null,
         loginForm: null,
-        credentialForm: null,
         container: null,
         controls: null,
         modal: null,
@@ -30,6 +28,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     _templates = {
         copyLink: null,
         detail: null,
+        credentialForm: null,
         deleteConfirmationDialog: null,
         optionsDialog: null,
         exportedDataWindow: null,
@@ -225,16 +224,6 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         _ui.modal.modal();
     };
 
-    var _setUpCredentialEditModal = function () {
-        _ui.credentialFormDialog.modal();
-        _ui.credentialFormDialog.find('input[name=Description]').focus();
-        _ui.credentialFormDialog.find('.btn-close').on('click', function (e) {
-            e.preventDefault();
-            _ui.credentialFormDialog.modal('hide');
-            _ui.searchInput.focus();
-        });
-    };
-
     // Load a record into the edit form
     // If null is passed as the credentialId, we set up the form for adding a new record
     var _loadCredential = function (credentialId, masterKey, userId) {
@@ -242,27 +231,24 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             _ajaxPost('/Main/Load', { id: credentialId }, function (data, status, request) {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
-
-                var f = _ui.credentialForm;
-                $('#CredentialID', f).val(data.CredentialID);
-                $('#Description', f).val(data.Description);
-                $('#Username', f).val(data.Username);
-                $('#Password', f).val(data.Password);
-                $('#PasswordConfirmation', f).val(data.PasswordConfirmation);
-                $('#Url', f).val(data.Url);
-                $('#UserDefined1Label', f).val(data.UserDefined1Label);
-                $('#UserDefined1', f).val(data.UserDefined1);
-                $('#UserDefined2Label', f).val(data.UserDefined2Label);
-                $('#UserDefined2', f).val(data.UserDefined2);
-                $('#Notes', f).val(data.Notes);
-                $('#UserID', f).val(data.UserID);
-
-                _setUpCredentialEditModal();
+                _showModal({
+                    title: 'Edit Credential',
+                    content: _templates.credentialForm(data),
+                    acceptText: 'Save',
+                    accept: function (e) {
+                        $('#credential-form').submit();
+                    }
+                });
             });
         } else { // New record setup
-            _ui.credentialFormDialog.find('input:not(.submit), textarea').val('');
-            _ui.credentialForm.find('#UserID').val(userId);
-            _setUpCredentialEditModal();
+            _showModal({
+                title: 'Add Credential',
+                content: _templates.credentialForm({ UserID: _userId }),
+                acceptText: 'Save',
+                accept: function (e) {
+                    $('#credential-form').submit();
+                }
+            });
         }
 
     };
@@ -551,9 +537,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
         // Cache UI selectors
         _ui.loginFormDialog = $('#login-form-dialog');
-        _ui.credentialFormDialog = $('#credential-form-dialog');
         _ui.loginForm = $('#login-form');
-        _ui.credentialForm = $('#credential-form');
         _ui.container = $('#container');
         _ui.controls = $('#controls');
         _ui.modal = $('#modal');
@@ -566,6 +550,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
         _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
         _templates.detail = Handlebars.compile($('#tmpl-detail').html());
+        _templates.credentialForm = Handlebars.compile($('#tmpl-credentialform').html());
         _templates.deleteConfirmationDialog = Handlebars.compile($('#tmpl-deleteconfirmationdialog').html());
         _templates.optionsDialog = Handlebars.compile($('#tmpl-optionsdialog').html());
         _templates.exportedDataWindow = Handlebars.compile($('#tmpl-exporteddatawindow').html());
@@ -669,7 +654,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             });
 
             // Save the new details on edit form submit
-            _ui.credentialForm.on('submit', function () {
+           $('body').on('submit', '#credential-form', function (e) {
                 var form = $(this);
                 $('#validation-message').remove();
                 form.find('div.has-error').removeClass('has-error');
@@ -683,7 +668,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                         errors[i].field.parent().parent().addClass('has-error');
                     }
 
-                    form.find('div.modal-body').prepend(_templates.validationMessage({ errors: errorMsg.join('<br />') }));
+                    _ui.modal.find('div.modal-body').prepend(_templates.validationMessage({ errors: errorMsg.join('<br />') }));
                     return false;
                 }
 
@@ -708,7 +693,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
                     // For now we just reload the entire table in the background
                     _loadCredentials(_userId, _masterKey, function (rows) {
-                        _ui.credentialFormDialog.modal('hide');
+                        _ui.modal.modal('hide');
                         var results = _search(_ui.searchInput.val(), _cachedList);
                         _buildDataTable(results, function (rows) {
                             _ui.container.html(_createCredentialTable(rows));
