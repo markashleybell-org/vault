@@ -187,7 +187,23 @@ QUnit.test('Test _generatePasswordHash64', function (assert) {
 QUnit.test('Test _changePassword', function (assert) { });
 QUnit.test('Test _exportData', function (assert) { });
 QUnit.test('Test _options', function (assert) { });
-QUnit.test('Test _buildDataTable', function (assert) { });
+
+QUnit.test('Test _buildDataTable', function (assert) {
+    expect(4);
+    var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
+    var userId = 1;
+    var list = [
+        { CredentialID: 1, Description: 'Cat', UserID: 1 },
+        { CredentialID: 2, Description: 'Dog', UserID: 1 },
+        { CredentialID: 3, Description: 'Fish', UserID: 1 }
+    ];
+    var rows = Vault.buildDataTable(list, function (rows) {
+        assert.ok(rows.length === 3);
+        assert.ok(rows[0].credentialid === 1 && rows[0].description === 'Cat' && rows[0].masterkey === masterKey && rows[0].userid === 1);
+        assert.ok(rows[1].credentialid === 2 && rows[1].description === 'Dog' && rows[1].masterkey === masterKey && rows[1].userid === 1);
+        assert.ok(rows[2].credentialid === 3 && rows[2].description === 'Fish' && rows[2].masterkey === masterKey && rows[2].userid === 1);
+    }, masterKey, userId);
+});
 
 QUnit.test('Test _createCredentialTable', function (assert) {
     var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
@@ -266,7 +282,7 @@ QUnit.test('Test _search', function (assert) {
 });
 
 QUnit.asyncTest('Test _debounce', function (assert) {
-    expect(2);
+    expect(3);
     var flag = false;
     var func = Vault.debounce(function () {
         flag = true;
@@ -277,6 +293,12 @@ QUnit.asyncTest('Test _debounce', function (assert) {
         assert.ok(flag === true);
         QUnit.start();
     }, 110);
+    var flag2 = false;
+    var func2 = Vault.debounce(function () {
+        flag2 = true;
+    }, 100, true);
+    func2();
+    assert.ok(flag2 === true);
 });
 
 QUnit.test('Test _sortCredentials', function (assert) {
