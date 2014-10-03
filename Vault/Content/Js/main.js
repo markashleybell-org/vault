@@ -777,11 +777,12 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
                     // For now we just reload the entire table in the background
                     _loadCredentials(_userId, _masterKey, function (rows) {
-
-                        _ui.container.append(_createCredentialTable(rows));
                         _ui.credentialFormDialog.modal('hide');
-                        _ui.searchInput.focus();
-
+                        var results = _search(_ui.searchInput.val(), _cachedList);
+                        _buildDataTable(results, function (rows) {
+                            _ui.container.html(_createCredentialTable(rows));
+                            _ui.searchInput.focus();
+                        }, _masterKey, _userId);
                     });
 
                 });
