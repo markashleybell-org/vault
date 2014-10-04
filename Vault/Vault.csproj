@@ -176,6 +176,7 @@
     <Content Include="Content\Js\blanket.js" />
     <Content Include="Content\Js\bootstrap.js" />
     <Content Include="Content\Js\handlebars-v1.3.0.js" />
+    <Content Include="Content\Js\hide-address-bar.js" />
     <Content Include="Content\Js\main.js" />
     <Content Include="Content\Js\passpack-v1.1.js" />
     <Content Include="Content\Js\qunit-1.15.0.js" />

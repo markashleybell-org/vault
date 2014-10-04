@@ -12,6 +12,7 @@ namespace Vault
                       "~/Content/Js/bootstrap.js",
                       "~/Content/Js/passpack-v1.1.js",
                       "~/Content/Js/handlebars-v1.3.0.js",
+                      "~/Content/Js/hide-address-bar.js",
                       "~/Content/Js/main.js"));
 
             bundles.Add(new ScriptBundle("~/Content/Js/test").Include(
