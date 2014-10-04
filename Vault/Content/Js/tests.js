@@ -273,6 +273,10 @@ QUnit.test('Test _search', function (assert) {
         { CredentialID: 3, Description: 'Catfish', UserID: '1' },
         { CredentialID: 3, Description: 'Dogfish', UserID: '1' }
     ];
+    var noresults1 = Vault.search(null, list);
+    var noresults2 = Vault.search('', list);
+    var noresults3 = Vault.search('d', list);
+    assert.ok(noresults1.length === 0 && noresults2.length === 0 && noresults3.length === 0);
     var results = Vault.search('do', list);
     assert.ok(results.length === 2);
     assert.ok(results[0].Description === 'Dog');

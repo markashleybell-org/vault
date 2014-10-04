@@ -453,7 +453,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     // Hide credential rows which don't contain a particular string
     var _search = function (query, list) {
         var results = [];
-        if (query !== null && $.trim(query) !== '') {
+        if (query !== null && $.trim(query) !== '' && query.length > 1) {
             query = query.toLowerCase();
             for (var i = 0; i < list.length; i++) {
                 if (list[i].Description.toLowerCase().indexOf(query) > -1) {
