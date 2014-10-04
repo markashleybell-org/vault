@@ -239,6 +239,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                         $('#credential-form').submit();
                     }
                 });
+                _ui.modal.find('#Description').focus();
             });
         } else { // New record setup
             _showModal({
@@ -249,6 +250,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                     $('#credential-form').submit();
                 }
             });
+            _ui.modal.find('#Description').focus();
         }
 
     };
