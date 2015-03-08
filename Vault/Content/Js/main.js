@@ -116,7 +116,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         } else {
             setTimeout(function () {
                 $.ajax(options);
-            }, 500);
+            }, 1000);
         }
     };
 
