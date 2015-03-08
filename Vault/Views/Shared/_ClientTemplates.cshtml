@@ -170,6 +170,12 @@
         <td>
             <button class="btn btn-default btn-block btn-l btn-credential-show-detail">
                 <span class="full">{{description}}</span><span class="truncated">{{truncate description 31}}</span>
+                <br />
+                <span class="label label-std">{{username}}</span>
+                @*<span class="label label-std">{{password}}</span>*@
+                {{#if weak}}
+                <span class="label label-warning">Weak Password</span>
+                {{/if}}
             </button>
         </td>
         <td class="center">

@@ -28,6 +28,14 @@
     padding: 3px 0 0 0;
 }
 
+#records .btn {
+    height: 60px;
+}
+
+.btn-credential-edit, .btn-credential-delete {
+    padding: 3px 8px;
+}
+
 #validation-message {
     color: #a94442;
     font-weight: bold;
@@ -80,6 +88,12 @@
 
 .full {
     display: none;
+}
+
+.label-std {
+    color: #808080;
+    font-weight: normal;
+    padding: .2em .6em .3em 0;
 }
 
 @media (min-width: 500px) {

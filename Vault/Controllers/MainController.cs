@@ -37,7 +37,7 @@ namespace Vault.Controllers
             using (var conn = _cf.GetConnection())
             {
                 conn.Open();
-                credentials = conn.Query<CredentialListViewModel>("select CredentialID, UserID, Description from tCredential where UserID = @UserID", new { UserID = userId });
+                credentials = conn.Query<CredentialListViewModel>("select CredentialID, UserID, Description, Username, Password from tCredential where UserID = @UserID", new { UserID = userId });
             }
 
             return Json(credentials);

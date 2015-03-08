@@ -12,6 +12,13 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     _artificialAjaxDelay = false, // Introduce an artificial delay for AJAX calls so we can test loaders locally
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
     _hasFlash = false, // Set true if browser has Flash Player installed
+    // A map of the properties which can be searched for using the fieldName:query syntax
+    // We need this because the search is not case-sensitive, whereas JS properties are!
+    _queryablePropertyMap = {
+        description: 'Description',
+        username: 'Username',
+        password: 'Password'
+    },
     _ui = {
         loginFormDialog: null,
         loginForm: null,
@@ -77,11 +84,15 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         }
     };
 
-    // Update the description of item with a specific ID in a list
-    var _addOrUpdateDescription = function (id, description, userId, list) {
+    // Update properties of the item with a specific ID in a list
+    var _updateProperties = function (id, properties, userId, list) {
         for (var i = 0; i < list.length; i++) {
             if (list[i].CredentialID === id) {
-                list[i].Description = description;
+                for (var propertyName in properties) {
+                    if (properties.hasOwnProperty(propertyName)) {
+                        list[i][propertyName] = properties[propertyName];
+                    }
+                }
                 return;
             }
         }
@@ -128,7 +139,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         } else {
             _ajaxPost('/Main/GetAll', { userId: userId }, function (data, status, request) {
                 var items = [];
-                // At this point we only actually need to decrypt Description for display,
+                // At this point we only actually need to decrypt a few things for display/search
                 // which speeds up client-side table construction time dramatically
                 $.each(data, function (i, item) {
                     items.push(_decryptObject(item, masterKey, ['CredentialID', 'UserID']));
@@ -405,7 +416,10 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             credentialid: credential.CredentialID,
             masterkey: masterKey,
             userid: userId,
-            description: credential.Description
+            description: credential.Description,
+            username: credential.Username,
+            password: credential.Password,
+            weak: (_scorePassword(credential.Password) < 60)
         };
     };
 
@@ -455,11 +469,25 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
     // Hide credential rows which don't contain a particular string
     var _search = function (query, list) {
+        query = $.trim(query).toLowerCase();
         var results = [];
-        if (query !== null && $.trim(query) !== '' && query.length > 1) {
-            query = query.toLowerCase();
+        if (query !== null && query !== '' && query.length > 1) {
+            var queryField = _queryablePropertyMap.description;
+            // Support queries in the form fieldName:query (e.g. username:me@email.com)
+            if(query.indexOf(':') !== -1) {
+                var queryData = query.split(':');
+                // Safeguard against spaces either side of colon, query part not 
+                // having been typed yet and searches on a non-existent property
+                if(queryData.length === 2 && queryData[0] !== '' && queryData[1] !== '') {
+                    // If the fieldName part exists in the property map
+                    if(typeof _queryablePropertyMap[queryData[0]] !== 'undefined') {
+                        queryField = _queryablePropertyMap[queryData[0]];
+                        query = queryData[1];
+                    }
+                }
+            }
             for (var i = 0; i < list.length; i++) {
-                if (list[i].Description.toLowerCase().indexOf(query) > -1) {
+                if (list[i][queryField].toLowerCase().indexOf(query) > -1) {
                     results.push(list[i]);
                 }
             }
@@ -533,6 +561,37 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         return a;
     };
 
+    // Password scoring function, stolen from: http://stackoverflow.com/a/11268104/43140
+    var _scorePassword = function(password) {
+        var score = 0;
+
+        if (!password)
+            return score;
+
+        // award every unique letter until 5 repetitions
+        var letters = new Object();
+        for (var i=0; i<password.length; i++) {
+            letters[password[i]] = (letters[password[i]] || 0) + 1;
+            score += 5.0 / letters[password[i]];
+        }
+
+        // bonus points for mixing it up
+        var variations = {
+            digits: /\d/.test(password),
+            lower: /[a-z]/.test(password),
+            upper: /[A-Z]/.test(password),
+            nonWords: /\W/.test(password),
+        }
+
+        var variationCount = 0;
+        for (var check in variations) {
+            variationCount += (variations[check] == true) ? 1 : 0;
+        }
+        score += (variationCount - 1) * 10;
+
+        return parseInt(score, 10);
+    };
+
     // Initialise the app
     var _init = function (test) {
         // Determine whether we're testing or not
@@ -542,7 +601,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,
                 removeFromList: _removeFromList,
-                addOrUpdateDescription: _addOrUpdateDescription,
+                updateProperties: _updateProperties,
                 defaultAjaxErrorCallback: _defaultAjaxErrorCallback,
                 ajaxPost: _ajaxPost,
                 loadCredentials: _loadCredentials,
@@ -721,18 +780,21 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                     credential[this.name] = $(this).val();
                 });
 
-                // Hold the modified Description so we can update the list if the update succeeds
-                var description = form.find('#Description').val();
+                // Hold the modified properties so we can update the list if the update succeeds
+                var properties = { 
+                    Description: form.find('#Description').val(), 
+                    Username: form.find('#Username').val(), 
+                    Password: form.find('#Password').val() 
+                };
 
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 credential = _encryptObject(credential, _masterKey, ['CredentialID', 'UserID']);
 
                 _ajaxPost('/Main/Update', credential, function (data, status, request) {
-                    // Update the cached credential list with the new Description so it is correct when we rebuild
-                    _addOrUpdateDescription(data.CredentialID, description, _userId, _cachedList);
+                    // Update the cached credential list with the new prperty values, so it is correct when we rebuild
+                    _updateProperties(data.CredentialID, properties, _userId, _cachedList);
                     // Re-sort the list in case the order should change
                     _sortCredentials(_cachedList);
-
                     // For now we just reload the entire table in the background
                     _loadCredentials(_userId, _masterKey, function (rows) {
                         _ui.modal.modal('hide');
