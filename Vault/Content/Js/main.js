@@ -96,7 +96,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 return;
             }
         }
-        list.push({ CredentialID: id, Description: description, UserID: userId });
+        list.push($.extend({ CredentialID: id, UserID: userId }, properties));
     };
 
     var _defaultAjaxErrorCallback = function (request, status, error) {
@@ -791,7 +791,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 credential = _encryptObject(credential, _masterKey, ['CredentialID', 'UserID']);
 
                 _ajaxPost('/Main/Update', credential, function (data, status, request) {
-                    // Update the cached credential list with the new prperty values, so it is correct when we rebuild
+                    // Update the cached credential list with the new property values, so it is correct when we rebuild
                     _updateProperties(data.CredentialID, properties, _userId, _cachedList);
                     // Re-sort the list in case the order should change
                     _sortCredentials(_cachedList);
