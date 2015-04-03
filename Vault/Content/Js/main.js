@@ -380,6 +380,30 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
         return false;
     };
 
+    // Import unencrypted JSON credential data
+    var _importData = function (userId, masterKey, rawData) {
+        var jsonImportData = JSON.parse(rawData);
+        var newData = [];
+        var excludes = ['CredentialID', 'UserID'];
+
+        $.each(jsonImportData, function (i, item) {
+            // Remove the confirmation property
+            delete item.PasswordConfirmation;
+            // Null out the old credential ID so UpdateMultiple knows this is a new record
+            item.CredentialID = null;
+            // Set the user ID to the ID of the new (logged in) user
+            item.UserID = userId;
+            newData.push(_encryptObject(item, _b64_to_utf8(masterKey), excludes));
+        });
+
+        _ajaxPost('/Main/UpdateMultiple', Passpack.JSON.stringify(newData), function (data, status, request) {
+            // Just reload the whole page when we're done to force login
+            window.location.href = '/';
+        }, null, 'application/json; charset=utf-8');
+
+        return false;
+    };
+
     // Show the options dialog
     var _options = function () {
         var dialogHtml = _templates.optionsDialog({
@@ -838,7 +862,8 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     var vault = {
         init: _init,
         changePassword: _changePassword,
-        exportData: _exportData
+        exportData: _exportData,
+        importData: _importData
     };
 
     return vault;
