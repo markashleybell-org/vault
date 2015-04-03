@@ -271,11 +271,11 @@ QUnit.test('Test _truncate', function (assert) {
 
 QUnit.test('Test _search', function (assert) {
     var list = [
-        { CredentialID: 1, Description: 'Cat', UserID: '1' },
-        { CredentialID: 2, Description: 'Dog', UserID: '1' },
-        { CredentialID: 3, Description: 'Fish', UserID: '1' },
-        { CredentialID: 3, Description: 'Catfish', UserID: '1' },
-        { CredentialID: 3, Description: 'Dogfish', UserID: '1' }
+        { CredentialID: 1, Description: 'Cat', Username: 'cat', Password: 'cat123', UserID: '1' },
+        { CredentialID: 2, Description: 'Dog', Username: 'dog', Password: 'dog123', UserID: '1' },
+        { CredentialID: 3, Description: 'Fish', Username: 'fish', Password: 'fish123', UserID: '1' },
+        { CredentialID: 3, Description: 'Catfish', Username: 'catfish', Password: 'catfish123', UserID: '1' },
+        { CredentialID: 3, Description: 'Dogfish', Username: 'dogfish', Password: 'dogfish123', UserID: '1' }
     ];
     var noresults1 = Vault.search(null, list);
     var noresults2 = Vault.search('', list);
@@ -285,6 +285,14 @@ QUnit.test('Test _search', function (assert) {
     assert.ok(results.length === 2);
     assert.ok(results[0].Description === 'Dog');
     assert.ok(results[1].Description === 'Dogfish');
+    results = Vault.search('username:dog', list);
+    assert.ok(results.length === 2);
+    assert.ok(results[0].Description === 'Dog');
+    assert.ok(results[1].Description === 'Dogfish');
+    results = Vault.search('password:cat', list);
+    assert.ok(results.length === 2);
+    assert.ok(results[0].Description === 'Cat');
+    assert.ok(results[1].Description === 'Catfish');
 });
 
 QUnit.asyncTest('Test _debounce', function (assert) {
