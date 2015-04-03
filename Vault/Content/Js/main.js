@@ -264,6 +264,8 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                     $('#credential-form').submit();
                 }
             });
+            _ui.modal.find('#Description').focus();
+            _showPasswordStrength(_ui.modal.find('#Password'));
         }
     };
 
