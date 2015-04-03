@@ -264,10 +264,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                     $('#credential-form').submit();
                 }
             });
-            _ui.modal.find('#Description').focus();
-            _showPasswordStrength(_ui.modal.find('#Password'));
         }
-
     };
 
     // Delete a record
@@ -819,6 +816,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 return false;
             });
 
+            // Show password strength as it is typed
             $('body').on('keyup', '#Password', _debounce(function (e) {
                 _showPasswordStrength($(this));
             }));
