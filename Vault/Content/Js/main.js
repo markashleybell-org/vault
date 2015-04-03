@@ -419,7 +419,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             description: credential.Description,
             username: credential.Username,
             password: credential.Password,
-            weak: (Passpack.utils.getBits(credential.Password) < 50)
+            weak: ($.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < 50)
         };
     };
 
