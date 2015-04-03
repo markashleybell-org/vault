@@ -822,6 +822,15 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             $('body').on('keyup', '#Password', _debounce(function (e) {
                 _showPasswordStrength($(this));
             }));
+
+            // Generate a nice strong password
+            $('body').on('click', 'button.generate-password', function (e) {
+                e.preventDefault();
+                var password = Passpack.utils.passGenerator({ ucase: 1, lcase: 1, nums: 1, symb: 1 }, 16);
+                $('#Password').val(password);
+                $('#PasswordConfirmation').val(password);
+                _showPasswordStrength($('#Password'));
+            });
         }
     };
 
