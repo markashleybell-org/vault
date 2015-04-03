@@ -96,6 +96,33 @@
     padding: .2em .6em .3em 0;
 }
 
+.password-strength {
+    border: solid 1px #e0e0e0;
+    border-radius: 3px;
+    position: relative;
+}
+
+.password-strength > span {
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    font-size: 11px;
+}
+
+.password-strength > div {
+    border-radius: 3px;
+    width: 0;
+    height: 16px;
+}
+
+.extremely-weak { background-color: #e43e3b; }
+.very-weak { background-color: #e66f6d; }
+.weak { background-color: #e08056; }
+.average { background-color: #de9c41; }
+.strong { background-color: #acf36c; }
+.very-strong { background-color: #8edd70; }
+.extremely-strong { background-color: #5cbb37; }
+
 @media (min-width: 500px) {
     .full {
         display: inline;

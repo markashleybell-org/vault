@@ -12,6 +12,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
     _artificialAjaxDelay = false, // Introduce an artificial delay for AJAX calls so we can test loaders locally
     _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
     _hasFlash = false, // Set true if browser has Flash Player installed
+    _weakPasswordThreshold = 40, // Bit value below which password is deemed weak
     // A map of the properties which can be searched for using the fieldName:query syntax
     // We need this because the search is not case-sensitive, whereas JS properties are!
     _queryablePropertyMap = {
@@ -252,6 +253,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                     }
                 });
                 _ui.modal.find('#Description').focus();
+                _showPasswordStrength(_ui.modal.find('#Password'));
             });
         } else { // New record setup
             _showModal({
@@ -263,6 +265,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
                 }
             });
             _ui.modal.find('#Description').focus();
+            _showPasswordStrength(_ui.modal.find('#Password'));
         }
 
     };
@@ -419,7 +422,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             description: credential.Description,
             username: credential.Username,
             password: credential.Password,
-            weak: ($.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < 50)
+            weak: ($.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < _weakPasswordThreshold)
         };
     };
 
@@ -559,6 +562,44 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             }
         }
         return a;
+    };
+
+    // Show password strength visually
+    var _showPasswordStrength = function (field) {
+        var strengthIndicator = field.next('div.password-strength');
+        var status = strengthIndicator.find('> span');
+        var bar = strengthIndicator.find('> div');
+        var strength = Passpack.utils.getBits(field.val());
+        bar.removeClass();
+        if (strength === 0) {
+            status.html('No Password');
+            bar.css('width', 0);
+        } else if (strength <= 100) {
+            bar.css('width', strength + '%');
+            if (strength <= 10) {
+                bar.addClass('extremely-weak');
+                status.html('Extremely Weak (' + strength + ')');
+            } else if (strength <= 25) {
+                bar.addClass('very-weak');
+                status.html('Very Weak (' + strength + ')');
+            } else if (strength <= _weakPasswordThreshold) {
+                bar.addClass('weak');
+                status.html('Weak (' + strength + ')');
+            } else if (strength <= 55) {
+                bar.addClass('average');
+                status.html('Average (' + strength + ')');
+            } else if (strength <= 75) {
+                bar.addClass('strong');
+                status.html('Strong (' + strength + ')');
+            } else {
+                bar.addClass('very-strong');
+                status.html('Very Strong (' + strength + ')');
+            }
+        } else {
+            bar.addClass('extremely-strong');
+            status.html('Extremely Strong (' + strength + ')');
+            bar.css('width', '100%');
+        }
     };
 
     // Initialise the app
@@ -724,7 +765,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             });
 
             // Save the new details on edit form submit
-           $('body').on('submit', '#credential-form', function (e) {
+            $('body').on('submit', '#credential-form', function (e) {
                 var form = $(this);
                 $('#validation-message').remove();
                 form.find('div.has-error').removeClass('has-error');
@@ -777,6 +818,10 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
 
                 return false;
             });
+
+            $('body').on('keyup', '#Password', _debounce(function (e) {
+                _showPasswordStrength($(this));
+            }));
         }
     };
 
