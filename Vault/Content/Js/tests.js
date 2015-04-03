@@ -138,19 +138,23 @@ QUnit.test('Test _removeFromList', function (assert) {
     assert.ok(list[1].Description === 'ITEM3');
 });
 
-QUnit.test('Test _addOrUpdateDescription', function (assert) {
+QUnit.test('Test _updateProperties', function (assert) {
     var list = [
-        { CredentialID: 1, Description: 'ITEM1', UserID: '1' },
-        { CredentialID: 2, Description: 'ITEM2', UserID: '1' },
-        { CredentialID: 3, Description: 'ITEM3', UserID: '1' }
+        { CredentialID: 1, Description: 'ITEM1', UserID: '1', Username: 'item1', Password: 'is9j' },
+        { CredentialID: 2, Description: 'ITEM2', UserID: '1', Username: 'item2', Password: '4ngi' },
+        { CredentialID: 3, Description: 'ITEM3', UserID: '1', Username: 'item3', Password: 's05n' }
     ];
     var userId = 1;
-    Vault.addOrUpdateDescription(2, 'ITEM2UPDATE', userId, list);
-    Vault.addOrUpdateDescription(0, 'ITEM4', userId, list);
+    Vault.updateProperties(2, { Description: 'ITEM2UPDATE', Username: 'item2new', Password: 'abcd' }, userId, list);
+    Vault.updateProperties(0, { Description: 'ITEM4', Username: 'item4', Password: 'c9yn' }, userId, list);
     assert.ok(list[1].Description === 'ITEM2UPDATE');
+    assert.ok(list[1].Username === 'item2new');
+    assert.ok(list[1].Password === 'abcd');
     assert.ok(list.length === 4);
     assert.ok(list[3].CredentialID === 0);
     assert.ok(list[3].Description == 'ITEM4');
+    assert.ok(list[3].Username === 'item4');
+    assert.ok(list[3].Password === 'c9yn');
     assert.ok(list[3].UserID === 1);
 });
 
