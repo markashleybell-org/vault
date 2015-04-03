@@ -419,7 +419,7 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             description: credential.Description,
             username: credential.Username,
             password: credential.Password,
-            weak: (_scorePassword(credential.Password) < 60)
+            weak: (Passpack.utils.getBits(credential.Password) < 50)
         };
     };
 
@@ -559,37 +559,6 @@ var Vault = (function ($, Passpack, Handlebars, window, undefined) {
             }
         }
         return a;
-    };
-
-    // Password scoring function, stolen from: http://stackoverflow.com/a/11268104/43140
-    var _scorePassword = function(password) {
-        var score = 0;
-
-        if (!password)
-            return score;
-
-        // award every unique letter until 5 repetitions
-        var letters = new Object();
-        for (var i=0; i<password.length; i++) {
-            letters[password[i]] = (letters[password[i]] || 0) + 1;
-            score += 5.0 / letters[password[i]];
-        }
-
-        // bonus points for mixing it up
-        var variations = {
-            digits: /\d/.test(password),
-            lower: /[a-z]/.test(password),
-            upper: /[A-Z]/.test(password),
-            nonWords: /\W/.test(password),
-        }
-
-        var variationCount = 0;
-        for (var check in variations) {
-            variationCount += (variations[check] == true) ? 1 : 0;
-        }
-        score += (variationCount - 1) * 10;
-
-        return parseInt(score, 10);
     };
 
     // Initialise the app
