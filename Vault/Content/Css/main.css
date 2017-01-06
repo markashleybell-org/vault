@@ -15,23 +15,6 @@
     padding-bottom: 15px;
 }
 
-#records td {
-    border: none;
-    padding: 3px 0 0 3px;
-}
-
-#records td:first-child {
-    padding: 3px 0 0 0;
-}
-
-#records .btn {
-    height: 60px;
-}
-
-#records a.btn {
-    line-height: 46px;
-}
-
 #validation-message {
     color: #a94442;
     font-weight: bold;
