@@ -178,24 +178,14 @@
 </script>
 
 <script id="tmpl-credentialtable" type="text/x-handlebars-template">
-    <table id="records" class="table table-condensed">
-        <colgroup>
-            <col class="td-credential-info" />
-            <col class="td-credential-button" />
-            <col class="td-credential-button" />
-            <col class="td-credential-button" />
-        </colgroup>
-        <tbody>
-            {{#each rows}}
-            {{> credentialtablerow}}
-            {{/each}}
-        </tbody>
-    </table>
+    {{#each rows}}
+    {{> credentialtablerow}}
+    {{/each}}
 </script>
 
 <script id="tmpl-credentialtablerow" type="text/x-handlebars-template">
-    <tr id="{{credentialid}}">
-        <td>
+    <div id="{{credentialid}}" class="row">
+        <div class="col-sm-15 ccol">
             <button class="btn btn-default btn-block btn-l btn-credential-show-detail">
                 <span class="full">{{description}}</span><span class="truncated">{{truncate description 31}}</span>
                 <br />
@@ -204,8 +194,8 @@
                 <span class="label label-warning">Weak Password</span>
                 {{/if}}
             </button>
-        </td>
-        <td class="center">
+        </div>
+        <div class="col-xs-8 col-sm-3 ccol">
             {{#if url}}
             <a class="btn btn-primary btn-block btn-credential-open" href="{{url}}" target="_blank">
                 <span class="fa fa-fw fa-external-link-square"></span> Web
@@ -215,18 +205,18 @@
                 <span class="fa fa-fw fa-external-link-square"></span> Web
             </button>
             {{/if}}
-        </td>
-        <td class="center">
+        </div>
+        <div class="col-xs-8 col-sm-3 ccol">
             <button class="btn btn-primary btn-block btn-credential-copy btn-credential-copy-username">
                 <span class="fa fa-fw fa-clone"></span> User
             </button>
             <input type="text" class="copy-content" name="copy-content" value="{{username}}" />
-        </td>
-        <td class="center">
+        </div>
+        <div class="col-xs-8 col-sm-3 ccol">
             <button class="btn btn-primary btn-block btn-credential-copy btn-credential-copy-password">
                 <span class="fa fa-fw fa-clone"></span> Pwd
             </button>
             <input type="text" class="copy-content" name="copy-content" value="{{password}}" />
-        </td>
-    </tr>
+        </div>
+    </div>
 </script>

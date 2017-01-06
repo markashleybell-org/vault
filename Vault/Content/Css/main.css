@@ -195,8 +195,22 @@
     display: none;
 }
 
+.btn-credential-show-detail {
+    padding-top: 8px;
+}
+
 .btn-credential-copy, .btn-credential-open {
     padding: 6px 10px 6px 8px;
+    line-height: 3.04em;
+    margin-top: 3px;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 768px) {
+    .btn-credential-copy, .btn-credential-open {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
 }
 
 .td-credential-info {
@@ -205,4 +219,15 @@
 
 .td-credential-button {
     width: 1%;
+}
+
+#container .row {
+    margin-bottom: 3px;
+    margin-left: -2px;
+    margin-right: -2px;
+}
+
+#container .ccol {
+  padding-left: 2px;
+  padding-right: 2px;
 }
