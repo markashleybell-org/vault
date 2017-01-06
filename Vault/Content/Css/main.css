@@ -42,14 +42,6 @@
     overflow: hidden;
 }
 
-.detail-label {
-    width: 120px;
-}
-
-.detail-copylink {
-    width: 82px;
-}
-
 #spinner {
     padding: 3px 5px 5px 5px; 
     background-color: #000;
@@ -211,14 +203,6 @@
         margin-top: 0;
         margin-bottom: 0;
     }
-}
-
-.td-credential-info {
-    width: auto;
-}
-
-.td-credential-button {
-    width: 1%;
 }
 
 #container .row {
