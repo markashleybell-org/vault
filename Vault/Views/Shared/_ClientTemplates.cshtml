@@ -124,38 +124,38 @@
     <p>Enter and confirm a new password:</p>
     <div class="form-horizontal">
         <div class="form-group">
-            <label for="NewPassword" class="col-sm-4 control-label">New Password</label>
-            <div class="col-sm-8">
+            <label for="NewPassword" class="col-sm-8 control-label">New Password</label>
+            <div class="col-sm-16">
                 <input type="password" id="NewPassword" name="NewPassword" class="form-control" value="" />
             </div>
         </div>
         <div class="form-group">
-            <label for="NewPasswordConfirm" class="col-sm-4 control-label">Confirm New Password</label>
-            <div class="col-sm-8">
+            <label for="NewPasswordConfirm" class="col-sm-8 control-label">Confirm New Password</label>
+            <div class="col-sm-16">
                 <input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" class="form-control" value="" />
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-4 col-sm-8">
+            <div class="col-sm-offset-8 col-sm-16">
                 <button class="btn btn-primary" id="change-password-button" onclick="Vault.changePassword('{{userid}}', '{{masterkey}}');">Change Password</button>
             </div>
         </div>
         <hr />
         <div class="form-group">
-            <label for="import-data" class="col-sm-4 control-label">Import Data</label>
-            <div class="col-sm-8">
+            <label for="import-data" class="col-sm-8 control-label">Import Data</label>
+            <div class="col-sm-16">
                 <textarea class="form-control" id="import-data" placeholder="Paste exported JSON data here"></textarea>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-4 col-sm-8">
+            <div class="col-sm-offset-8 col-sm-16">
                 <button class="btn btn-primary" id="import-button" onclick="Vault.importData('{{userid}}', '{{masterkey}}', $('#import-data').val());">Import Data</button>
             </div>
         </div>
         <hr />
         <div class="form-group">
-            <label for="export-button" class="col-sm-4 control-label">Export Data</label>
-            <div class="col-sm-8">
+            <label for="export-button" class="col-sm-8 control-label">Export Data</label>
+            <div class="col-sm-16">
                 <button class="btn btn-primary" id="export-button" onclick="Vault.exportData('{{userid}}', '{{masterkey}}');">Export Data</button>
             </div>
         </div>
