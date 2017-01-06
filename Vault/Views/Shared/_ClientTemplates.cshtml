@@ -43,73 +43,53 @@
     <span class="truncated">{{truncate Url 26}}</span>
 </script>
 
+<script id="tmpl-copylink" type="text/x-handlebars-template">
+    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
+    <input type="text" class="copy-content" value="{{Content}}" />
+</script>
+
 <script id="tmpl-detail" type="text/x-handlebars-template">
-    <table class="table detail">
-        <colgroup>
-            <col class="detail-label" />
-            <col class="detail-copylink" />
-            <col class="detail-data" />
-        </colgroup>
-        <tbody>
-            {{#if Url}}
-            <tr>
-                <th>Url</th>
-                <td>
-                    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
-                    <input type="text" class="copy-content" value="{{Url}}" />
-                </td>
-                <td>{{{UrlHtml}}}</td>
-            </tr>
-            {{/if}}
-            {{#if Username}}
-            <tr>
-                <th>Username</th>
-                <td>
-                    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
-                    <input type="text" class="copy-content" value="{{Username}}" />
-                </td>
-                <td>{{Username}}</td>
-            </tr>
-            {{/if}}
-            {{#if Password}}
-            <tr>
-                <th>Password</th>
-                <td>
-                    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
-                    <input type="text" class="copy-content" value="{{Password}}" />
-                </td>
-                <td>{{Password}}</td>
-            </tr>
-            {{/if}}
-            {{#if UserDefined1}}
-            <tr>
-                <th>{{UserDefined1Label}}</th>
-                <td>
-                    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
-                    <input type="text" class="copy-content" value="{{UserDefined1}}" />
-                </td>
-                <td>{{UserDefined1}}</td>
-            </tr>
-            {{/if}}
-            {{#if UserDefined2}}
-            <tr>
-                <th>{{UserDefined2Label}}</th>
-                <td>
-                    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
-                    <input type="text" class="copy-content" value="{{UserDefined2}}" />
-                </td>
-                <td>{{UserDefined2}}</td>
-            </tr>
-            {{/if}}
-            {{#if Notes}}
-            <tr>
-                <th>Notes</th>
-                <td>&nbsp;</td>
-                <td>{{breaklines Notes}}</td>
-            </tr>
-            {{/if}}
-        </tbody>
-    </table>
+    {{#if Url}}
+    <div class="row row-detail">
+        <div class="col-xs-24 col-sm-5 row-detail-header">Url</div>
+        <div class="col-xs-6 col-sm-4">{{> copylink Content=Url }}</div>
+        <div class="col-xs-18 col-sm-15">{{{UrlHtml}}}</div>
+    </div>
+    {{/if}}
+    {{#if Username}}
+    <div class="row row-detail">
+        <div class="col-xs-24 col-sm-5 row-detail-header">Username</div>
+        <div class="col-xs-6 col-sm-4">{{> copylink Content=Username }}</div>
+        <div class="col-xs-18 col-sm-15">{{Username}}</div>
+    </div>
+    {{/if}}
+    {{#if Password}}
+    <div class="row row-detail">
+        <div class="col-xs-24 col-sm-5 row-detail-header">Password</div>
+        <div class="col-xs-6 col-sm-4">{{> copylink Content=Password }}</div>
+        <div class="col-xs-18 col-sm-15">{{Password}}</div>
+    </div>
+    {{/if}}
+    {{#if UserDefined1}}
+    <div class="row row-detail">
+        <div class="col-xs-24 col-sm-5 row-detail-header">{{UserDefined1Label}}</div>
+        <div class="col-xs-6 col-sm-4">{{> copylink Content=UserDefined1 }}</div>
+        <div class="col-xs-18 col-sm-15">{{UserDefined1}}</div>
+    </div>
+    {{/if}}
+    {{#if UserDefined2}}
+    <div class="row row-detail">
+        <div class="col-xs-24 col-sm-5 row-detail-header">{{UserDefined2Label}}</div>
+        <div class="col-xs-6 col-sm-4">{{> copylink Content=UserDefined2 }}</div>
+        <div class="col-xs-18 col-sm-15">{{UserDefined2}}</div>
+    </div>
+    {{/if}}
+    {{#if Notes}}
+    <div class="row row-detail">
+        <div class="col-xs-24 col-sm-9 row-detail-header">Notes</div>
+        <div class="col-xs-24 col-sm-15">{{breaklines Notes}}</div>
+    </div>
+    {{/if}}
 </script>
 
 <script id="tmpl-credentialform" type="text/x-handlebars-template">

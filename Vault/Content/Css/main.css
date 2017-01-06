@@ -189,11 +189,13 @@
 
 .btn-credential-show-detail {
     padding-top: 8px;
+    display: table-cell;
+    height: 58px;
 }
 
 .btn-credential-copy, .btn-credential-open {
     padding: 6px 10px 6px 8px;
-    line-height: 3.04em;
+    line-height: 45px;
     margin-top: 5px;
     margin-bottom: 10px;
 }
@@ -212,6 +214,21 @@
 }
 
 #container .ccol {
-  padding-left: 2px;
-  padding-right: 2px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.row-detail {
+    border-top: solid 1px #e0e0e0;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.row-detail:first-child {
+    border: none;
+    padding-top: 0;
+}
+
+.row-detail-header {
+    font-weight: bold;
 }

@@ -47,7 +47,8 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             validationMessage: null,
             modalHeader: null,
             modalBody: null,
-            modalFooter: null
+            modalFooter: null,
+            copyLink: null
         },
         _encryptObject,
         _decryptObject,
@@ -733,6 +734,9 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         _templates.modalHeader = Handlebars.compile($('#tmpl-modalheader').html());
         _templates.modalBody = Handlebars.compile($('#tmpl-modalbody').html());
         _templates.modalFooter = Handlebars.compile($('#tmpl-modalfooter').html());
+        _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
+
+        Handlebars.registerPartial('copylink', _templates.copyLink); 
 
         Handlebars.registerHelper('breaklines', function (text) {
             text = Handlebars.Utils.escapeExpression(text);
