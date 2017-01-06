@@ -168,7 +168,7 @@
     <Content Include="Content\Img\favicon.ico" />
     <Content Include="Content\Js\blanket.js" />
     <Content Include="Content\Js\bootstrap.js" />
-    <Content Include="Content\Js\handlebars-v1.3.0.js" />
+    <Content Include="Content\Js\handlebars-v4.0.5.js" />
     <Content Include="Content\Js\hide-address-bar.js" />
     <Content Include="Content\Js\js.cookie.js" />
     <Content Include="Content\Js\main.js" />
