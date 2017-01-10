@@ -62,26 +62,23 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             exportedDataWindow: null
         };
 
-    // Encrypt the properties of an object literal using Passpack
+    // Encrypt/decrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
-    function _encryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
+    function _crypt(action: IPasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]): Credential {
         Object.keys(obj).forEach(function (k: string): void {
             if (excludes.indexOf(k) === -1) {
-                obj[k] = Passpack.encode('AES', obj[k], _b64_to_utf8(masterKey));
+                obj[k] = action('AES', obj[k], _b64_to_utf8(masterKey));
             }
         });
         return obj;
     }
 
-    // Decrypt the properties of an object literal using Passpack
-    // excludes is an array of property names whose values should not be encrypted
+    function _encryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
+        return _crypt(Passpack.encode, obj, masterKey, excludes);
+    }
+
     function _decryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
-        Object.keys(obj).forEach(function (k: string): void {
-            if (excludes.indexOf(k) === -1) {
-                obj[k] = Passpack.decode('AES', obj[k], _b64_to_utf8(masterKey));
-            }
-        });
-        return obj;
+        return _crypt(Passpack.decode, obj, masterKey, excludes);
     }
 
     function _createMasterKey(password: string): string {
@@ -116,7 +113,7 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         return window.alert('Http Error: ' + status + ' - ' + error);
     }
 
-    function _ajaxPost(url: string, data: any, successCallback: XHRSuccess, errorCallback?: XHRError, contentType?: string): void {
+    function _ajaxPost(url: string, data: any, successCallback: IXHRSuccess, errorCallback?: IXHRError, contentType?: string): void {
         _ui.spinner.show();
 
         if (!errorCallback) {

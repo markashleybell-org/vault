@@ -54,25 +54,21 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         copyLink: null,
         exportedDataWindow: null
     };
-    // Encrypt the properties of an object literal using Passpack
+    // Encrypt/decrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
-    function _encryptObject(obj, masterKey, excludes) {
+    function _crypt(action, obj, masterKey, excludes) {
         Object.keys(obj).forEach(function (k) {
             if (excludes.indexOf(k) === -1) {
-                obj[k] = Passpack.encode('AES', obj[k], _b64_to_utf8(masterKey));
+                obj[k] = action('AES', obj[k], _b64_to_utf8(masterKey));
             }
         });
         return obj;
     }
-    // Decrypt the properties of an object literal using Passpack
-    // excludes is an array of property names whose values should not be encrypted
+    function _encryptObject(obj, masterKey, excludes) {
+        return _crypt(Passpack.encode, obj, masterKey, excludes);
+    }
     function _decryptObject(obj, masterKey, excludes) {
-        Object.keys(obj).forEach(function (k) {
-            if (excludes.indexOf(k) === -1) {
-                obj[k] = Passpack.decode('AES', obj[k], _b64_to_utf8(masterKey));
-            }
-        });
-        return obj;
+        return _crypt(Passpack.decode, obj, masterKey, excludes);
     }
     function _createMasterKey(password) {
         return Passpack.utils.hashx(password + Passpack.utils.hashx(password, true, true), true, true);

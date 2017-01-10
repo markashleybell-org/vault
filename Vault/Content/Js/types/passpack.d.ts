@@ -1,4 +1,4 @@
-﻿interface PasspackCharMatrix {
+﻿declare class PasspackCharMatrix {
     lcase: number[];
     ucase: number[];
     nums: number[];
@@ -6,7 +6,7 @@
     space: number[];
 }
 
-interface PasspackUtils {
+interface IPasspackUtils {
     getBits(passphrase: string): number;
     charMatrix: PasspackCharMatrix;
     passGenerator(chars: any, n: number): string;
@@ -17,10 +17,14 @@ interface PasspackUtils {
     getStringFromHex(str: string, n: number): string;
 }
 
-interface Passpack {
-    decode(algorithm: string, enctext: string, key: string, pars?: any): string;
-    encode(algorithm: string, plaintext: string, key: string, pars?: any): string;
-    utils: PasspackUtils;
+interface IPasspack {
+    decode: IPasspackCryptoFunction;
+    encode: IPasspackCryptoFunction;
+    utils: IPasspackUtils;
 }
 
-declare var Passpack: Passpack;
+interface IPasspackCryptoFunction {
+    (algorithm: string, text: string, key: string, pars?: any): string;
+}
+
+declare var Passpack: IPasspack;

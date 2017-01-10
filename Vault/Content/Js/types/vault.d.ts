@@ -1,17 +1,19 @@
-﻿// Workaround declarations for deprecated functions 
+﻿/* tslint:disable:comment-format quotemark */
+
+// Workaround declarations for deprecated functions
 // until I have time to investigate side effects of removal
 declare function escape(s: string): string;
 declare function unescape(s: string): string;
 
-interface XHRSuccess {
+interface IXHRSuccess {
     (data: any, status?: string, request?: JQueryXHR): void;
 }
 
-interface XHRError {
+interface IXHRError {
     (request: JQueryXHR, status: string, error: string): void;
 }
 
-interface Credential {
+declare class Credential {
     CredentialID: string;
     UserID: string;
     Description: string;
@@ -27,7 +29,7 @@ interface Credential {
     PwdOptions: string;
 }
 
-interface CredentialSummary {
+declare class CredentialSummary {
     credentialid: string;
     masterkey: string;
     userid: string;
