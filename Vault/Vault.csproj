@@ -188,6 +188,7 @@
     <TypeScriptCompile Include="Content\Js\types\jquery.d.ts" />
     <TypeScriptCompile Include="Content\Js\types\js.cookie.d.ts" />
     <TypeScriptCompile Include="Content\Js\types\passpack.d.ts" />
+    <TypeScriptCompile Include="Content\Js\types\vault.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_CredentialForm.cshtml" />
@@ -226,9 +227,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Vault.ruleset" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="JSLintNet.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="tsconfig.json" />
