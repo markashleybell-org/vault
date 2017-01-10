@@ -1,17 +1,25 @@
-﻿interface PasspackUtils {
-    getBits(passphrase: string);
-    charMatrix;
-    passGenerator(chars: {}, n: number);
-    simplePassGenerator(n: number);
-    genRandomKey(x: number, salt: string);
-    getArrayFromHexString(hexstr: string, n: number);
-    hashx(str: string, nohex?: boolean, full?: boolean);
-    getStringFromHex(str: string, n: number);
+﻿interface PasspackCharMatrix {
+    lcase: Array<number>;
+    ucase: Array<number>;
+    nums: Array<number>;
+    symb: Array<number>;
+    space: Array<number>;
+}
+
+interface PasspackUtils {
+    getBits(passphrase: string): number;
+    charMatrix: PasspackCharMatrix;
+    passGenerator(chars: {}, n: number): string;
+    simplePassGenerator(n: number): string;
+    genRandomKey(x: number, salt: string): string;
+    getArrayFromHexString(hexstr: string, n: number): Array<number>;
+    hashx(str: string, nohex?: boolean, full?: boolean): string;
+    getStringFromHex(str: string, n: number): string;
 }
 
 interface Passpack {
-    decode(algorithm: string, enctext: string, key: string, pars?: any);
-    encode(algorithm: string, plaintext: string, key: string, pars?: any);
+    decode(algorithm: string, enctext: string, key: string, pars?: any): string;
+    encode(algorithm: string, plaintext: string, key: string, pars?: any): string;
     utils: PasspackUtils;
 }
 
