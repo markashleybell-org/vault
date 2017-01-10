@@ -3,6 +3,7 @@
 /// <reference path="types/passpack.d.ts" />
 /// <reference path="types/handlebars.d.ts" />
 /// <reference path="types/js.cookie.d.ts" />
+/// <reference path="types/vault.d.ts" />
 var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     'use strict';
     // Private member variables

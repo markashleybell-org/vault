@@ -3,19 +3,7 @@
 /// <reference path="types/passpack.d.ts" />
 /// <reference path="types/handlebars.d.ts" />
 /// <reference path="types/js.cookie.d.ts" />
-
-// Workaround declarations for deprecated functions 
-// until I have time to investigate side effects of removal
-declare function escape(s: string): string;
-declare function unescape(s: string): string;
-
-interface AjaxSuccessCallback {
-    (data: any, status?: string, request?: JQueryXHR): any;
-}
-
-interface AjaxErrorCallback {
-    (request: JQueryXHR, textStatus: string, errorThrown: string): any;
-}
+/// <reference path="types/vault.d.ts" />
 
 var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     'use strict';
@@ -70,7 +58,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
 
     // Encrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
-    function _encryptObject(obj, masterKey, excludes) {
+    function _encryptObject(obj: {}, masterKey: string, excludes: Array<string>) {
         Object.keys(obj).forEach(function (k) {
             if (excludes.indexOf(k) === -1) {
                 obj[k] = Passpack.encode('AES', obj[k], _b64_to_utf8(masterKey));
@@ -81,7 +69,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
 
     // Decrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
-    function _decryptObject(obj, masterKey, excludes) {
+    function _decryptObject(obj: {}, masterKey: string, excludes: Array<string>) {
         Object.keys(obj).forEach(function (k) {
             if (excludes.indexOf(k) === -1) {
                 obj[k] = Passpack.decode('AES', obj[k], _b64_to_utf8(masterKey));
@@ -91,7 +79,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Remove the item with a specific ID from an array
-    function _removeFromList(id, list) {
+    function _removeFromList(id: string, list: Array<Credential>) {
         list.forEach(function (item, i) {
             if (item.CredentialID === id) {
                 list.splice(i, 1);
@@ -424,7 +412,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         // Get all the credentials, decrypt each one
         _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data) {
             var exportItems = data.map(function (item) {
-                var o = _decryptObject(item, _b64_to_utf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
+                var o = <Credential>_decryptObject(item, _b64_to_utf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
                 return o;
             });
