@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "es3",
+        "sourceMap": false,
+        "noImplicitAny": false,
+        "noEmitOnError": false
+    },
+    "compileOnSave": true,
+    "exclude": [
+        "node_modules",
+        "**/*.d.ts"
+    ]
+}

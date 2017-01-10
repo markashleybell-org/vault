@@ -1,56 +1,73 @@
-/// <reference path="types/bootstrap.d.ts" />
+﻿/// <reference path="types/bootstrap.d.ts" />
 /// <reference path="types/jquery.d.ts" />
 /// <reference path="types/passpack.d.ts" />
 /// <reference path="types/handlebars.d.ts" />
 /// <reference path="types/js.cookie.d.ts" />
+
+// Workaround declarations for deprecated functions 
+// until I have time to investigate side effects of removal
+declare function escape(s: string): string;
+declare function unescape(s: string): string;
+
+interface AjaxSuccessCallback {
+    (data: any, status?: string, request?: JQueryXHR): any;
+}
+
+interface AjaxErrorCallback {
+    (request: JQueryXHR, textStatus: string, errorThrown: string): any;
+}
+
 var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     'use strict';
     // Private member variables
     var _userId = '', // GUID identifying logged-in user
-    _password = '', // Current user's password
-    _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
-    _artificialAjaxDelay = false, // Introduce an artificial delay for AJAX calls so we can test loaders locally
-    _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
-    _weakPasswordThreshold = 40, // Bit value below which password is deemed weak
-    _basePath = null, // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
-    _public = {}, // Public function container
-    // A map of the properties which can be searched for using the fieldName:query syntax
-    // We need this because the search is not case-sensitive, whereas JS properties are!
-    _queryablePropertyMap = {
-        description: 'Description',
-        username: 'Username',
-        password: 'Password',
-        url: 'Url',
-        filter: 'FILTER'
-    }, _ui = {
-        loginFormDialog: null,
-        loginForm: null,
-        container: null,
-        controls: null,
-        modal: null,
-        modalContent: null,
-        records: null,
-        newButton: null,
-        adminButton: null,
-        clearSearchButton: null,
-        searchInput: null,
-        spinner: null
-    }, _templates = {
-        urlLink: null,
-        urlText: null,
-        detail: null,
-        credentialForm: null,
-        deleteConfirmationDialog: null,
-        optionsDialog: null,
-        credentialTable: null,
-        credentialTableRow: null,
-        validationMessage: null,
-        modalHeader: null,
-        modalBody: null,
-        modalFooter: null,
-        copyLink: null,
-        exportedDataWindow: null
-    };
+        _password = '', // Current user's password
+        _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
+        _artificialAjaxDelay = false, // Introduce an artificial delay for AJAX calls so we can test loaders locally
+        _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
+        _weakPasswordThreshold = 40, // Bit value below which password is deemed weak
+        _basePath = null, // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
+        _public = {}, // Public function container
+        // A map of the properties which can be searched for using the fieldName:query syntax
+        // We need this because the search is not case-sensitive, whereas JS properties are!
+        _queryablePropertyMap = {
+            description: 'Description',
+            username: 'Username',
+            password: 'Password',
+            url: 'Url',
+            filter: 'FILTER'
+        },
+        _ui = {
+            loginFormDialog: null,
+            loginForm: null,
+            container: null,
+            controls: null,
+            modal: null,
+            modalContent: null,
+            records: null,
+            newButton: null,
+            adminButton: null,
+            clearSearchButton: null,
+            searchInput: null,
+            spinner: null
+        },
+        _templates = {
+            urlLink: null,
+            urlText: null,
+            detail: null,
+            credentialForm: null,
+            deleteConfirmationDialog: null,
+            optionsDialog: null,
+            credentialTable: null,
+            credentialTableRow: null,
+            validationMessage: null,
+            modalHeader: null,
+            modalBody: null,
+            modalFooter: null,
+            copyLink: null,
+            exportedDataWindow: null
+        };
+
     // Encrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
     function _encryptObject(obj, masterKey, excludes) {
@@ -61,6 +78,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         });
         return obj;
     }
+
     // Decrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
     function _decryptObject(obj, masterKey, excludes) {
@@ -71,6 +89,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         });
         return obj;
     }
+
     // Remove the item with a specific ID from an array
     function _removeFromList(id, list) {
         list.forEach(function (item, i) {
@@ -79,6 +98,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             }
         });
     }
+
     // Update properties of the item with a specific ID in a list
     function _updateProperties(id, properties, userId, list) {
         var items = list.filter(function (item) { return item.CredentialID === id; });
@@ -86,21 +106,25 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         if (items.length) {
             // Map the property values to it
             $.extend(items[0], properties);
-        }
-        else {
+        } else {
             // If we didn't find an existing item, add a new item with the supplied property values
             list.push($.extend({ CredentialID: id, UserID: userId }, properties));
         }
     }
+
     function _defaultAjaxErrorCallback(ignore, status, error) {
         return window.alert('Http Error: ' + status + ' - ' + error);
     }
-    function _ajaxPost(url, data, successCallback, errorCallback, contentType) {
+
+    function _ajaxPost(url: string, data: any, successCallback: AjaxSuccessCallback, errorCallback?: AjaxErrorCallback, contentType?: string) {
         var options;
+
         _ui.spinner.show();
+
         if (!errorCallback) {
             errorCallback = _defaultAjaxErrorCallback;
         }
+
         options = {
             url: url,
             data: data,
@@ -109,24 +133,25 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             success: function (data, status, request) { _ui.spinner.hide(); successCallback(data, status, request); },
             error: function (request, status, error) { _ui.spinner.hide(); errorCallback(request, status, error); }
         };
+
         if (contentType) {
             options.contentType = contentType;
         }
+
         if (!_artificialAjaxDelay) {
             $.ajax(options);
-        }
-        else {
+        } else {
             window.setTimeout(function () {
                 $.ajax(options);
             }, 2000);
         }
     }
+
     // Load all records for a specific user
     function _loadCredentials(userId, masterKey, callback) {
         if (_cachedList !== null && _cachedList.length) {
             _buildDataTable(_cachedList, callback, masterKey, userId);
-        }
-        else {
+        } else {
             _ajaxPost(_basePath + 'Main/GetAll', { userId: userId }, function (data) {
                 // At this point we only actually need to decrypt a few things for display/search
                 // which speeds up client-side table construction time dramatically
@@ -140,15 +165,19 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             });
         }
     }
+
     // Show the read-only details modal
     function _showDetail(credentialId, masterKey) {
         _ajaxPost(_basePath + 'Main/Load', { id: credentialId }, function (data) {
-            var urlText, urlHtml, detailHtml;
+            var urlText,
+                urlHtml,
+                detailHtml;
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
             // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
             urlText = _templates.urlText({ Url: data.Url });
             urlHtml = data.Url.indexOf('//') === -1 ? urlText : _templates.urlLink({ Url: data.Url, UrlText: urlText });
+
             detailHtml = _templates.detail({
                 Url: data.Url,
                 UrlHtml: urlHtml,
@@ -160,6 +189,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 UserDefined2Label: data.UserDefined2Label,
                 Notes: data.Notes
             });
+
             _showModal({
                 credentialId: credentialId,
                 title: data.Description,
@@ -171,16 +201,19 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             });
         });
     }
+
     // Default action for modal accept button
     function _defaultAcceptAction(e) {
         e.preventDefault();
         _ui.modal.modal('hide');
     }
+
     // Default action for modal close button
     function _defaultCloseAction(e) {
         e.preventDefault();
         _ui.modal.modal('hide');
     }
+
     // Show a Bootstrap modal with options as below
     // var modalOptions = {
     //     credentialId: '9c75660b-13ae-4c4f-b1d7-6770498a2466',
@@ -200,16 +233,22 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     //     delete: function() {}
     // };
     function _showModal(options) {
-        var showAccept = options.showAccept || false, showClose = options.showClose || true, showEdit = options.showEdit || false, showDelete = options.showDelete || false, html = _templates.modalHeader({
-            title: options.title,
-            closeText: options.closeText || 'Close',
-            showAccept: showAccept,
-            showClose: showClose,
-            showEdit: showEdit,
-            showDelete: showDelete
-        }) + _templates.modalBody({
-            content: options.content
-        });
+        var showAccept = options.showAccept || false,
+            showClose = options.showClose || true,
+            showEdit = options.showEdit || false,
+            showDelete = options.showDelete || false,
+
+            html = _templates.modalHeader({
+                title: options.title,
+                closeText: options.closeText || 'Close',
+                showAccept: showAccept,
+                showClose: showClose,
+                showEdit: showEdit,
+                showDelete: showDelete
+            }) + _templates.modalBody({
+                content: options.content
+            });
+
         if (showAccept || showClose || showEdit || showDelete) {
             html += _templates.modalFooter({
                 credentialId: options.credentialId,
@@ -223,6 +262,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 showDelete: showDelete
             });
         }
+
         _ui.modalContent.html(html);
         _ui.modal.off('click', 'button.btn-accept');
         _ui.modal.off('click', 'button.btn-close');
@@ -234,10 +274,12 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         _ui.modal.on('click', 'button.btn-delete', options.ondelete || function () { window.alert('NOT BOUND'); });
         _ui.modal.modal();
     }
+
     function _getPasswordLength() {
         var len = parseInt($('#len').val(), 10);
         return isNaN(len) ? 16 : len;
     }
+
     function _getPasswordGenerationOptions() {
         var options = {};
         $('input.generate-password-option').each(function () {
@@ -248,9 +290,11 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         });
         return options;
     }
-    function _isChecked(el) {
-        return el[0].checked;
+
+    function _isChecked(el: JQuery) {
+        return (<HTMLInputElement>el[0]).checked;
     }
+
     // Load a record into the edit form
     // If null is passed as the credentialId, we set up the form for adding a new record
     function _loadCredential(credentialId, masterKey) {
@@ -271,8 +315,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 _showPasswordStrength(_ui.modal.find('#Password'));
                 _setPasswordOptions(_ui.modal, data.PwdOptions);
             });
-        }
-        else {
+        } else { // New record setup
             _showModal({
                 title: 'Add Credential',
                 content: _templates.credentialForm({ UserID: _userId }),
@@ -286,6 +329,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             _showPasswordStrength(_ui.modal.find('#Password'));
         }
     }
+
     // Delete a record
     function _deleteCredential(credentialId, userId, masterKey) {
         _ajaxPost(_basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, function (data) {
@@ -303,6 +347,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             }
         });
     }
+
     // Show delete confirmation dialog
     function _confirmDelete(id, masterKey) {
         _showModal({
@@ -316,30 +361,37 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             }
         });
     }
+
     // Generate standard hash for a password
     function _generatePasswordHash(password) {
         return Passpack.utils.hashx(password);
     }
+
     // Generate 64-bit hash for a password
     function _generatePasswordHash64(password) {
         // The hash is now a full 64 char string
         return Passpack.utils.hashx(password, false, true);
     }
+
     // Change the password and re-encrypt all credentials with the new password
     function _changePassword(userId, masterKey) {
         var newPassword = $('#NewPassword').val();
         var newPasswordConfirm = $('#NewPasswordConfirm').val();
+
         if (newPassword === '') {
             window.alert('Password cannot be left blank.');
             return false;
         }
+
         if (newPassword !== newPasswordConfirm) {
             window.alert('Password confirmation does not match password.');
             return false;
         }
+
         if (!window.confirm('When the password change is complete you will be logged out and will need to log back in.\n\nAre you sure you want to change the master password?')) {
             return false;
         }
+
         var newPasswordHash = Passpack.utils.hashx(newPassword);
         // Convert the new master key to Base64 so that encryptObject() gets what it's expecting
         var newMasterKey = _utf8_to_b64(Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, true, true), true, true));
@@ -350,6 +402,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             var newData = data.map(function (item) {
                 return _encryptObject(_decryptObject(item, _b64_to_utf8(masterKey), excludes), newMasterKey, excludes);
             });
+
             _ajaxPost(_basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function () {
                 // Store the new password in hashed form
                 _ajaxPost(_basePath + 'Main/UpdatePassword', {
@@ -362,8 +415,10 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 });
             }, null, 'application/json; charset=utf-8');
         });
+
         return false;
     }
+
     // Export all credential data as JSON
     function _exportData(userId, masterKey) {
         // Get all the credentials, decrypt each one
@@ -373,20 +428,23 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
                 return o;
             });
+
             var exportWindow = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
             if (exportWindow && exportWindow.top) {
                 exportWindow.document.write(_templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
-            }
-            else {
+            } else {
                 window.alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
             }
         });
+
         return false;
     }
+
     // Import unencrypted JSON credential data
     function _importData(userId, masterKey, rawData) {
         var jsonImportData = JSON.parse(rawData);
         var excludes = ['CredentialID', 'UserID'];
+
         var newData = jsonImportData.map(function (item) {
             // Remove the confirmation property
             delete item.PasswordConfirmation;
@@ -396,36 +454,44 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             item.UserID = userId;
             return _encryptObject(item, _b64_to_utf8(masterKey), excludes);
         });
+
         _ajaxPost(_basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function () {
             // Just reload the whole page when we're done to force login
             window.location.href = _basePath.length > 1 ? _basePath.slice(0, -1) : _basePath;
         }, null, 'application/json; charset=utf-8');
+
         return false;
     }
+
     // Show the options dialog
     function _options() {
         var dialogHtml = _templates.optionsDialog({
             userid: _userId,
             masterkey: _utf8_to_b64(_masterKey)
         });
+
         _showModal({
             title: 'Admin',
             content: dialogHtml
         });
     }
+
     // Build the data table
     function _buildDataTable(data, callback, masterKey, userId) {
         // Create a table row for each record and add it to the rows array
         var rows = data.map(function (item) {
             return _createCredentialDisplayData(item, masterKey, userId);
         });
+
         // Fire the callback and pass it the array of rows
         callback(rows);
     }
+
     // Create the credential table
     function _createCredentialTable(rows) {
         return _templates.credentialTable({ rows: rows });
     }
+
     // Create a single table row for a credential
     function _createCredentialDisplayData(credential, masterKey, userId) {
         return {
@@ -439,33 +505,46 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             weak: $.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < _weakPasswordThreshold
         };
     }
+
     // Validate a credential record form
     function _validateRecord(f) {
-        var errors = [], description = $('#Description', f), password = $('#Password', f), passwordConfirmation = $('#PasswordConfirmation', f);
+        var errors = [],
+            description = $('#Description', f),
+            password = $('#Password', f),
+            passwordConfirmation = $('#PasswordConfirmation', f);
+
         if (description.val() === '') {
             errors.push({ field: description, msg: 'You must fill in a Description' });
         }
+
         // We don't mind if these are blank, but they must be the same!
         if (password.val() !== passwordConfirmation.val()) {
             errors.push({ field: passwordConfirmation, msg: 'Password confirmation does not match' });
         }
+
         return errors;
     }
+
     // Encode string to Base64
     function _utf8_to_b64(str) {
         return window.btoa(encodeURIComponent(escape(str)));
     }
+
     // Decode Base64 string
     function _b64_to_utf8(str) {
         return unescape(decodeURIComponent(window.atob(str)));
     }
+
     // Truncate a string at a specified length
     function _truncate(str, len) {
         return str.length > len ? str.substring(0, len - 3) + '...' : str;
     }
+
     // Hide credential rows which don't contain a particular string
     function _search(query, list) {
-        var results = [], queryField, queryData;
+        var results = [],
+            queryField,
+            queryData;
         // Tidy up the query text
         query = $.trim(query).toLowerCase();
         if (query !== null && query !== '' && query.length > 1) {
@@ -486,15 +565,13 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             if (queryField === 'FILTER') {
                 if (query === 'all') {
                     results = list;
-                }
-                else if (query === 'weak') {
+                } else if (query === 'weak') {
                     results = list.filter(function (item) {
                         var pwd = item['Password'];
                         return pwd && Passpack.utils.getBits(pwd) <= _weakPasswordThreshold;
                     });
                 }
-            }
-            else {
+            } else {
                 results = list.filter(function (item) {
                     return item[queryField].toLowerCase().indexOf(query) > -1;
                 });
@@ -502,8 +579,9 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         }
         return results;
     }
+
     // Rate-limit calls to the supplied function
-    function _debounce(func, wait, immediate) {
+    function _debounce(func: Function, wait?: number, immediate?: boolean) {
         var timeout;
         return function () {
             var context = this, args = arguments;
@@ -521,54 +599,54 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             }
         };
     }
+
     // Sort credentials alphabetically by description
     function _sortCredentials(credentials) {
         credentials.sort(function (a, b) {
-            var desca = a.Description.toUpperCase(), descb = b.Description.toUpperCase();
+            var desca = a.Description.toUpperCase(),
+                descb = b.Description.toUpperCase();
             return desca < descb ? -1 : desca > descb ? 1 : 0;
         });
     }
+
     // Show password strength visually
     function _showPasswordStrength(field) {
-        var strengthIndicator = field.next('div.password-strength'), status = strengthIndicator.find('> span'), bar = strengthIndicator.find('> div'), strength = Passpack.utils.getBits(field.val());
+        var strengthIndicator = field.next('div.password-strength'),
+            status = strengthIndicator.find('> span'),
+            bar = strengthIndicator.find('> div'),
+            strength = Passpack.utils.getBits(field.val());
         bar.removeClass();
         if (strength === 0) {
             status.html('No Password');
             bar.css('width', 0);
-        }
-        else if (strength <= 100) {
+        } else if (strength <= 100) {
             bar.css('width', strength + '%');
             if (strength <= 10) {
                 bar.addClass('extremely-weak');
                 status.html('Extremely Weak (' + strength + ')');
-            }
-            else if (strength <= 25) {
+            } else if (strength <= 25) {
                 bar.addClass('very-weak');
                 status.html('Very Weak (' + strength + ')');
-            }
-            else if (strength <= _weakPasswordThreshold) {
+            } else if (strength <= _weakPasswordThreshold) {
                 bar.addClass('weak');
                 status.html('Weak (' + strength + ')');
-            }
-            else if (strength <= 55) {
+            } else if (strength <= 55) {
                 bar.addClass('average');
                 status.html('Average (' + strength + ')');
-            }
-            else if (strength <= 75) {
+            } else if (strength <= 75) {
                 bar.addClass('strong');
                 status.html('Strong (' + strength + ')');
-            }
-            else {
+            } else {
                 bar.addClass('very-strong');
                 status.html('Very Strong (' + strength + ')');
             }
-        }
-        else {
+        } else {
             bar.addClass('extremely-strong');
             status.html('Extremely Strong (' + strength + ')');
             bar.css('width', '100%');
         }
     }
+
     function _setPasswordOptions(form, opts) {
         var optArray = opts.split('|');
         form.find('[name=len]').val(optArray[0]);
@@ -577,6 +655,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         form.find('[name=nums]')[0].checked = optArray[3] === '1' ? true : false;
         form.find('[name=symb]')[0].checked = optArray[4] === '1' ? true : false;
     }
+
     // Initialise the app
     function _init(basePath, testMode, devMode) {
         // Set the base path for AJAX requests/redirects
@@ -617,6 +696,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             };
             $.extend(_public, testMethods);
         }
+
         // Cache UI selectors
         _ui.loginFormDialog = $('#login-form-dialog');
         _ui.loginForm = $('#login-form');
@@ -629,6 +709,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         _ui.clearSearchButton = $('#clear-search');
         _ui.searchInput = $('#search');
         _ui.spinner = $('#spinner');
+
         _templates.urlLink = Handlebars.compile($('#tmpl-urllink').html());
         _templates.urlText = Handlebars.compile($('#tmpl-urltext').html());
         _templates.detail = Handlebars.compile($('#tmpl-detail').html());
@@ -643,18 +724,23 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         _templates.modalBody = Handlebars.compile($('#tmpl-modalbody').html());
         _templates.modalFooter = Handlebars.compile($('#tmpl-modalfooter').html());
         _templates.copyLink = Handlebars.compile($('#tmpl-copylink').html());
+
         Handlebars.registerPartial('credentialtablerow', _templates.credentialTableRow);
-        Handlebars.registerPartial('copylink', _templates.copyLink);
+
+        Handlebars.registerPartial('copylink', _templates.copyLink); 
+
         Handlebars.registerHelper('breaklines', function (text) {
             text = Handlebars.Utils.escapeExpression(text);
             text = text.replace(/(\r\n|\n|\r)/gm, '<br />');
             return new Handlebars.SafeString(text);
         });
+
         Handlebars.registerHelper('truncate', function (text, size) {
             text = text.length > size ? text.substring(0, size - 3) + '...' : text;
             text = Handlebars.Utils.escapeExpression(text);
             return new Handlebars.SafeString(text);
         });
+
         // Don't set up event handlers in test mode
         if (!testMode) {
             _ui.container.on('click', '.btn-credential-show-detail', function (e) {
@@ -662,14 +748,17 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 var id = $(this).parent().parent().attr('id');
                 _showDetail(id, _masterKey);
             });
+
             _ui.newButton.on('click', function (e) {
                 e.preventDefault();
                 _loadCredential(null, _masterKey);
             });
+
             _ui.adminButton.on('click', function (e) {
                 e.preventDefault();
                 _options();
             });
+
             _ui.clearSearchButton.on('click', function (e) {
                 e.preventDefault();
                 var results = _search(null, _cachedList);
@@ -678,15 +767,19 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 }, _masterKey, _userId);
                 _ui.searchInput.val('').focus();
             });
+
             _ui.searchInput.on('keyup', _debounce(function () {
                 var results = _search(this.value, _cachedList);
                 _buildDataTable(results, function (rows) {
                     _ui.container.html(_createCredentialTable(rows));
                 }, _masterKey, _userId);
             }, 200));
+
             // Initialise globals and load data on correct login
             _ui.loginForm.on('submit', function () {
-                var username = _ui.loginForm.find('#UN1209').val(), password = _ui.loginForm.find('#PW9804').val();
+                var username = _ui.loginForm.find('#UN1209').val(),
+                    password = _ui.loginForm.find('#PW9804').val();
+
                 _ajaxPost(_basePath + 'Main/Login', {
                     UN1209: Passpack.utils.hashx(username),
                     PW9804: Passpack.utils.hashx(password)
@@ -697,6 +790,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                         _userId = data.id;
                         _password = password;
                         _masterKey = _utf8_to_b64(Passpack.utils.hashx(_password + Passpack.utils.hashx(_password, true, true), true, true));
+
                         _loadCredentials(_userId, _masterKey, function () {
                             // Successfully logged in. Hide the login form
                             _ui.loginForm.hide();
@@ -706,26 +800,38 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                         });
                     }
                 });
+
                 return false;
             });
+
             // Save the new details on edit form submit
             $('body').on('submit', '#credential-form', function () {
-                var form = $(this), errors = [], errorMsg = [], credential = {}, properties = {};
+                var form = $(this),
+                    errors = [],
+                    errorMsg = [],
+                    credential = {},
+                    properties = {};
+
                 $('#validation-message').remove();
                 form.find('div.has-error').removeClass('has-error');
+
                 errors = _validateRecord(form);
+
                 if (errors.length > 0) {
                     errors.forEach(function (error) {
                         errorMsg.push(error.msg);
                         error.field.parent().parent().addClass('has-error');
                     });
+
                     _ui.modal.find('div.modal-body').prepend(_templates.validationMessage({ errors: errorMsg.join('<br />') }));
                     return false;
                 }
+
                 // Serialize the form inputs into an object
                 form.find('input[class!=submit], textarea').each(function () {
                     credential[this.name] = $(this).val();
                 });
+
                 // Hold the modified properties so we can update the list if the update succeeds
                 properties = {
                     Description: form.find('#Description').val(),
@@ -733,8 +839,10 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                     Password: form.find('#Password').val(),
                     Url: form.find('#Url').val()
                 };
+
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 credential = _encryptObject(credential, _masterKey, ['CredentialID', 'UserID']);
+
                 _ajaxPost(_basePath + 'Main/Update', credential, function (data) {
                     // Update the cached credential list with the new property values, so it is correct when we rebuild
                     _updateProperties(data.CredentialID, properties, _userId, _cachedList);
@@ -749,12 +857,15 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                         }, _masterKey, _userId);
                     });
                 });
+
                 return false;
             });
+
             // Show password strength as it is typed
             $('body').on('keyup', '#Password', _debounce(function () {
                 _showPasswordStrength($(this));
             }));
+
             // Generate a nice strong password
             $('body').on('click', 'button.generate-password', function (e) {
                 e.preventDefault();
@@ -762,18 +873,20 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 $('#Password').val(password);
                 $('#PasswordConfirmation').val(password);
                 var opts = [$('#len').val(),
-                    _isChecked($('#ucase')) ? 1 : 0,
-                    _isChecked($('#lcase')) ? 1 : 0,
-                    _isChecked($('#nums')) ? 1 : 0,
-                    _isChecked($('#symb')) ? 1 : 0];
+                            _isChecked($('#ucase')) ? 1 : 0,
+                            _isChecked($('#lcase')) ? 1 : 0,
+                            _isChecked($('#nums')) ? 1 : 0,
+                            _isChecked($('#symb')) ? 1 : 0];
                 $('#PwdOptions').val(opts.join('|'));
                 _showPasswordStrength($('#Password'));
             });
+
             // Toggle password generation option UI visibility
             $('body').on('click', 'a.generate-password-options-toggle', function (e) {
                 e.preventDefault();
                 $('div.generate-password-options').toggle();
             });
+
             // Copy content to clipboard when copy icon is clicked
             $('body').on('click', 'a.copy-link', function (e) {
                 e.preventDefault();
@@ -784,19 +897,22 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                     if (document.execCommand("copy")) {
                         a.find('span').addClass('copied').removeClass('fa-clone').addClass('fa-check-square');
                     }
-                }
-                catch (ex) {
+                } catch (ex) {
                     window.alert('Copy operation is not supported by the current browser: ' + ex.message);
                 }
+
             });
+
             $('body').on('click', 'button.btn-credential-open', function (e) {
                 e.preventDefault();
                 var url = $(this).data('url');
                 window.open(url);
             });
+
             $('body').on('click', 'button.btn-credential-copy', function (e) {
                 e.preventDefault();
-                var allButtons = $('button.btn-credential-copy'), button = $(this);
+                var allButtons = $('button.btn-credential-copy'),
+                    button = $(this);
                 allButtons.removeClass('btn-success').addClass('btn-primary');
                 allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
                 button.next('input.copy-content').select();
@@ -805,29 +921,29 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                         button.addClass('btn-success').removeClass('btn-primary');
                         button.find('span').removeClass('fa-clone').addClass('fa-check-square');
                     }
-                }
-                catch (ex) {
+                } catch (ex) {
                     window.alert('Copy operation is not supported by the current browser: ' + ex.message);
                 }
             });
+
             // Automatically focus the search field if a key is pressed from the credential list
-            $('body').on('keydown', function (e) {
-                if (e.target.nodeName == 'BODY') {
+            $('body').on('keydown', function(e) {
+                if(e.target.nodeName == 'BODY') {
                     e.preventDefault();
                     // Cancel the first mouseup event which will be fired after focus
-                    _ui.searchInput.one('mouseup', function (me) {
+                    _ui.searchInput.one('mouseup', function(me){
                         me.preventDefault();
                     });
                     _ui.searchInput.focus();
                     var char = String.fromCharCode(e.keyCode);
                     if (/[a-zA-Z0-9]/.test(char)) {
                         _ui.searchInput.val(e.shiftKey ? char : char.toLowerCase());
-                    }
-                    else {
+                    } else {
                         _ui.searchInput.select();
                     }
                 }
             });
+
             // If we're in dev mode, automatically log in with a cookie manually created on the dev machine
             if (devMode) {
                 _ui.loginForm.find('#UN1209').val(Cookies.get('vault-dev-username'));
@@ -839,12 +955,15 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             }
         }
     }
+
     _public = {
         init: _init,
         changePassword: _changePassword,
         exportData: _exportData,
         importData: _importData
     };
+
     // Expose public methods
     return _public;
+
 }(jQuery, Passpack, Handlebars, Cookies, window, document));
