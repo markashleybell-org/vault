@@ -3,12 +3,12 @@
 declare function escape(s: string): string;
 declare function unescape(s: string): string;
 
-interface AjaxSuccessCallback {
+interface XHRSuccess {
     (data: any, status?: string, request?: JQueryXHR): void;
 }
 
-interface AjaxErrorCallback {
-    (request: JQueryXHR, textStatus: string, errorThrown: string): void;
+interface XHRError {
+    (request: JQueryXHR, status: string, error: string): void;
 }
 
 interface Credential {
@@ -25,4 +25,15 @@ interface Credential {
     UserDefined2: string;
     Notes: string;
     PwdOptions: string;
+}
+
+interface CredentialSummary {
+    credentialid: string;
+    masterkey: string;
+    userid: string;
+    description: string;
+    username: string;
+    password: string;
+    url: string;
+    weak: boolean;
 }

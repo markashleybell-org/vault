@@ -5,27 +5,33 @@
 /// <reference path="types/js.cookie.d.ts" />
 /// <reference path="types/vault.d.ts" />
 
-var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
+/* tslint:disable */
+
+let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     'use strict';
-    // Private member variables
-    var _userId = '', // GUID identifying logged-in user
-        _password = '', // Current user's password
-        _masterKey = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
-        _artificialAjaxDelay = false, // Introduce an artificial delay for AJAX calls so we can test loaders locally
-        _cachedList = [], // Hold the list of credential summaries in memory to avoid requerying and decrypting after each save
-        _weakPasswordThreshold = 40, // Bit value below which password is deemed weak
-        _basePath = null, // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
-        _public = {}, // Public function container
+
+    /* tslint:enable */
+    /* tslint:disable:comment-format quotemark */
+
+    const _weakPasswordThreshold: number = 40,      // Bit value below which password is deemed weak
+          _artificialAjaxDelay: boolean = false;    // Introduce an artificial delay for AJAX calls so we can test loaders locally
+
+    let _userId: string = '', // GUID identifying logged-in user
+        _password: string = '', // Current user's password
+        _masterKey: string = '', // Master key for Passpack encryption (Base64 encoded hash of (password + hashed pasword))
+        _cachedList: Credential[] = [], // Hold the credential summary list in memory to avoid requerying/decrypting after save
+        _basePath: string = null, // Base URL (used mostly for XHR requests, particularly when app is hosted as a sub-application)
+        _public: any = {}, // Public function container
         // A map of the properties which can be searched for using the fieldName:query syntax
         // We need this because the search is not case-sensitive, whereas JS properties are!
-        _queryablePropertyMap = {
+        _queryablePropertyMap: any = {
             description: 'Description',
             username: 'Username',
             password: 'Password',
             url: 'Url',
             filter: 'FILTER'
         },
-        _ui = {
+        _ui: any = {
             loginFormDialog: null,
             loginForm: null,
             container: null,
@@ -39,7 +45,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             searchInput: null,
             spinner: null
         },
-        _templates = {
+        _templates: any = {
             urlLink: null,
             urlText: null,
             detail: null,
@@ -58,8 +64,8 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
 
     // Encrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
-    function _encryptObject(obj: {}, masterKey: string, excludes: Array<string>) {
-        Object.keys(obj).forEach(function (k) {
+    function _encryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
+        Object.keys(obj).forEach(function (k: string): void {
             if (excludes.indexOf(k) === -1) {
                 obj[k] = Passpack.encode('AES', obj[k], _b64_to_utf8(masterKey));
             }
@@ -69,8 +75,8 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
 
     // Decrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
-    function _decryptObject(obj: {}, masterKey: string, excludes: Array<string>) {
-        Object.keys(obj).forEach(function (k) {
+    function _decryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
+        Object.keys(obj).forEach(function (k: string): void {
             if (excludes.indexOf(k) === -1) {
                 obj[k] = Passpack.decode('AES', obj[k], _b64_to_utf8(masterKey));
             }
@@ -78,9 +84,13 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         return obj;
     }
 
+    function _createMasterKey(password: string): string {
+        return Passpack.utils.hashx(password + Passpack.utils.hashx(password, true, true), true, true);
+    }
+
     // Remove the item with a specific ID from an array
-    function _removeFromList(id: string, list: Array<Credential>) {
-        list.forEach(function (item, i) {
+    function _removeFromList(id: string, list: Credential[]): void {
+        list.forEach(function (item: Credential, i: number): void {
             if (item.CredentialID === id) {
                 list.splice(i, 1);
             }
@@ -88,8 +98,10 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Update properties of the item with a specific ID in a list
-    function _updateProperties(id, properties, userId, list) {
-        var items = list.filter(function (item) { return item.CredentialID === id; });
+    function _updateProperties(id: string, properties: any, userId: string, list: Credential[]): void {
+        let items: Credential[] = list.filter(function (item: Credential): boolean {
+            return item.CredentialID === id;
+        });
         // If an item with the ID already exists
         if (items.length) {
             // Map the property values to it
@@ -100,26 +112,30 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         }
     }
 
-    function _defaultAjaxErrorCallback(ignore, status, error) {
+    function _defaultAjaxErrorCallback(ignore: JQueryXHR, status: string, error: string): void {
         return window.alert('Http Error: ' + status + ' - ' + error);
     }
 
-    function _ajaxPost(url: string, data: any, successCallback: AjaxSuccessCallback, errorCallback?: AjaxErrorCallback, contentType?: string) {
-        var options;
-
+    function _ajaxPost(url: string, data: any, successCallback: XHRSuccess, errorCallback?: XHRError, contentType?: string): void {
         _ui.spinner.show();
 
         if (!errorCallback) {
             errorCallback = _defaultAjaxErrorCallback;
         }
 
-        options = {
+        let options: any = {
             url: url,
             data: data,
             dataType: 'json',
             type: 'POST',
-            success: function (data, status, request) { _ui.spinner.hide(); successCallback(data, status, request); },
-            error: function (request, status, error) { _ui.spinner.hide(); errorCallback(request, status, error); }
+            success: function (data: any, status: string, request: JQueryXHR): void {
+                _ui.spinner.hide();
+                successCallback(data, status, request);
+            },
+            error: function (request: JQueryXHR, status: string, error: string): void {
+                _ui.spinner.hide();
+                errorCallback(request, status, error);
+            }
         };
 
         if (contentType) {
@@ -129,21 +145,21 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         if (!_artificialAjaxDelay) {
             $.ajax(options);
         } else {
-            window.setTimeout(function () {
+            window.setTimeout(function (): void {
                 $.ajax(options);
             }, 2000);
         }
     }
 
     // Load all records for a specific user
-    function _loadCredentials(userId, masterKey, callback) {
+    function _loadCredentials(userId: string, masterKey: string, callback: Function): void {
         if (_cachedList !== null && _cachedList.length) {
             _buildDataTable(_cachedList, callback, masterKey, userId);
         } else {
-            _ajaxPost(_basePath + 'Main/GetAll', { userId: userId }, function (data) {
+            _ajaxPost(_basePath + 'Main/GetAll', { userId: userId }, function (data: Credential[]): void {
                 // At this point we only actually need to decrypt a few things for display/search
                 // which speeds up client-side table construction time dramatically
-                var items = data.map(function (item) {
+                let items: Credential[] = data.map(function (item: Credential): Credential {
                     return _decryptObject(item, masterKey, ['CredentialID', 'UserID']);
                 });
                 // Cache the whole (decrypted) list on the client
@@ -155,18 +171,15 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Show the read-only details modal
-    function _showDetail(credentialId, masterKey) {
-        _ajaxPost(_basePath + 'Main/Load', { id: credentialId }, function (data) {
-            var urlText,
-                urlHtml,
-                detailHtml;
+    function _showDetail(credentialId: string, masterKey: string): void {
+        _ajaxPost(_basePath + 'Main/Load', { id: credentialId }, function (data: Credential): void {
             // CredentialID and UserID are not currently encrypted so don't try to decode them
             data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
             // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
-            urlText = _templates.urlText({ Url: data.Url });
-            urlHtml = data.Url.indexOf('//') === -1 ? urlText : _templates.urlLink({ Url: data.Url, UrlText: urlText });
+            let urlText: string = _templates.urlText({ Url: data.Url });
+            let urlHtml: string = data.Url.indexOf('//') === -1 ? urlText : _templates.urlLink({ Url: data.Url, UrlText: urlText });
 
-            detailHtml = _templates.detail({
+            let detailHtml: string = _templates.detail({
                 Url: data.Url,
                 UrlHtml: urlHtml,
                 Username: data.Username,
@@ -184,26 +197,26 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 content: detailHtml,
                 showEdit: true,
                 showDelete: true,
-                onedit: function () { _loadCredential($(this).data('credentialid'), masterKey); },
-                ondelete: function () { _confirmDelete($(this).data('credentialid'), masterKey); }
+                onedit: function (): void { _loadCredential($(this).data('credentialid'), masterKey); },
+                ondelete: function (): void { _confirmDelete($(this).data('credentialid'), masterKey); }
             });
         });
     }
 
     // Default action for modal accept button
-    function _defaultAcceptAction(e) {
+    function _defaultAcceptAction(e: Event): void {
         e.preventDefault();
         _ui.modal.modal('hide');
     }
 
     // Default action for modal close button
-    function _defaultCloseAction(e) {
+    function _defaultCloseAction(e: Event): void {
         e.preventDefault();
         _ui.modal.modal('hide');
     }
 
     // Show a Bootstrap modal with options as below
-    // var modalOptions = {
+    // let modalOptions = {
     //     credentialId: '9c75660b-13ae-4c4f-b1d7-6770498a2466',
     //     title: 'TEST',
     //     content: '<p>TEST</p>',
@@ -220,13 +233,12 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     //     deleteText: 'Delete',
     //     delete: function() {}
     // };
-    function _showModal(options) {
-        var showAccept = options.showAccept || false,
-            showClose = options.showClose || true,
-            showEdit = options.showEdit || false,
-            showDelete = options.showDelete || false,
-
-            html = _templates.modalHeader({
+    function _showModal(options: any): void {
+        let showAccept: boolean = options.showAccept || false,
+            showClose: boolean = options.showClose || true,
+            showEdit: boolean = options.showEdit || false,
+            showDelete: boolean = options.showDelete || false,
+            html: string = _templates.modalHeader({
                 title: options.title,
                 closeText: options.closeText || 'Close',
                 showAccept: showAccept,
@@ -258,20 +270,20 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         _ui.modal.off('click', 'button.btn-delete');
         _ui.modal.on('click', 'button.btn-accept', options.onaccept || _defaultAcceptAction);
         _ui.modal.on('click', 'button.btn-close', options.onclose || _defaultCloseAction);
-        _ui.modal.on('click', 'button.btn-edit', options.onedit || function () { window.alert('NOT BOUND'); });
-        _ui.modal.on('click', 'button.btn-delete', options.ondelete || function () { window.alert('NOT BOUND'); });
+        _ui.modal.on('click', 'button.btn-edit', options.onedit || function (): void { window.alert('NOT BOUND'); });
+        _ui.modal.on('click', 'button.btn-delete', options.ondelete || function (): void { window.alert('NOT BOUND'); });
         _ui.modal.modal();
     }
 
-    function _getPasswordLength() {
-        var len = parseInt($('#len').val(), 10);
+    function _getPasswordLength(): number {
+        let len: number = parseInt($('#len').val(), 10);
         return isNaN(len) ? 16 : len;
     }
 
-    function _getPasswordGenerationOptions() {
-        var options = {};
-        $('input.generate-password-option').each(function () {
-            var checkbox = $(this);
+    function _getPasswordGenerationOptions(): any {
+        let options: any = {};
+        $('input.generate-password-option').each(function (): void {
+            let checkbox: JQuery = $(this);
             if (_isChecked(checkbox)) {
                 options[checkbox.attr('name')] = 1;
             }
@@ -279,15 +291,19 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         return options;
     }
 
-    function _isChecked(el: JQuery) {
+    function _isChecked(el: JQuery): boolean {
         return (<HTMLInputElement>el[0]).checked;
+    }
+
+    function _checkIf(el: JQuery, condition: () => boolean): void {
+        (<HTMLInputElement>el[0]).checked = condition();
     }
 
     // Load a record into the edit form
     // If null is passed as the credentialId, we set up the form for adding a new record
-    function _loadCredential(credentialId, masterKey) {
+    function _loadCredential(credentialId: string, masterKey: string): void {
         if (credentialId !== null) {
-            _ajaxPost(_basePath + 'Main/Load', { id: credentialId }, function (data) {
+            _ajaxPost(_basePath + 'Main/Load', { id: credentialId }, function (data: Credential): void {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
                 _showModal({
@@ -295,7 +311,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                     content: _templates.credentialForm(data),
                     showAccept: true,
                     acceptText: 'Save',
-                    onaccept: function () {
+                    onaccept: function (): void {
                         $('#credential-form').submit();
                     }
                 });
@@ -309,7 +325,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 content: _templates.credentialForm({ UserID: _userId }),
                 showAccept: true,
                 acceptText: 'Save',
-                onaccept: function () {
+                onaccept: function (): void {
                     $('#credential-form').submit();
                 }
             });
@@ -319,16 +335,16 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Delete a record
-    function _deleteCredential(credentialId, userId, masterKey) {
-        _ajaxPost(_basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, function (data) {
+    function _deleteCredential(credentialId: string, userId: string, masterKey: string): void {
+        _ajaxPost(_basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, function (data: any): void {
             if (data.Success) {
                 // Remove the deleted item from the cached list before reload
                 _removeFromList(credentialId, _cachedList);
                 // For now we just reload the entire table in the background
-                _loadCredentials(userId, masterKey, function () {
+                _loadCredentials(userId, masterKey, function (): void {
                     _ui.modal.modal('hide');
-                    var results = _search(_ui.searchInput.val(), _cachedList);
-                    _buildDataTable(results, function (rows) {
+                    let results: Credential[] = _search(_ui.searchInput.val(), _cachedList);
+                    _buildDataTable(results, function (rows: CredentialSummary[]): void {
                         _ui.container.html(_createCredentialTable(rows));
                     }, _masterKey, userId);
                 });
@@ -337,13 +353,13 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Show delete confirmation dialog
-    function _confirmDelete(id, masterKey) {
+    function _confirmDelete(id: string, masterKey: string): void {
         _showModal({
             title: 'Delete Credential',
             content: _templates.deleteConfirmationDialog(),
             showDelete: true,
             deleteText: 'Yes, Delete This Credential',
-            ondelete: function (e) {
+            ondelete: function (e: Event): void {
                 e.preventDefault();
                 _deleteCredential(id, _userId, masterKey);
             }
@@ -351,89 +367,87 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Generate standard hash for a password
-    function _generatePasswordHash(password) {
+    function _generatePasswordHash(password: string): string {
         return Passpack.utils.hashx(password);
     }
 
     // Generate 64-bit hash for a password
-    function _generatePasswordHash64(password) {
+    function _generatePasswordHash64(password: string): string {
         // The hash is now a full 64 char string
         return Passpack.utils.hashx(password, false, true);
     }
 
     // Change the password and re-encrypt all credentials with the new password
-    function _changePassword(userId, masterKey) {
-        var newPassword = $('#NewPassword').val();
-        var newPasswordConfirm = $('#NewPasswordConfirm').val();
+    function _changePassword(userId: string, masterKey: string): void {
+        let newPassword: string = $('#NewPassword').val(),
+            newPasswordConfirm: string = $('#NewPasswordConfirm').val(),
+            confirmationMsg: string = 'When the password change is complete you will be logged out and will need to log back in.\n\n'
+                                    + 'Are you SURE you want to change the master password?';
 
         if (newPassword === '') {
             window.alert('Password cannot be left blank.');
-            return false;
+            return;
         }
 
         if (newPassword !== newPasswordConfirm) {
             window.alert('Password confirmation does not match password.');
-            return false;
+            return;
         }
 
-        if (!window.confirm('When the password change is complete you will be logged out and will need to log back in.\n\nAre you sure you want to change the master password?')) {
-            return false;
+        if (!window.confirm(confirmationMsg)) {
+            return;
         }
 
-        var newPasswordHash = Passpack.utils.hashx(newPassword);
-        // Convert the new master key to Base64 so that encryptObject() gets what it's expecting
-        var newMasterKey = _utf8_to_b64(Passpack.utils.hashx(newPassword + Passpack.utils.hashx(newPassword, true, true), true, true));
+        let newPasswordHash: string = Passpack.utils.hashx(newPassword),
+            newMasterKey: string = _utf8_to_b64(_createMasterKey(newPassword));
+
         // Get all the credentials, decrypt each with the old password
         // and re-encrypt it with the new one
-        _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data) {
-            var excludes = ['CredentialID', 'UserID', 'PasswordConfirmation'];
-            var newData = data.map(function (item) {
+        _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data: Credential[]): void {
+            let excludes: string[] = ['CredentialID', 'UserID', 'PasswordConfirmation'];
+            let newData: Credential[] = data.map(function (item: Credential): Credential {
                 return _encryptObject(_decryptObject(item, _b64_to_utf8(masterKey), excludes), newMasterKey, excludes);
             });
 
-            _ajaxPost(_basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function () {
+            _ajaxPost(_basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function (): void {
                 // Store the new password in hashed form
                 _ajaxPost(_basePath + 'Main/UpdatePassword', {
                     newHash: newPasswordHash,
                     userid: userId,
                     oldHash: Passpack.utils.hashx(_password)
-                }, function () {
+                }, function (): void {
                     // Just reload the whole page when we're done to force login
                     window.location.href = _basePath.length > 1 ? _basePath.slice(0, -1) : _basePath;
                 });
             }, null, 'application/json; charset=utf-8');
         });
-
-        return false;
     }
 
     // Export all credential data as JSON
-    function _exportData(userId, masterKey) {
+    function _exportData(userId: string, masterKey: string): void {
         // Get all the credentials, decrypt each one
-        _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data) {
-            var exportItems = data.map(function (item) {
-                var o = <Credential>_decryptObject(item, _b64_to_utf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
+        _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data: Credential[]): void {
+            let exportItems: Credential[] = data.map(function (item: Credential): Credential {
+                let o: Credential = _decryptObject(item, _b64_to_utf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
                 delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
                 return o;
             });
 
-            var exportWindow = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
+            let exportWindow:Window = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
             if (exportWindow && exportWindow.top) {
                 exportWindow.document.write(_templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
             } else {
                 window.alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
             }
         });
-
-        return false;
     }
 
     // Import unencrypted JSON credential data
-    function _importData(userId, masterKey, rawData) {
-        var jsonImportData = JSON.parse(rawData);
-        var excludes = ['CredentialID', 'UserID'];
+    function _importData(userId: string, masterKey: string, rawData: string): void {
+        let jsonImportData: Credential[] = JSON.parse(rawData);
+        let excludes: string[] = ['CredentialID', 'UserID'];
 
-        var newData = jsonImportData.map(function (item) {
+        let newData: Credential[] = jsonImportData.map(function (item: Credential): Credential {
             // Remove the confirmation property
             delete item.PasswordConfirmation;
             // Null out the old credential ID so UpdateMultiple knows this is a new record
@@ -443,17 +457,15 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             return _encryptObject(item, _b64_to_utf8(masterKey), excludes);
         });
 
-        _ajaxPost(_basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function () {
+        _ajaxPost(_basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function (): void {
             // Just reload the whole page when we're done to force login
             window.location.href = _basePath.length > 1 ? _basePath.slice(0, -1) : _basePath;
         }, null, 'application/json; charset=utf-8');
-
-        return false;
     }
 
     // Show the options dialog
-    function _options() {
-        var dialogHtml = _templates.optionsDialog({
+    function _options(): void {
+        let dialogHtml: string = _templates.optionsDialog({
             userid: _userId,
             masterkey: _utf8_to_b64(_masterKey)
         });
@@ -465,9 +477,9 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Build the data table
-    function _buildDataTable(data, callback, masterKey, userId) {
+    function _buildDataTable(data: Credential[], callback: Function, masterKey: string, userId: string): void {
         // Create a table row for each record and add it to the rows array
-        var rows = data.map(function (item) {
+        let rows: CredentialSummary[] = data.map(function (item: Credential): CredentialSummary {
             return _createCredentialDisplayData(item, masterKey, userId);
         });
 
@@ -476,12 +488,12 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Create the credential table
-    function _createCredentialTable(rows) {
+    function _createCredentialTable(rows: CredentialSummary[]): string {
         return _templates.credentialTable({ rows: rows });
     }
 
     // Create a single table row for a credential
-    function _createCredentialDisplayData(credential, masterKey, userId) {
+    function _createCredentialDisplayData(credential: Credential, masterKey: string, userId: string): CredentialSummary {
         return {
             credentialid: credential.CredentialID,
             masterkey: masterKey,
@@ -495,11 +507,11 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Validate a credential record form
-    function _validateRecord(f) {
-        var errors = [],
-            description = $('#Description', f),
-            password = $('#Password', f),
-            passwordConfirmation = $('#PasswordConfirmation', f);
+    function _validateRecord(f: JQuery): any[] {
+        let errors: any[] = [],
+            description: JQuery = f.find('#Description'),
+            password: JQuery = f.find('#Password'),
+            passwordConfirmation: JQuery = f.find('#PasswordConfirmation');
 
         if (description.val() === '') {
             errors.push({ field: description, msg: 'You must fill in a Description' });
@@ -514,25 +526,25 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Encode string to Base64
-    function _utf8_to_b64(str) {
+    function _utf8_to_b64(str: string): string {
         return window.btoa(encodeURIComponent(escape(str)));
     }
 
     // Decode Base64 string
-    function _b64_to_utf8(str) {
+    function _b64_to_utf8(str: string): string {
         return unescape(decodeURIComponent(window.atob(str)));
     }
 
     // Truncate a string at a specified length
-    function _truncate(str, len) {
+    function _truncate(str: string, len: number): string {
         return str.length > len ? str.substring(0, len - 3) + '...' : str;
     }
 
     // Hide credential rows which don't contain a particular string
-    function _search(query, list) {
-        var results = [],
-            queryField,
-            queryData;
+    function _search(query: string, list: Credential[]): Credential[] {
+        let results: Credential[] = [],
+            queryField: string,
+            queryData: string[];
         // Tidy up the query text
         query = $.trim(query).toLowerCase();
         if (query !== null && query !== '' && query.length > 1) {
@@ -554,13 +566,13 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 if (query === 'all') {
                     results = list;
                 } else if (query === 'weak') {
-                    results = list.filter(function (item) {
-                        var pwd = item['Password'];
+                    results = list.filter(function (item: Credential): boolean {
+                        let pwd: string = item.Password;
                         return pwd && Passpack.utils.getBits(pwd) <= _weakPasswordThreshold;
                     });
                 }
             } else {
-                results = list.filter(function (item) {
+                results = list.filter(function (item: Credential): boolean {
                     return item[queryField].toLowerCase().indexOf(query) > -1;
                 });
             }
@@ -569,17 +581,17 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Rate-limit calls to the supplied function
-    function _debounce(func: Function, wait?: number, immediate?: boolean) {
-        var timeout;
-        return function () {
-            var context = this, args = arguments;
-            var later = function () {
+    function _debounce(func: Function, wait?: number, immediate?: boolean): (e: Event) => void {
+        let timeout: number;
+        return function (): void {
+            let context: Function = this, args: IArguments = arguments;
+            let later: Function = function (): void {
                 timeout = null;
                 if (!immediate) {
                     func.apply(context, args);
                 }
             };
-            var callNow = immediate && !timeout;
+            let callNow: boolean = immediate && !timeout;
             window.clearTimeout(timeout);
             timeout = window.setTimeout(later, wait);
             if (callNow) {
@@ -589,20 +601,20 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
 
     // Sort credentials alphabetically by description
-    function _sortCredentials(credentials) {
-        credentials.sort(function (a, b) {
-            var desca = a.Description.toUpperCase(),
-                descb = b.Description.toUpperCase();
+    function _sortCredentials(credentials: Credential[]): void {
+        credentials.sort(function (a: Credential, b: Credential): number {
+            let desca: string = a.Description.toUpperCase(),
+                descb: string = b.Description.toUpperCase();
             return desca < descb ? -1 : desca > descb ? 1 : 0;
         });
     }
 
     // Show password strength visually
-    function _showPasswordStrength(field) {
-        var strengthIndicator = field.next('div.password-strength'),
-            status = strengthIndicator.find('> span'),
-            bar = strengthIndicator.find('> div'),
-            strength = Passpack.utils.getBits(field.val());
+    function _showPasswordStrength(field: JQuery): void {
+        let strengthIndicator: JQuery = field.next('div.password-strength'),
+            status: JQuery = strengthIndicator.find('> span'),
+            bar: JQuery = strengthIndicator.find('> div'),
+            strength: number = Passpack.utils.getBits(field.val());
         bar.removeClass();
         if (strength === 0) {
             status.html('No Password');
@@ -635,22 +647,22 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         }
     }
 
-    function _setPasswordOptions(form, opts) {
-        var optArray = opts.split('|');
+    function _setPasswordOptions(form: JQuery, opts: string): void {
+        let optArray: string[] = opts.split('|');
         form.find('[name=len]').val(optArray[0]);
-        form.find('[name=ucase]')[0].checked = optArray[1] === '1' ? true : false;
-        form.find('[name=lcase]')[0].checked = optArray[2] === '1' ? true : false;
-        form.find('[name=nums]')[0].checked = optArray[3] === '1' ? true : false;
-        form.find('[name=symb]')[0].checked = optArray[4] === '1' ? true : false;
+        _checkIf(form.find('[name=ucase]'), () => optArray[1] === '1');
+        _checkIf(form.find('[name=lcase]'), () => optArray[2] === '1');
+        _checkIf(form.find('[name=nums]'), () => optArray[3] === '1');
+        _checkIf(form.find('[name=symb]'), () => optArray[4] === '1');
     }
 
     // Initialise the app
-    function _init(basePath, testMode, devMode) {
+    function _init(basePath: string, testMode: boolean, devMode: boolean): void {
         // Set the base path for AJAX requests/redirects
         _basePath = basePath;
         // Determine whether we're testing or not
         if (testMode) {
-            var testMethods = {
+            let testMethods: any = {
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,
                 removeFromList: _removeFromList,
@@ -715,15 +727,15 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
 
         Handlebars.registerPartial('credentialtablerow', _templates.credentialTableRow);
 
-        Handlebars.registerPartial('copylink', _templates.copyLink); 
+        Handlebars.registerPartial('copylink', _templates.copyLink);
 
-        Handlebars.registerHelper('breaklines', function (text) {
+        Handlebars.registerHelper('breaklines', function (text: string): hbs.SafeString {
             text = Handlebars.Utils.escapeExpression(text);
             text = text.replace(/(\r\n|\n|\r)/gm, '<br />');
             return new Handlebars.SafeString(text);
         });
 
-        Handlebars.registerHelper('truncate', function (text, size) {
+        Handlebars.registerHelper('truncate', function (text: string, size: number): hbs.SafeString {
             text = text.length > size ? text.substring(0, size - 3) + '...' : text;
             text = Handlebars.Utils.escapeExpression(text);
             return new Handlebars.SafeString(text);
@@ -731,55 +743,57 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
 
         // Don't set up event handlers in test mode
         if (!testMode) {
-            _ui.container.on('click', '.btn-credential-show-detail', function (e) {
+            _ui.container.on('click', '.btn-credential-show-detail', function (e: Event): void {
                 e.preventDefault();
-                var id = $(this).parent().parent().attr('id');
+                let id: string = $(this).parent().parent().attr('id');
                 _showDetail(id, _masterKey);
             });
 
-            _ui.newButton.on('click', function (e) {
+            _ui.newButton.on('click', function (e: Event): void {
                 e.preventDefault();
                 _loadCredential(null, _masterKey);
             });
 
-            _ui.adminButton.on('click', function (e) {
+            _ui.adminButton.on('click', function (e: Event): void {
                 e.preventDefault();
                 _options();
             });
 
-            _ui.clearSearchButton.on('click', function (e) {
+            _ui.clearSearchButton.on('click', function (e: Event): void {
                 e.preventDefault();
-                var results = _search(null, _cachedList);
-                _buildDataTable(results, function (rows) {
+                let results: Credential[] = _search(null, _cachedList);
+                _buildDataTable(results, function (rows: CredentialSummary[]): void {
                     _ui.container.html(_createCredentialTable(rows));
                 }, _masterKey, _userId);
                 _ui.searchInput.val('').focus();
             });
 
-            _ui.searchInput.on('keyup', _debounce(function () {
-                var results = _search(this.value, _cachedList);
-                _buildDataTable(results, function (rows) {
+            _ui.searchInput.on('keyup', _debounce(function (): void {
+                let results: Credential[] = _search(this.value, _cachedList);
+                _buildDataTable(results, function (rows: CredentialSummary[]): void {
                     _ui.container.html(_createCredentialTable(rows));
                 }, _masterKey, _userId);
             }, 200));
 
             // Initialise globals and load data on correct login
-            _ui.loginForm.on('submit', function () {
-                var username = _ui.loginForm.find('#UN1209').val(),
-                    password = _ui.loginForm.find('#PW9804').val();
+            _ui.loginForm.on('submit', function (e: Event): void {
+                e.preventDefault();
+
+                let username: string = _ui.loginForm.find('#UN1209').val(),
+                    password: string = _ui.loginForm.find('#PW9804').val();
 
                 _ajaxPost(_basePath + 'Main/Login', {
                     UN1209: Passpack.utils.hashx(username),
                     PW9804: Passpack.utils.hashx(password)
-                }, function (data) {
+                }, function (data: any): void {
                     // If the details were valid
                     if (data.result === 1 && data.id !== '') {
                         // Set some private variables so that we can reuse them for encryption during this session
                         _userId = data.id;
                         _password = password;
-                        _masterKey = _utf8_to_b64(Passpack.utils.hashx(_password + Passpack.utils.hashx(_password, true, true), true, true));
+                        _masterKey = _utf8_to_b64(_createMasterKey(_password));
 
-                        _loadCredentials(_userId, _masterKey, function () {
+                        _loadCredentials(_userId, _masterKey, function (): void {
                             // Successfully logged in. Hide the login form
                             _ui.loginForm.hide();
                             _ui.loginFormDialog.modal('hide');
@@ -788,17 +802,17 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                         });
                     }
                 });
-
-                return false;
             });
 
             // Save the new details on edit form submit
-            $('body').on('submit', '#credential-form', function () {
-                var form = $(this),
-                    errors = [],
-                    errorMsg = [],
-                    credential = {},
-                    properties = {};
+            $('body').on('submit', '#credential-form', function (e: Event): void {
+                e.preventDefault();
+
+                let form: JQuery = $(this),
+                    errors: any[] = [],
+                    errorMsg: string[] = [],
+                    credential: Credential = null,
+                    properties: any = {};
 
                 $('#validation-message').remove();
                 form.find('div.has-error').removeClass('has-error');
@@ -806,17 +820,17 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 errors = _validateRecord(form);
 
                 if (errors.length > 0) {
-                    errors.forEach(function (error) {
+                    errors.forEach(function (error: any): void {
                         errorMsg.push(error.msg);
                         error.field.parent().parent().addClass('has-error');
                     });
 
                     _ui.modal.find('div.modal-body').prepend(_templates.validationMessage({ errors: errorMsg.join('<br />') }));
-                    return false;
+                    return;
                 }
 
                 // Serialize the form inputs into an object
-                form.find('input[class!=submit], textarea').each(function () {
+                form.find('input[class!=submit], textarea').each(function (): void {
                     credential[this.name] = $(this).val();
                 });
 
@@ -831,54 +845,54 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 credential = _encryptObject(credential, _masterKey, ['CredentialID', 'UserID']);
 
-                _ajaxPost(_basePath + 'Main/Update', credential, function (data) {
+                _ajaxPost(_basePath + 'Main/Update', credential, function (data: Credential): void {
                     // Update the cached credential list with the new property values, so it is correct when we rebuild
                     _updateProperties(data.CredentialID, properties, _userId, _cachedList);
                     // Re-sort the list in case the order should change
                     _sortCredentials(_cachedList);
                     // For now we just reload the entire table in the background
-                    _loadCredentials(_userId, _masterKey, function () {
-                        var results = _search(_ui.searchInput.val(), _cachedList);
+                    _loadCredentials(_userId, _masterKey, function (): void {
+                        let results: Credential[] = _search(_ui.searchInput.val(), _cachedList);
                         _ui.modal.modal('hide');
-                        _buildDataTable(results, function (rows) {
+                        _buildDataTable(results, function (rows: CredentialSummary[]): void {
                             _ui.container.html(_createCredentialTable(rows));
                         }, _masterKey, _userId);
                     });
                 });
 
-                return false;
+                return;
             });
 
             // Show password strength as it is typed
-            $('body').on('keyup', '#Password', _debounce(function () {
+            $('body').on('keyup', '#Password', _debounce(function (): void {
                 _showPasswordStrength($(this));
             }));
 
             // Generate a nice strong password
-            $('body').on('click', 'button.generate-password', function (e) {
+            $('body').on('click', 'button.generate-password', function (e: Event): void {
                 e.preventDefault();
-                var password = Passpack.utils.passGenerator(_getPasswordGenerationOptions(), _getPasswordLength());
+                let password: string = Passpack.utils.passGenerator(_getPasswordGenerationOptions(), _getPasswordLength());
                 $('#Password').val(password);
                 $('#PasswordConfirmation').val(password);
-                var opts = [$('#len').val(),
-                            _isChecked($('#ucase')) ? 1 : 0,
-                            _isChecked($('#lcase')) ? 1 : 0,
-                            _isChecked($('#nums')) ? 1 : 0,
-                            _isChecked($('#symb')) ? 1 : 0];
+                let opts: any[] = [$('#len').val(),
+                                   _isChecked($('#ucase')) ? 1 : 0,
+                                   _isChecked($('#lcase')) ? 1 : 0,
+                                   _isChecked($('#nums')) ? 1 : 0,
+                                   _isChecked($('#symb')) ? 1 : 0];
                 $('#PwdOptions').val(opts.join('|'));
                 _showPasswordStrength($('#Password'));
             });
 
             // Toggle password generation option UI visibility
-            $('body').on('click', 'a.generate-password-options-toggle', function (e) {
+            $('body').on('click', 'a.generate-password-options-toggle', function (e: Event): void {
                 e.preventDefault();
                 $('div.generate-password-options').toggle();
             });
 
             // Copy content to clipboard when copy icon is clicked
-            $('body').on('click', 'a.copy-link', function (e) {
+            $('body').on('click', 'a.copy-link', function (e: Event): void {
                 e.preventDefault();
-                var a = $(this);
+                let a: JQuery = $(this);
                 $('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
                 a.next('input.copy-content').select();
                 try {
@@ -891,16 +905,15 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
 
             });
 
-            $('body').on('click', 'button.btn-credential-open', function (e) {
+            $('body').on('click', 'button.btn-credential-open', function (e: Event): void {
                 e.preventDefault();
-                var url = $(this).data('url');
-                window.open(url);
+                window.open($(this).data('url'));
             });
 
-            $('body').on('click', 'button.btn-credential-copy', function (e) {
+            $('body').on('click', 'button.btn-credential-copy', function (e: Event): void {
                 e.preventDefault();
-                var allButtons = $('button.btn-credential-copy'),
-                    button = $(this);
+                let allButtons: JQuery = $('button.btn-credential-copy'),
+                    button: JQuery = $(this);
                 allButtons.removeClass('btn-success').addClass('btn-primary');
                 allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
                 button.next('input.copy-content').select();
@@ -915,17 +928,19 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             });
 
             // Automatically focus the search field if a key is pressed from the credential list
-            $('body').on('keydown', function(e) {
-                if(e.target.nodeName == 'BODY') {
+            $('body').on('keydown', function (e: Event): void {
+                let event: KeyboardEvent = e as KeyboardEvent;
+                let eventTarget: HTMLElement = e.target as HTMLElement;
+                if (eventTarget.nodeName === 'BODY') {
                     e.preventDefault();
                     // Cancel the first mouseup event which will be fired after focus
-                    _ui.searchInput.one('mouseup', function(me){
+                    _ui.searchInput.one('mouseup', function (me: Event): void {
                         me.preventDefault();
                     });
                     _ui.searchInput.focus();
-                    var char = String.fromCharCode(e.keyCode);
+                    let char: string = String.fromCharCode(event.keyCode);
                     if (/[a-zA-Z0-9]/.test(char)) {
-                        _ui.searchInput.val(e.shiftKey ? char : char.toLowerCase());
+                        _ui.searchInput.val(event.shiftKey ? char : char.toLowerCase());
                     } else {
                         _ui.searchInput.select();
                     }
@@ -937,8 +952,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 _ui.loginForm.find('#UN1209').val(Cookies.get('vault-dev-username'));
                 _ui.loginForm.find('#PW9804').val(Cookies.get('vault-dev-password'));
                 _ui.loginForm.submit();
-            }
-            else {
+            } else {
                 _ui.loginForm.find('#UN1209').focus();
             }
         }
