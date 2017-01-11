@@ -33,6 +33,40 @@ var testMethods = {
 };
 */
 
+var TestGlobals = {
+    // Vault.utf8_to_b64(Vault.createMasterKey('test123'))
+    masterKey: 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==',
+    masterKeyDecoded: window.unescape(decodeURIComponent(window.atob('JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg=='))),
+    testCredential: {
+        CredentialID: '361fe91a-3dca-4871-b69e-c41c31507c8c',
+        Description: 'Test Credential',
+        Notes: 'Test Notes:\n\nThese are test notes.',
+        Password: '8{s?(\'7.171h)3H',
+        PasswordConfirmation: '8{s?(\'7.171h)3H',
+        Url: 'http://www.test.com?id=23&param=TEST+VALUE',
+        UserDefined1: 'CUSTOM1',
+        UserDefined1Label: 'Custom 1',
+        UserDefined2: 'CUSTOM2',
+        UserDefined2Label: 'Custom 2',
+        UserID: 'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
+        Username: '_testuser123'
+    },
+    testCredentialEncrypted: {
+        CredentialID: '361fe91a-3dca-4871-b69e-c41c31507c8c',
+        Description: 'EcOPw4TDj0gBITAhITAhLSExMCFQITEwIWJHQcK9wpJtXHQgRMKtaw==',
+        Notes: 'FcOPw4TDj0gBITAhITAhLcOJFBjCvcOzw43CtVxmwoJzw4pAw63CpcKRLSkDwpg5LiE0NSHCmwNTajjCmVbCtMKAwq0tw43CvQ==',
+        Password: 'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
+        PasswordConfirmation: 'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
+        Url: 'E8OPw4TDj0gBITAhITAhLRnDh8KUG8O5dlVZZ8OBwrwgO8KQNDctecKbM8KGworDmzoUbsOrSEnCrMKSDyMtNkhZw6/Cgyp5ZSExMiEG',
+        UserDefined1: 'FMOPw4TDj0gBITAhITAhLW88TTrDrEXDvw==',
+        UserDefined1Label: 'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmM=',
+        UserDefined2: 'FcOPw4TDj0gBITAhITAhLcOeJDjCncKcw47DqA==',
+        UserDefined2Label: 'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmA=',
+        UserID: 'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
+        Username: 'EsOPw4TDj0gBITAhITAhLcKHw7LChcOKwpUHbsOIw60iYXs='
+    }
+};
+
 QUnit.begin(function () {
     console.log('start tests');
 });
@@ -53,70 +87,58 @@ QUnit.test('Got Vault', function (assert) {
     assert.ok(typeof Vault !== 'undefined');
 });
 
+function checkEncryption(assert, credential) {
+    assert.ok(credential.CredentialID === '361fe91a-3dca-4871-b69e-c41c31507c8c');
+    assert.ok(Passpack.decode('AES', credential.Description, TestGlobals.masterKeyDecoded) === 'Test Credential');
+    assert.ok(Passpack.decode('AES', credential.Notes, TestGlobals.masterKeyDecoded) === 'Test Notes:\n\nThese are test notes.');
+    assert.ok(Passpack.decode('AES', credential.Password, TestGlobals.masterKeyDecoded) === '8{s?(\'7.171h)3H');
+    assert.ok(Passpack.decode('AES', credential.PasswordConfirmation, TestGlobals.masterKeyDecoded) === '8{s?(\'7.171h)3H');
+    assert.ok(Passpack.decode('AES', credential.Url, TestGlobals.masterKeyDecoded) === 'http://www.test.com?id=23&param=TEST+VALUE');
+    assert.ok(Passpack.decode('AES', credential.UserDefined1, TestGlobals.masterKeyDecoded) === 'CUSTOM1');
+    assert.ok(Passpack.decode('AES', credential.UserDefined1Label, TestGlobals.masterKeyDecoded) === 'Custom 1');
+    assert.ok(Passpack.decode('AES', credential.UserDefined2, TestGlobals.masterKeyDecoded) === 'CUSTOM2');
+    assert.ok(Passpack.decode('AES', credential.UserDefined2Label, TestGlobals.masterKeyDecoded) === 'Custom 2');
+    assert.ok(credential.UserID === 'ef0ee37f-2ace-417c-b30d-ccfaf4450906');
+    assert.ok(Passpack.decode('AES', credential.Username, TestGlobals.masterKeyDecoded) === '_testuser123');
+}
+
+function checkDecryption(assert, credential) {
+    assert.ok(credential.CredentialID === '361fe91a-3dca-4871-b69e-c41c31507c8c');
+    assert.ok(credential.Description === 'Test Credential');
+    assert.ok(credential.Notes === 'Test Notes:\n\nThese are test notes.');
+    assert.ok(credential.Password === '8{s?(\'7.171h)3H');
+    assert.ok(credential.PasswordConfirmation === '8{s?(\'7.171h)3H');
+    assert.ok(credential.Url === 'http://www.test.com?id=23&param=TEST+VALUE');
+    assert.ok(credential.UserDefined1 === 'CUSTOM1');
+    assert.ok(credential.UserDefined1Label === 'Custom 1');
+    assert.ok(credential.UserDefined2 === 'CUSTOM2');
+    assert.ok(credential.UserDefined2Label === 'Custom 2');
+    assert.ok(credential.UserID === 'ef0ee37f-2ace-417c-b30d-ccfaf4450906');
+    assert.ok(credential.Username === '_testuser123');
+}
+
+QUnit.test('Test _crypt(Passpack.encode)', function (assert) {
+    var encrypted = Vault.crypt(Passpack.encode, TestGlobals.testCredential, TestGlobals.masterKey, ['CredentialID', 'UserID']);
+    checkEncryption(assert, encrypted);
+});
+
+QUnit.test('Test _crypt(Passpack.decode)', function (assert) {
+    var decrypted = Vault.crypt(Passpack.decode, TestGlobals.testCredentialEncrypted, TestGlobals.masterKey, ['CredentialID', 'UserID']);
+    checkDecryption(assert, decrypted);
+});
+
 QUnit.test('Test _encryptObject', function (assert) {
-    // base64encode('test123' + passpackhash('test123'))
-    var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
-    var masterKeyDecoded = window.unescape(decodeURIComponent(window.atob(masterKey)));
-    var credential = {
-        CredentialID: '361fe91a-3dca-4871-b69e-c41c31507c8c',
-        Description: 'Test Credential',
-        Notes: 'Test Notes:\n\nThese are test notes.',
-        Password: '8{s?(\'7.171h)3H',
-        PasswordConfirmation: '8{s?(\'7.171h)3H',
-        Url: 'http://www.test.com?id=23&param=TEST+VALUE',
-        UserDefined1: 'CUSTOM1',
-        UserDefined1Label: 'Custom 1',
-        UserDefined2: 'CUSTOM2',
-        UserDefined2Label: 'Custom 2',
-        UserID: 'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
-        Username: '_testuser123'
-    };
-    var encrypted = Vault.encryptObject(credential, masterKey, ['CredentialID', 'UserID']);
-    assert.ok(encrypted.CredentialID === '361fe91a-3dca-4871-b69e-c41c31507c8c');
-    assert.ok(Passpack.decode('AES', encrypted.Description, masterKeyDecoded) === 'Test Credential');
-    assert.ok(Passpack.decode('AES', encrypted.Notes, masterKeyDecoded) === 'Test Notes:\n\nThese are test notes.');
-    assert.ok(Passpack.decode('AES', encrypted.Password, masterKeyDecoded) === '8{s?(\'7.171h)3H');
-    assert.ok(Passpack.decode('AES', encrypted.PasswordConfirmation, masterKeyDecoded) === '8{s?(\'7.171h)3H');
-    assert.ok(Passpack.decode('AES', encrypted.Url, masterKeyDecoded) === 'http://www.test.com?id=23&param=TEST+VALUE');
-    assert.ok(Passpack.decode('AES', encrypted.UserDefined1, masterKeyDecoded) === 'CUSTOM1');
-    assert.ok(Passpack.decode('AES', encrypted.UserDefined1Label, masterKeyDecoded) === 'Custom 1');
-    assert.ok(Passpack.decode('AES', encrypted.UserDefined2, masterKeyDecoded) === 'CUSTOM2');
-    assert.ok(Passpack.decode('AES', encrypted.UserDefined2Label, masterKeyDecoded) === 'Custom 2');
-    assert.ok(encrypted.UserID === 'ef0ee37f-2ace-417c-b30d-ccfaf4450906');
-    assert.ok(Passpack.decode('AES', encrypted.Username, masterKeyDecoded) === '_testuser123');
+    var encrypted = Vault.encryptObject(TestGlobals.testCredential, TestGlobals.masterKey, ['CredentialID', 'UserID']);
+    checkEncryption(assert, encrypted);
 });
 
 QUnit.test('Test _decryptObject', function (assert) {
-    // base64encode('test123' + passpackhash('test123'))
-    var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
-    var masterKeyDecoded = window.unescape(decodeURIComponent(window.atob(masterKey)));
-    var credential = {
-        CredentialID: '361fe91a-3dca-4871-b69e-c41c31507c8c',
-        Description: 'EcOPw4TDj0gBITAhITAhLSExMCFQITEwIWJHQcK9wpJtXHQgRMKtaw==',
-        Notes: 'FcOPw4TDj0gBITAhITAhLcOJFBjCvcOzw43CtVxmwoJzw4pAw63CpcKRLSkDwpg5LiE0NSHCmwNTajjCmVbCtMKAwq0tw43CvQ==',
-        Password: 'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
-        PasswordConfirmation: 'E8OPw4TDj0gBITAhITAhLUnDiMKTVMOrfk0hMCEhMzMhwoHCozx3w5AI',
-        Url: 'E8OPw4TDj0gBITAhITAhLRnDh8KUG8O5dlVZZ8OBwrwgO8KQNDctecKbM8KGworDmzoUbsOrSEnCrMKSDyMtNkhZw6/Cgyp5ZSExMiEG',
-        UserDefined1: 'FMOPw4TDj0gBITAhITAhLW88TTrDrEXDvw==',
-        UserDefined1Label: 'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmM=',
-        UserDefined2: 'FcOPw4TDj0gBITAhITAhLcOeJDjCncKcw47DqA==',
-        UserDefined2Label: 'FMOPw4TDj0gBITAhITAhLW8cbRrDjGXDrmA=',
-        UserID: 'ef0ee37f-2ace-417c-b30d-ccfaf4450906',
-        Username: 'EsOPw4TDj0gBITAhITAhLcKHw7LChcOKwpUHbsOIw60iYXs='
-    };
-    var decrypted = Vault.decryptObject(credential, masterKey, ['CredentialID', 'UserID']);
-    assert.ok(decrypted.CredentialID === '361fe91a-3dca-4871-b69e-c41c31507c8c');
-    assert.ok(decrypted.Description === 'Test Credential');
-    assert.ok(decrypted.Notes === 'Test Notes:\n\nThese are test notes.');
-    assert.ok(decrypted.Password === '8{s?(\'7.171h)3H');
-    assert.ok(decrypted.PasswordConfirmation === '8{s?(\'7.171h)3H');
-    assert.ok(decrypted.Url === 'http://www.test.com?id=23&param=TEST+VALUE');
-    assert.ok(decrypted.UserDefined1 === 'CUSTOM1');
-    assert.ok(decrypted.UserDefined1Label === 'Custom 1');
-    assert.ok(decrypted.UserDefined2 === 'CUSTOM2');
-    assert.ok(decrypted.UserDefined2Label === 'Custom 2');
-    assert.ok(decrypted.UserID === 'ef0ee37f-2ace-417c-b30d-ccfaf4450906');
-    assert.ok(decrypted.Username === '_testuser123');
+    var decrypted = Vault.decryptObject(TestGlobals.testCredentialEncrypted, TestGlobals.masterKey, ['CredentialID', 'UserID']);
+    checkDecryption(assert, decrypted);
+});
+
+QUnit.test('Test _createMasterKey', function (assert) {
+    assert.ok(Passpack.utils.hashx('test123' + Passpack.utils.hashx('test123', true, true), true, true) == Vault.createMasterKey('test123'));
 });
 
 QUnit.test('Test _removeFromList', function (assert) {

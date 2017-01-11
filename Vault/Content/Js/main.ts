@@ -65,12 +65,15 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     // Encrypt/decrypt the properties of an object literal using Passpack
     // excludes is an array of property names whose values should not be encrypted
     function _crypt(action: IPasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]): Credential {
+        var newCredential: any = {};
         Object.keys(obj).forEach(function (k: string): void {
             if (excludes.indexOf(k) === -1) {
-                obj[k] = action('AES', obj[k], _b64_to_utf8(masterKey));
+                newCredential[k] = action('AES', obj[k], _b64_to_utf8(masterKey));
+            } else {
+                newCredential[k] = obj[k];
             }
         });
-        return obj;
+        return newCredential;
     }
 
     function _encryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
@@ -660,8 +663,10 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         // Determine whether we're testing or not
         if (testMode) {
             let testMethods: any = {
+                crypt: _crypt,
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,
+                createMasterKey: _createMasterKey,
                 removeFromList: _removeFromList,
                 updateProperties: _updateProperties,
                 defaultAjaxErrorCallback: _defaultAjaxErrorCallback,
