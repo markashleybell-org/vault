@@ -77,24 +77,30 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     function _createMasterKey(password) {
         return Passpack.utils.hashx(password + Passpack.utils.hashx(password, true, true), true, true);
     }
-    // Remove the item with a specific ID from an array
+    // Remove the credential with a specific ID from an array
     function _removeFromList(id, list) {
         return list.filter(function (item) { return item.CredentialID != id; });
     }
-    // Update properties of the item with a specific ID in a list
-    function _updateProperties(id, properties, userId, list) {
-        var items = list.filter(function (item) {
-            return item.CredentialID === id;
+    // Find the index of a credential within an array
+    function _findIndex(id, list) {
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].CredentialID == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    function _createCredentialFromFormFields(form) {
+        var obj = {};
+        // Serialize the form inputs into an object
+        form.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each(function () {
+            obj[this.name] = $(this).val();
         });
-        // If an item with the ID already exists
-        if (items.length) {
-            // Map the property values to it
-            $.extend(items[0], properties);
-        }
-        else {
-            // If we didn't find an existing item, add a new item with the supplied property values
-            list.push($.extend({ CredentialID: id, UserID: userId }, properties));
-        }
+        return obj;
+    }
+    // Update properties of the item with a specific ID in a list
+    function _updateProperties(properties, credential) {
+        return $.extend({}, credential, properties);
     }
     function _defaultAjaxErrorCallback(ignore, status, error) {
         return window.alert('Http Error: ' + status + ' - ' + error);
@@ -719,7 +725,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             // Save the new details on edit form submit
             $('body').on('submit', '#credential-form', function (e) {
                 e.preventDefault();
-                var form = $(this), errors = [], errorMsg = [], credential = null, properties = {};
+                var form = $(this), errors = [], errorMsg = [], properties = {};
                 $('#validation-message').remove();
                 form.find('div.has-error').removeClass('has-error');
                 errors = _validateRecord(form);
@@ -731,10 +737,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                     _ui.modal.find('div.modal-body').prepend(_templates.validationMessage({ errors: errorMsg.join('<br />') }));
                     return;
                 }
-                // Serialize the form inputs into an object
-                form.find('input[class!=submit], textarea').each(function () {
-                    credential[this.name] = $(this).val();
-                });
+                var credential = _createCredentialFromFormFields(form);
                 // Hold the modified properties so we can update the list if the update succeeds
                 properties = {
                     Description: form.find('#Description').val(),
@@ -745,8 +748,13 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 // CredentialID and UserID are not currently encrypted so don't try to decode them
                 credential = _encryptObject(credential, _masterKey, ['CredentialID', 'UserID']);
                 _ajaxPost(_basePath + 'Main/Update', credential, function (data) {
-                    // Update the cached credential list with the new property values, so it is correct when we rebuild
-                    _updateProperties(data.CredentialID, properties, _userId, _cachedList);
+                    var idx = _findIndex(data.CredentialID, _cachedList);
+                    if (idx === -1) {
+                        _cachedList.push($.extend({ CredentialID: data.CredentialID, UserID: _userId }, properties));
+                    }
+                    else {
+                        _cachedList[idx] = _updateProperties(properties, _cachedList[idx]);
+                    }
                     // Re-sort the list in case the order should change
                     _sortCredentials(_cachedList);
                     // For now we just reload the entire table in the background

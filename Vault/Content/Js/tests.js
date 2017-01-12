@@ -159,20 +159,11 @@ QUnit.test('Test _updateProperties', function (assert) {
         { CredentialID: 2, Description: 'ITEM2', UserID: '1', Username: 'item2', Password: '4ngi', Url: 'http://test2.com' },
         { CredentialID: 3, Description: 'ITEM3', UserID: '1', Username: 'item3', Password: 's05n', Url: 'http://test3.com' }
     ];
-    var userId = 1;
-    Vault.updateProperties(2, { Description: 'ITEM2UPDATE', Username: 'item2new', Password: 'abcd', Url: 'http://test4.com' }, userId, list);
-    Vault.updateProperties(0, { Description: 'ITEM4', Username: 'item4', Password: 'c9yn', Url: 'http://test5.com' }, userId, list);
+    list[1] = Vault.updateProperties({ Description: 'ITEM2UPDATE', Username: 'item2new', Password: 'abcd', Url: 'http://test4.com' }, list[1]);
     assert.ok(list[1].Description === 'ITEM2UPDATE');
     assert.ok(list[1].Username === 'item2new');
     assert.ok(list[1].Password === 'abcd');
     assert.ok(list[1].Url === 'http://test4.com');
-    assert.ok(list.length === 4);
-    assert.ok(list[3].CredentialID === 0);
-    assert.ok(list[3].Description === 'ITEM4');
-    assert.ok(list[3].Username === 'item4');
-    assert.ok(list[3].Password === 'c9yn');
-    assert.ok(list[3].Url === 'http://test5.com');
-    assert.ok(list[3].UserID === 1);
 });
 
 QUnit.test('Test _defaultAjaxErrorCallback', function (assert) {

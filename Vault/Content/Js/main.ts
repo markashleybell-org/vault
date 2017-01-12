@@ -88,24 +88,33 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         return Passpack.utils.hashx(password + Passpack.utils.hashx(password, true, true), true, true);
     }
 
-    // Remove the item with a specific ID from an array
+    // Remove the credential with a specific ID from an array
     function _removeFromList(id: string, list: Credential[]): Credential[] {
         return list.filter((item) => item.CredentialID != id);
     }
 
-    // Update properties of the item with a specific ID in a list
-    function _updateProperties(id: string, properties: any, userId: string, list: Credential[]): void {
-        let items: Credential[] = list.filter(function (item: Credential): boolean {
-            return item.CredentialID === id;
-        });
-        // If an item with the ID already exists
-        if (items.length) {
-            // Map the property values to it
-            $.extend(items[0], properties);
-        } else {
-            // If we didn't find an existing item, add a new item with the supplied property values
-            list.push($.extend({ CredentialID: id, UserID: userId }, properties));
+    // Find the index of a credential within an array
+    function _findIndex(id: string, list: Credential[]): number {
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].CredentialID == id) {
+                return i;
+            }
         }
+        return -1;
+    }
+
+    function _createCredentialFromFormFields(form: JQuery): Credential {
+        let obj: any = {};
+        // Serialize the form inputs into an object
+        form.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each(function (): void {
+            obj[this.name] = $(this).val();
+        });
+        return obj;
+    }
+
+    // Update properties of the item with a specific ID in a list
+    function _updateProperties(properties: any, credential: Credential): Credential {
+        return $.extend({}, credential, properties);
     }
 
     function _defaultAjaxErrorCallback(ignore: JQueryXHR, status: string, error: string): void {
@@ -809,7 +818,6 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 let form: JQuery = $(this),
                     errors: any[] = [],
                     errorMsg: string[] = [],
-                    credential: Credential = null,
                     properties: any = {};
 
                 $('#validation-message').remove();
@@ -827,10 +835,7 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                     return;
                 }
 
-                // Serialize the form inputs into an object
-                form.find('input[class!=submit], textarea').each(function (): void {
-                    credential[this.name] = $(this).val();
-                });
+                let credential = _createCredentialFromFormFields(form);
 
                 // Hold the modified properties so we can update the list if the update succeeds
                 properties = {
@@ -844,8 +849,12 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 credential = _encryptObject(credential, _masterKey, ['CredentialID', 'UserID']);
 
                 _ajaxPost(_basePath + 'Main/Update', credential, function (data: Credential): void {
-                    // Update the cached credential list with the new property values, so it is correct when we rebuild
-                    _updateProperties(data.CredentialID, properties, _userId, _cachedList);
+                    var idx = _findIndex(data.CredentialID, _cachedList);
+                    if (idx === -1) {
+                        _cachedList.push($.extend({ CredentialID: data.CredentialID, UserID: _userId }, properties));
+                    } else {
+                        _cachedList[idx] = _updateProperties(properties, _cachedList[idx]);
+                    }
                     // Re-sort the list in case the order should change
                     _sortCredentials(_cachedList);
                     // For now we just reload the entire table in the background
