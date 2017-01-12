@@ -138,7 +138,7 @@ QUnit.test('Test _decryptObject', function (assert) {
 });
 
 QUnit.test('Test _createMasterKey', function (assert) {
-    assert.ok(Passpack.utils.hashx('test123' + Passpack.utils.hashx('test123', true, true), true, true) == Vault.createMasterKey('test123'));
+    assert.ok(Passpack.utils.hashx('test123' + Passpack.utils.hashx('test123', true, true), true, true) === Vault.createMasterKey('test123'));
 });
 
 QUnit.test('Test _removeFromList', function (assert) {
