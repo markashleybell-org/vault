@@ -79,11 +79,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
     }
     // Remove the item with a specific ID from an array
     function _removeFromList(id, list) {
-        list.forEach(function (item, i) {
-            if (item.CredentialID === id) {
-                list.splice(i, 1);
-            }
-        });
+        return list.filter(function (item) { return item.CredentialID != id; });
     }
     // Update properties of the item with a specific ID in a list
     function _updateProperties(id, properties, userId, list) {
@@ -306,7 +302,7 @@ var Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         _ajaxPost(_basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, function (data) {
             if (data.Success) {
                 // Remove the deleted item from the cached list before reload
-                _removeFromList(credentialId, _cachedList);
+                _cachedList = _removeFromList(credentialId, _cachedList);
                 // For now we just reload the entire table in the background
                 _loadCredentials(userId, masterKey, function () {
                     _ui.modal.modal('hide');

@@ -147,10 +147,10 @@ QUnit.test('Test _removeFromList', function (assert) {
         { CredentialID: 2, Description: 'ITEM2' },
         { CredentialID: 3, Description: 'ITEM3' }
     ];
-    Vault.removeFromList(2, list);
-    assert.ok(list.length === 2);
-    assert.ok(list[0].Description === 'ITEM1');
-    assert.ok(list[1].Description === 'ITEM3');
+    var list2 = Vault.removeFromList(2, list);
+    assert.ok(list2.length === 2);
+    assert.ok(list2[0].Description === 'ITEM1');
+    assert.ok(list2[1].Description === 'ITEM3');
 });
 
 QUnit.test('Test _updateProperties', function (assert) {
