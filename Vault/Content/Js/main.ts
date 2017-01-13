@@ -676,6 +676,7 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 crypt: _crypt,
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,
+                findIndex: _findIndex,
                 createMasterKey: _createMasterKey,
                 removeFromList: _removeFromList,
                 updateProperties: _updateProperties,

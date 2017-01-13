@@ -183,6 +183,18 @@ QUnit.test('_encryptObject', function (assert) {
     checkEncryption(assert, encrypted);
 });
 
+QUnit.test('_findIndex', function (assert) {
+    var data = [
+        { CredentialID: '1', Value: 'TEST1' }, 
+        { CredentialID: '2', Value: 'TEST2' }, 
+        { CredentialID: '3', Value: 'TEST3' }
+    ];
+    var idx = Vault.findIndex('2', data);
+    assert.ok(idx === 1);
+    idx = Vault.findIndex('5', data);
+    assert.ok(idx === -1);
+});
+
 QUnit.test('_debounce', function (assert) {
     var done = assert.async();
     var func = Vault.debounce(function () {
