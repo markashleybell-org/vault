@@ -62,65 +62,6 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             exportedDataWindow: null
         };
 
-    // Encrypt/decrypt the properties of an object literal using Passpack
-    // excludes is an array of property names whose values should not be encrypted
-    function _crypt(action: IPasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]): Credential {
-        var newCredential: any = {};
-        Object.keys(obj).forEach(function (k: string): void {
-            if (excludes.indexOf(k) === -1) {
-                newCredential[k] = action('AES', obj[k], _b64_to_utf8(masterKey));
-            } else {
-                newCredential[k] = obj[k];
-            }
-        });
-        return newCredential;
-    }
-
-    function _encryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
-        return _crypt(Passpack.encode, obj, masterKey, excludes);
-    }
-
-    function _decryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
-        return _crypt(Passpack.decode, obj, masterKey, excludes);
-    }
-
-    function _createMasterKey(password: string): string {
-        return Passpack.utils.hashx(password + Passpack.utils.hashx(password, true, true), true, true);
-    }
-
-    // Remove the credential with a specific ID from an array
-    function _removeFromList(id: string, list: Credential[]): Credential[] {
-        return list.filter((item) => item.CredentialID != id);
-    }
-
-    // Find the index of a credential within an array
-    function _findIndex(id: string, list: Credential[]): number {
-        for (var i = 0; i < list.length; i++) {
-            if (list[i].CredentialID == id) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    function _createCredentialFromFormFields(form: JQuery): Credential {
-        let obj: any = {};
-        // Serialize the form inputs into an object
-        form.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each(function (): void {
-            obj[this.name] = $(this).val();
-        });
-        return obj;
-    }
-
-    // Update properties of the item with a specific ID in a list
-    function _updateProperties(properties: any, credential: Credential): Credential {
-        return $.extend({}, credential, properties);
-    }
-
-    function _defaultAjaxErrorCallback(ignore: JQueryXHR, status: string, error: string): void {
-        return window.alert('Http Error: ' + status + ' - ' + error);
-    }
-
     function _ajaxPost(url: string, data: any, successCallback: IXHRSuccess, errorCallback?: IXHRError, contentType?: string): void {
         _ui.spinner.show();
 
@@ -156,6 +97,315 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         }
     }
 
+    // Decode Base64 string
+    function _b64_to_utf8(str: string): string {
+        return unescape(decodeURIComponent(window.atob(str)));
+    }
+
+    // Build the data table
+    function _buildDataTable(data, callback, masterKey, userId) {
+        // Create a table row for each record and add it to the rows array
+        var rows = data.map(function (item) {
+            return _createCredentialDisplayData(item, masterKey, userId);
+        });
+        // Fire the callback and pass it the array of rows
+        callback(rows);
+    }
+
+    // Change the password and re-encrypt all credentials with the new password
+    function _changePassword(userId: string, masterKey: string): void {
+        let newPassword: string = $('#NewPassword').val(),
+            newPasswordConfirm: string = $('#NewPasswordConfirm').val(),
+            confirmationMsg: string = 'When the password change is complete you will be logged out and will need to log back in.\n\n'
+                + 'Are you SURE you want to change the master password?';
+
+        if (newPassword === '') {
+            window.alert('Password cannot be left blank.');
+            return;
+        }
+
+        if (newPassword !== newPasswordConfirm) {
+            window.alert('Password confirmation does not match password.');
+            return;
+        }
+
+        if (!window.confirm(confirmationMsg)) {
+            return;
+        }
+
+        let newPasswordHash: string = Passpack.utils.hashx(newPassword),
+            newMasterKey: string = _utf8_to_b64(_createMasterKey(newPassword));
+
+        // Get all the credentials, decrypt each with the old password
+        // and re-encrypt it with the new one
+        _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data: Credential[]): void {
+            let excludes: string[] = ['CredentialID', 'UserID', 'PasswordConfirmation'];
+            let newData: Credential[] = data.map(function (item: Credential): Credential {
+                return _encryptObject(_decryptObject(item, _b64_to_utf8(masterKey), excludes), newMasterKey, excludes);
+            });
+
+            _ajaxPost(_basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function (): void {
+                // Store the new password in hashed form
+                _ajaxPost(_basePath + 'Main/UpdatePassword', {
+                    newHash: newPasswordHash,
+                    userid: userId,
+                    oldHash: Passpack.utils.hashx(_password)
+                }, function (): void {
+                    // Just reload the whole page when we're done to force login
+                    window.location.href = _basePath.length > 1 ? _basePath.slice(0, -1) : _basePath;
+                });
+            }, null, 'application/json; charset=utf-8');
+        });
+    }
+
+    function _checkIf(el: JQuery, condition: () => boolean): void {
+        (<HTMLInputElement>el[0]).checked = condition();
+    }
+
+    // Show delete confirmation dialog
+    function _confirmDelete(id: string, masterKey: string): void {
+        _showModal({
+            title: 'Delete Credential',
+            content: _templates.deleteConfirmationDialog(),
+            showDelete: true,
+            deleteText: 'Yes, Delete This Credential',
+            ondelete: function (e: Event): void {
+                e.preventDefault();
+                _deleteCredential(id, _userId, masterKey);
+            }
+        });
+    }
+
+    // Create a single table row for a credential
+    function _createCredentialDisplayData(credential: Credential, masterKey: string, userId: string): CredentialSummary {
+        return {
+            credentialid: credential.CredentialID,
+            masterkey: masterKey,
+            userid: userId,
+            description: credential.Description,
+            username: credential.Username,
+            password: credential.Password,
+            url: credential.Url,
+            weak: $.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < _weakPasswordThreshold
+        };
+    }
+
+    function _createCredentialFromFormFields(form: JQuery): Credential {
+        let obj: any = {};
+        // Serialize the form inputs into an object
+        form.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each(function (): void {
+            obj[this.name] = $(this).val();
+        });
+        return obj;
+    }
+
+    // Create the credential table
+    function _createCredentialTable(rows: CredentialSummary[]): string {
+        return _templates.credentialTable({ rows: rows });
+    }
+
+    function _createMasterKey(password: string): string {
+        return Passpack.utils.hashx(password + Passpack.utils.hashx(password, true, true), true, true);
+    }
+    
+    /**
+     * Encrypt/decrypt the properties of an object literal using Passpack.
+     * @param {IPasspackCryptoFunction} action - The Passpack function to use for encryption/decryption
+     * @param {any} obj - The object literal to be encrypted/decrypted
+     * @param {string} masterKey - A Passpack master key
+     * @param {string[]} excludes - An array of object property names whose values should not be encrypted
+     * @returns {Credential}
+     */
+    function _crypt(action: IPasspackCryptoFunction, obj: any, masterKey: string, excludes: string[]): Credential {
+        var newCredential: any = {};
+        Object.keys(obj).forEach(function (k: string): void {
+            if (excludes.indexOf(k) === -1) {
+                newCredential[k] = action('AES', obj[k], _b64_to_utf8(masterKey));
+            } else {
+                newCredential[k] = obj[k];
+            }
+        });
+        return newCredential;
+    }
+
+    // Rate-limit calls to the supplied function
+    function _debounce(func: Function, wait?: number, immediate?: boolean): (e: Event) => void {
+        let timeout: number;
+        return function (): void {
+            let context: Function = this, args: IArguments = arguments;
+            let later: Function = function (): void {
+                timeout = null;
+                if (!immediate) {
+                    func.apply(context, args);
+                }
+            };
+            let callNow: boolean = immediate && !timeout;
+            window.clearTimeout(timeout);
+            timeout = window.setTimeout(later, wait);
+            if (callNow) {
+                func.apply(context, args);
+            }
+        };
+    }
+
+    function _decryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
+        return _crypt(Passpack.decode, obj, masterKey, excludes);
+    }
+
+    function _encryptObject(obj: any, masterKey: string, excludes: string[]): Credential {
+        return _crypt(Passpack.encode, obj, masterKey, excludes);
+    }
+
+    // Default action for modal accept button
+    function _defaultAcceptAction(e: Event): void {
+        e.preventDefault();
+        _ui.modal.modal('hide');
+    }
+
+    function _defaultAjaxErrorCallback(ignore: JQueryXHR, status: string, error: string): void {
+        return window.alert('Http Error: ' + status + ' - ' + error);
+    }
+
+    // Default action for modal close button
+    function _defaultCloseAction(e: Event): void {
+        e.preventDefault();
+        _ui.modal.modal('hide');
+    }
+
+    // Delete a record
+    function _deleteCredential(credentialId: string, userId: string, masterKey: string): void {
+        _ajaxPost(_basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, function (data: any): void {
+            if (data.Success) {
+                // Remove the deleted item from the cached list before reload
+                _cachedList = _removeFromList(credentialId, _cachedList);
+                // For now we just reload the entire table in the background
+                _loadCredentials(userId, masterKey, function (): void {
+                    _ui.modal.modal('hide');
+                    let results: Credential[] = _search(_ui.searchInput.val(), _cachedList);
+                    _buildDataTable(results, function (rows: CredentialSummary[]): void {
+                        _ui.container.html(_createCredentialTable(rows));
+                    }, _masterKey, userId);
+                });
+            }
+        });
+    }
+
+    // Export all credential data as JSON
+    function _exportData(userId: string, masterKey: string): void {
+        // Get all the credentials, decrypt each one
+        _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data: Credential[]): void {
+            let exportItems: Credential[] = data.map(function (item: Credential): Credential {
+                let o: Credential = _decryptObject(item, _b64_to_utf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
+                delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
+                return o;
+            });
+
+            let exportWindow: Window = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
+            if (exportWindow && exportWindow.top) {
+                exportWindow.document.write(_templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
+            } else {
+                window.alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
+            }
+        });
+    }
+
+    // Find the index of a credential within an array
+    function _findIndex(id: string, list: Credential[]): number {
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].CredentialID == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // Generate standard hash for a password
+    function _generatePasswordHash(password: string): string {
+        return Passpack.utils.hashx(password);
+    }
+
+    // Generate 64-bit hash for a password
+    function _generatePasswordHash64(password: string): string {
+        // The hash is now a full 64 char string
+        return Passpack.utils.hashx(password, false, true);
+    }
+
+    function _getPasswordLength(): number {
+        let len: number = parseInt($('#len').val(), 10);
+        return isNaN(len) ? 16 : len;
+    }
+
+    function _getPasswordGenerationOptions(): any {
+        let options: any = {};
+        $('input.generate-password-option').each(function (): void {
+            let checkbox: JQuery = $(this);
+            if (_isChecked(checkbox)) {
+                options[checkbox.attr('name')] = 1;
+            }
+        });
+        return options;
+    }
+
+    // Import unencrypted JSON credential data
+    function _importData(userId: string, masterKey: string, rawData: string): void {
+        let jsonImportData: Credential[] = JSON.parse(rawData);
+        let excludes: string[] = ['CredentialID', 'UserID'];
+
+        let newData: Credential[] = jsonImportData.map(function (item: Credential): Credential {
+            // Remove the confirmation property
+            delete item.PasswordConfirmation;
+            // Null out the old credential ID so UpdateMultiple knows this is a new record
+            item.CredentialID = null;
+            // Set the user ID to the ID of the new (logged in) user
+            item.UserID = userId;
+            return _encryptObject(item, _b64_to_utf8(masterKey), excludes);
+        });
+
+        _ajaxPost(_basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function (): void {
+            // Just reload the whole page when we're done to force login
+            window.location.href = _basePath.length > 1 ? _basePath.slice(0, -1) : _basePath;
+        }, null, 'application/json; charset=utf-8');
+    }
+
+    function _isChecked(el: JQuery): boolean {
+        return (<HTMLInputElement>el[0]).checked;
+    }
+
+    // Load a record into the edit form
+    // If null is passed as the credentialId, we set up the form for adding a new record
+    function _loadCredential(credentialId: string, masterKey: string): void {
+        if (credentialId !== null) {
+            _ajaxPost(_basePath + 'Main/Load', { id: credentialId }, function (data: Credential): void {
+                // CredentialID and UserID are not currently encrypted so don't try to decode them
+                data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
+                _showModal({
+                    title: 'Edit Credential',
+                    content: _templates.credentialForm(data),
+                    showAccept: true,
+                    acceptText: 'Save',
+                    onaccept: function (): void {
+                        $('#credential-form').submit();
+                    }
+                });
+                _ui.modal.find('#Description').focus();
+                _showPasswordStrength(_ui.modal.find('#Password'));
+                _setPasswordOptions(_ui.modal, data.PwdOptions);
+            });
+        } else { // New record setup
+            _showModal({
+                title: 'Add Credential',
+                content: _templates.credentialForm({ UserID: _userId }),
+                showAccept: true,
+                acceptText: 'Save',
+                onaccept: function (): void {
+                    $('#credential-form').submit();
+                }
+            });
+            _ui.modal.find('#Description').focus();
+            _showPasswordStrength(_ui.modal.find('#Password'));
+        }
+    }
+
     // Load all records for a specific user
     function _loadCredentials(userId: string, masterKey: string, callback: Function): void {
         if (_cachedList !== null && _cachedList.length) {
@@ -173,6 +423,73 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 _buildDataTable(_cachedList, callback, masterKey, userId);
             });
         }
+    }
+
+    // Show the options dialog
+    function _options(): void {
+        let dialogHtml: string = _templates.optionsDialog({
+            userid: _userId,
+            masterkey: _utf8_to_b64(_masterKey)
+        });
+
+        _showModal({
+            title: 'Admin',
+            content: dialogHtml
+        });
+    }
+
+    // Remove the credential with a specific ID from an array
+    function _removeFromList(id: string, list: Credential[]): Credential[] {
+        return list.filter((item) => item.CredentialID != id);
+    }
+
+    // Hide credential rows which don't contain a particular string
+    function _search(query: string, list: Credential[]): Credential[] {
+        let results: Credential[] = [],
+            queryField: string,
+            queryData: string[];
+        // Tidy up the query text
+        query = $.trim(query).toLowerCase();
+        if (query !== null && query !== '' && query.length > 1) {
+            queryField = _queryablePropertyMap.description;
+            // Support queries in the form fieldName:query (e.g. username:me@email.com)
+            if (query.indexOf(':') !== -1) {
+                queryData = query.split(':');
+                // Safeguard against spaces either side of colon, query part not
+                // having been typed yet and searches on a non-existent property
+                if (queryData.length === 2 && queryData[0] !== '' && queryData[1] !== '') {
+                    // If the fieldName part exists in the property map
+                    if (_queryablePropertyMap[queryData[0]]) {
+                        queryField = _queryablePropertyMap[queryData[0]];
+                        query = queryData[1];
+                    }
+                }
+            }
+            if (queryField === 'FILTER') {
+                if (query === 'all') {
+                    results = list;
+                } else if (query === 'weak') {
+                    results = list.filter(function (item: Credential): boolean {
+                        let pwd: string = item.Password;
+                        return pwd && Passpack.utils.getBits(pwd) <= _weakPasswordThreshold;
+                    });
+                }
+            } else {
+                results = list.filter(function (item: Credential): boolean {
+                    return item[queryField].toLowerCase().indexOf(query) > -1;
+                });
+            }
+        }
+        return results;
+    }
+
+    function _setPasswordOptions(form: JQuery, opts: string): void {
+        let optArray: string[] = opts.split('|');
+        form.find('[name=len]').val(optArray[0]);
+        _checkIf(form.find('[name=ucase]'), () => optArray[1] === '1');
+        _checkIf(form.find('[name=lcase]'), () => optArray[2] === '1');
+        _checkIf(form.find('[name=nums]'), () => optArray[3] === '1');
+        _checkIf(form.find('[name=symb]'), () => optArray[4] === '1');
     }
 
     // Show the read-only details modal
@@ -206,18 +523,6 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 ondelete: function (): void { _confirmDelete($(this).data('credentialid'), masterKey); }
             });
         });
-    }
-
-    // Default action for modal accept button
-    function _defaultAcceptAction(e: Event): void {
-        e.preventDefault();
-        _ui.modal.modal('hide');
-    }
-
-    // Default action for modal close button
-    function _defaultCloseAction(e: Event): void {
-        e.preventDefault();
-        _ui.modal.modal('hide');
     }
 
     // Show a Bootstrap modal with options as below
@@ -280,340 +585,6 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         _ui.modal.modal();
     }
 
-    function _getPasswordLength(): number {
-        let len: number = parseInt($('#len').val(), 10);
-        return isNaN(len) ? 16 : len;
-    }
-
-    function _getPasswordGenerationOptions(): any {
-        let options: any = {};
-        $('input.generate-password-option').each(function (): void {
-            let checkbox: JQuery = $(this);
-            if (_isChecked(checkbox)) {
-                options[checkbox.attr('name')] = 1;
-            }
-        });
-        return options;
-    }
-
-    function _isChecked(el: JQuery): boolean {
-        return (<HTMLInputElement>el[0]).checked;
-    }
-
-    function _checkIf(el: JQuery, condition: () => boolean): void {
-        (<HTMLInputElement>el[0]).checked = condition();
-    }
-
-    // Load a record into the edit form
-    // If null is passed as the credentialId, we set up the form for adding a new record
-    function _loadCredential(credentialId: string, masterKey: string): void {
-        if (credentialId !== null) {
-            _ajaxPost(_basePath + 'Main/Load', { id: credentialId }, function (data: Credential): void {
-                // CredentialID and UserID are not currently encrypted so don't try to decode them
-                data = _decryptObject(data, masterKey, ['CredentialID', 'UserID']);
-                _showModal({
-                    title: 'Edit Credential',
-                    content: _templates.credentialForm(data),
-                    showAccept: true,
-                    acceptText: 'Save',
-                    onaccept: function (): void {
-                        $('#credential-form').submit();
-                    }
-                });
-                _ui.modal.find('#Description').focus();
-                _showPasswordStrength(_ui.modal.find('#Password'));
-                _setPasswordOptions(_ui.modal, data.PwdOptions);
-            });
-        } else { // New record setup
-            _showModal({
-                title: 'Add Credential',
-                content: _templates.credentialForm({ UserID: _userId }),
-                showAccept: true,
-                acceptText: 'Save',
-                onaccept: function (): void {
-                    $('#credential-form').submit();
-                }
-            });
-            _ui.modal.find('#Description').focus();
-            _showPasswordStrength(_ui.modal.find('#Password'));
-        }
-    }
-
-    // Delete a record
-    function _deleteCredential(credentialId: string, userId: string, masterKey: string): void {
-        _ajaxPost(_basePath + 'Main/Delete', { credentialId: credentialId, userId: userId }, function (data: any): void {
-            if (data.Success) {
-                // Remove the deleted item from the cached list before reload
-                _cachedList = _removeFromList(credentialId, _cachedList);
-                // For now we just reload the entire table in the background
-                _loadCredentials(userId, masterKey, function (): void {
-                    _ui.modal.modal('hide');
-                    let results: Credential[] = _search(_ui.searchInput.val(), _cachedList);
-                    _buildDataTable(results, function (rows: CredentialSummary[]): void {
-                        _ui.container.html(_createCredentialTable(rows));
-                    }, _masterKey, userId);
-                });
-            }
-        });
-    }
-
-    // Show delete confirmation dialog
-    function _confirmDelete(id: string, masterKey: string): void {
-        _showModal({
-            title: 'Delete Credential',
-            content: _templates.deleteConfirmationDialog(),
-            showDelete: true,
-            deleteText: 'Yes, Delete This Credential',
-            ondelete: function (e: Event): void {
-                e.preventDefault();
-                _deleteCredential(id, _userId, masterKey);
-            }
-        });
-    }
-
-    // Generate standard hash for a password
-    function _generatePasswordHash(password: string): string {
-        return Passpack.utils.hashx(password);
-    }
-
-    // Generate 64-bit hash for a password
-    function _generatePasswordHash64(password: string): string {
-        // The hash is now a full 64 char string
-        return Passpack.utils.hashx(password, false, true);
-    }
-
-    // Change the password and re-encrypt all credentials with the new password
-    function _changePassword(userId: string, masterKey: string): void {
-        let newPassword: string = $('#NewPassword').val(),
-            newPasswordConfirm: string = $('#NewPasswordConfirm').val(),
-            confirmationMsg: string = 'When the password change is complete you will be logged out and will need to log back in.\n\n'
-                                    + 'Are you SURE you want to change the master password?';
-
-        if (newPassword === '') {
-            window.alert('Password cannot be left blank.');
-            return;
-        }
-
-        if (newPassword !== newPasswordConfirm) {
-            window.alert('Password confirmation does not match password.');
-            return;
-        }
-
-        if (!window.confirm(confirmationMsg)) {
-            return;
-        }
-
-        let newPasswordHash: string = Passpack.utils.hashx(newPassword),
-            newMasterKey: string = _utf8_to_b64(_createMasterKey(newPassword));
-
-        // Get all the credentials, decrypt each with the old password
-        // and re-encrypt it with the new one
-        _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data: Credential[]): void {
-            let excludes: string[] = ['CredentialID', 'UserID', 'PasswordConfirmation'];
-            let newData: Credential[] = data.map(function (item: Credential): Credential {
-                return _encryptObject(_decryptObject(item, _b64_to_utf8(masterKey), excludes), newMasterKey, excludes);
-            });
-
-            _ajaxPost(_basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function (): void {
-                // Store the new password in hashed form
-                _ajaxPost(_basePath + 'Main/UpdatePassword', {
-                    newHash: newPasswordHash,
-                    userid: userId,
-                    oldHash: Passpack.utils.hashx(_password)
-                }, function (): void {
-                    // Just reload the whole page when we're done to force login
-                    window.location.href = _basePath.length > 1 ? _basePath.slice(0, -1) : _basePath;
-                });
-            }, null, 'application/json; charset=utf-8');
-        });
-    }
-
-    // Export all credential data as JSON
-    function _exportData(userId: string, masterKey: string): void {
-        // Get all the credentials, decrypt each one
-        _ajaxPost(_basePath + 'Main/GetAllComplete', { userId: userId }, function (data: Credential[]): void {
-            let exportItems: Credential[] = data.map(function (item: Credential): Credential {
-                let o: Credential = _decryptObject(item, _b64_to_utf8(masterKey), ['CredentialID', 'UserID', 'PasswordConfirmation']);
-                delete o.PasswordConfirmation; // Remove the password confirmation as it's not needed for export
-                return o;
-            });
-
-            let exportWindow:Window = window.open('', 'EXPORT_WINDOW', 'WIDTH=700, HEIGHT=600');
-            if (exportWindow && exportWindow.top) {
-                exportWindow.document.write(_templates.exportedDataWindow({ json: JSON.stringify(exportItems, undefined, 4) }));
-            } else {
-                window.alert('The export feature works by opening a popup window, but our popup window was blocked by your browser.');
-            }
-        });
-    }
-
-    // Import unencrypted JSON credential data
-    function _importData(userId: string, masterKey: string, rawData: string): void {
-        let jsonImportData: Credential[] = JSON.parse(rawData);
-        let excludes: string[] = ['CredentialID', 'UserID'];
-
-        let newData: Credential[] = jsonImportData.map(function (item: Credential): Credential {
-            // Remove the confirmation property
-            delete item.PasswordConfirmation;
-            // Null out the old credential ID so UpdateMultiple knows this is a new record
-            item.CredentialID = null;
-            // Set the user ID to the ID of the new (logged in) user
-            item.UserID = userId;
-            return _encryptObject(item, _b64_to_utf8(masterKey), excludes);
-        });
-
-        _ajaxPost(_basePath + 'Main/UpdateMultiple', JSON.stringify(newData), function (): void {
-            // Just reload the whole page when we're done to force login
-            window.location.href = _basePath.length > 1 ? _basePath.slice(0, -1) : _basePath;
-        }, null, 'application/json; charset=utf-8');
-    }
-
-    // Show the options dialog
-    function _options(): void {
-        let dialogHtml: string = _templates.optionsDialog({
-            userid: _userId,
-            masterkey: _utf8_to_b64(_masterKey)
-        });
-
-        _showModal({
-            title: 'Admin',
-            content: dialogHtml
-        });
-    }
-
-    // Build the data table
-    function _buildDataTable(data: Credential[], callback: Function, masterKey: string, userId: string): void {
-        // Create a table row for each record and add it to the rows array
-        let rows: CredentialSummary[] = data.map(function (item: Credential): CredentialSummary {
-            return _createCredentialDisplayData(item, masterKey, userId);
-        });
-
-        // Fire the callback and pass it the array of rows
-        callback(rows);
-    }
-
-    // Create the credential table
-    function _createCredentialTable(rows: CredentialSummary[]): string {
-        return _templates.credentialTable({ rows: rows });
-    }
-
-    // Create a single table row for a credential
-    function _createCredentialDisplayData(credential: Credential, masterKey: string, userId: string): CredentialSummary {
-        return {
-            credentialid: credential.CredentialID,
-            masterkey: masterKey,
-            userid: userId,
-            description: credential.Description,
-            username: credential.Username,
-            password: credential.Password,
-            url: credential.Url,
-            weak: $.trim(credential.Password) !== '' && Passpack.utils.getBits(credential.Password) < _weakPasswordThreshold
-        };
-    }
-
-    // Validate a credential record form
-    function _validateRecord(f: JQuery): any[] {
-        let errors: any[] = [],
-            description: JQuery = f.find('#Description'),
-            password: JQuery = f.find('#Password'),
-            passwordConfirmation: JQuery = f.find('#PasswordConfirmation');
-
-        if (description.val() === '') {
-            errors.push({ field: description, msg: 'You must fill in a Description' });
-        }
-
-        // We don't mind if these are blank, but they must be the same!
-        if (password.val() !== passwordConfirmation.val()) {
-            errors.push({ field: passwordConfirmation, msg: 'Password confirmation does not match' });
-        }
-
-        return errors;
-    }
-
-    // Encode string to Base64
-    function _utf8_to_b64(str: string): string {
-        return window.btoa(encodeURIComponent(escape(str)));
-    }
-
-    // Decode Base64 string
-    function _b64_to_utf8(str: string): string {
-        return unescape(decodeURIComponent(window.atob(str)));
-    }
-
-    // Truncate a string at a specified length
-    function _truncate(str: string, len: number): string {
-        return str.length > len ? str.substring(0, len - 3) + '...' : str;
-    }
-
-    // Hide credential rows which don't contain a particular string
-    function _search(query: string, list: Credential[]): Credential[] {
-        let results: Credential[] = [],
-            queryField: string,
-            queryData: string[];
-        // Tidy up the query text
-        query = $.trim(query).toLowerCase();
-        if (query !== null && query !== '' && query.length > 1) {
-            queryField = _queryablePropertyMap.description;
-            // Support queries in the form fieldName:query (e.g. username:me@email.com)
-            if (query.indexOf(':') !== -1) {
-                queryData = query.split(':');
-                // Safeguard against spaces either side of colon, query part not
-                // having been typed yet and searches on a non-existent property
-                if (queryData.length === 2 && queryData[0] !== '' && queryData[1] !== '') {
-                    // If the fieldName part exists in the property map
-                    if (_queryablePropertyMap[queryData[0]]) {
-                        queryField = _queryablePropertyMap[queryData[0]];
-                        query = queryData[1];
-                    }
-                }
-            }
-            if (queryField === 'FILTER') {
-                if (query === 'all') {
-                    results = list;
-                } else if (query === 'weak') {
-                    results = list.filter(function (item: Credential): boolean {
-                        let pwd: string = item.Password;
-                        return pwd && Passpack.utils.getBits(pwd) <= _weakPasswordThreshold;
-                    });
-                }
-            } else {
-                results = list.filter(function (item: Credential): boolean {
-                    return item[queryField].toLowerCase().indexOf(query) > -1;
-                });
-            }
-        }
-        return results;
-    }
-
-    // Rate-limit calls to the supplied function
-    function _debounce(func: Function, wait?: number, immediate?: boolean): (e: Event) => void {
-        let timeout: number;
-        return function (): void {
-            let context: Function = this, args: IArguments = arguments;
-            let later: Function = function (): void {
-                timeout = null;
-                if (!immediate) {
-                    func.apply(context, args);
-                }
-            };
-            let callNow: boolean = immediate && !timeout;
-            window.clearTimeout(timeout);
-            timeout = window.setTimeout(later, wait);
-            if (callNow) {
-                func.apply(context, args);
-            }
-        };
-    }
-
-    // Sort credentials alphabetically by description
-    function _sortCredentials(credentials: Credential[]): void {
-        credentials.sort(function (a: Credential, b: Credential): number {
-            let desca: string = a.Description.toUpperCase(),
-                descb: string = b.Description.toUpperCase();
-            return desca < descb ? -1 : desca > descb ? 1 : 0;
-        });
-    }
-
     // Show password strength visually
     function _showPasswordStrength(field: JQuery): void {
         let strengthIndicator: JQuery = field.next('div.password-strength'),
@@ -652,13 +623,47 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         }
     }
 
-    function _setPasswordOptions(form: JQuery, opts: string): void {
-        let optArray: string[] = opts.split('|');
-        form.find('[name=len]').val(optArray[0]);
-        _checkIf(form.find('[name=ucase]'), () => optArray[1] === '1');
-        _checkIf(form.find('[name=lcase]'), () => optArray[2] === '1');
-        _checkIf(form.find('[name=nums]'), () => optArray[3] === '1');
-        _checkIf(form.find('[name=symb]'), () => optArray[4] === '1');
+    // Sort credentials alphabetically by description
+    function _sortCredentials(credentials: Credential[]): void {
+        credentials.sort(function (a: Credential, b: Credential): number {
+            let desca: string = a.Description.toUpperCase(),
+                descb: string = b.Description.toUpperCase();
+            return desca < descb ? -1 : desca > descb ? 1 : 0;
+        });
+    }
+
+    // Truncate a string at a specified length
+    function _truncate(str: string, len: number): string {
+        return str.length > len ? str.substring(0, len - 3) + '...' : str;
+    }
+
+    // Update properties of the item with a specific ID in a list
+    function _updateProperties(properties: any, credential: Credential): Credential {
+        return $.extend({}, credential, properties);
+    }
+
+    // Encode string to Base64
+    function _utf8_to_b64(str: string): string {
+        return window.btoa(encodeURIComponent(escape(str)));
+    }
+
+    // Validate a credential record form
+    function _validateRecord(f: JQuery): any[] {
+        let errors: any[] = [],
+            description: JQuery = f.find('#Description'),
+            password: JQuery = f.find('#Password'),
+            passwordConfirmation: JQuery = f.find('#PasswordConfirmation');
+
+        if (description.val() === '') {
+            errors.push({ field: description, msg: 'You must fill in a Description' });
+        }
+
+        // We don't mind if these are blank, but they must be the same!
+        if (password.val() !== passwordConfirmation.val()) {
+            errors.push({ field: passwordConfirmation, msg: 'Password confirmation does not match' });
+        }
+
+        return errors;
     }
 
     // Initialise the app
