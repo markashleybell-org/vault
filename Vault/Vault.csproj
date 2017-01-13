@@ -164,7 +164,7 @@
   <ItemGroup>
     <Content Include="Content\Css\bootstrap.css" />
     <Content Include="Content\Css\main.css" />
-    <Content Include="Content\Css\qunit-1.15.0.css" />
+    <Content Include="Content\Css\qunit-2.1.1.css" />
     <Content Include="Content\Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\Img\ajax-loader.gif" />
     <Content Include="Content\Img\favicon.ico" />
@@ -175,7 +175,8 @@
     <Content Include="Content\Js\js.cookie.js" />
     <TypeScriptCompile Include="Content\Js\main.ts" />
     <Content Include="Content\Js\passpack-v1.1.js" />
-    <Content Include="Content\Js\qunit-1.15.0.js" />
+    <Content Include="Content\Js\qunit-2.1.1.css" />
+    <Content Include="Content\Js\qunit-2.1.1.js" />
     <Content Include="Content\Js\tests.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />

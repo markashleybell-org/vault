@@ -117,31 +117,31 @@ function checkDecryption(assert, credential) {
     assert.ok(credential.Username === '_testuser123');
 }
 
-QUnit.test('Test _crypt(Passpack.encode)', function (assert) {
+QUnit.test('_crypt(Passpack.encode)', function (assert) {
     var encrypted = Vault.crypt(Passpack.encode, TestGlobals.testCredential, TestGlobals.masterKey, ['CredentialID', 'UserID']);
     checkEncryption(assert, encrypted);
 });
 
-QUnit.test('Test _crypt(Passpack.decode)', function (assert) {
+QUnit.test('_crypt(Passpack.decode)', function (assert) {
     var decrypted = Vault.crypt(Passpack.decode, TestGlobals.testCredentialEncrypted, TestGlobals.masterKey, ['CredentialID', 'UserID']);
     checkDecryption(assert, decrypted);
 });
 
-QUnit.test('Test _encryptObject', function (assert) {
+QUnit.test('_encryptObject', function (assert) {
     var encrypted = Vault.encryptObject(TestGlobals.testCredential, TestGlobals.masterKey, ['CredentialID', 'UserID']);
     checkEncryption(assert, encrypted);
 });
 
-QUnit.test('Test _decryptObject', function (assert) {
+QUnit.test('_decryptObject', function (assert) {
     var decrypted = Vault.decryptObject(TestGlobals.testCredentialEncrypted, TestGlobals.masterKey, ['CredentialID', 'UserID']);
     checkDecryption(assert, decrypted);
 });
 
-QUnit.test('Test _createMasterKey', function (assert) {
+QUnit.test('_createMasterKey', function (assert) {
     assert.ok(Passpack.utils.hashx('test123' + Passpack.utils.hashx('test123', true, true), true, true) === Vault.createMasterKey('test123'));
 });
 
-QUnit.test('Test _removeFromList', function (assert) {
+QUnit.test('_removeFromList', function (assert) {
     var list = [
         { CredentialID: 1, Description: 'ITEM1' },
         { CredentialID: 2, Description: 'ITEM2' },
@@ -153,7 +153,7 @@ QUnit.test('Test _removeFromList', function (assert) {
     assert.ok(list2[1].Description === 'ITEM3');
 });
 
-QUnit.test('Test _updateProperties', function (assert) {
+QUnit.test('_updateProperties', function (assert) {
     var list = [
         { CredentialID: 1, Description: 'ITEM1', UserID: '1', Username: 'item1', Password: 'is9j', Url: 'http://test1.com' },
         { CredentialID: 2, Description: 'ITEM2', UserID: '1', Username: 'item2', Password: '4ngi', Url: 'http://test2.com' },
@@ -166,7 +166,7 @@ QUnit.test('Test _updateProperties', function (assert) {
     assert.ok(list[1].Url === 'http://test4.com');
 });
 
-QUnit.test('Test _defaultAjaxErrorCallback', function (assert) {
+QUnit.test('_defaultAjaxErrorCallback', function (assert) {
     var originalAlert = window.alert;
     window.alert = function (msg) { return msg; };
     var alertResult = Vault.defaultAjaxErrorCallback(null, 'STATUS', 'ERROR');
@@ -174,21 +174,21 @@ QUnit.test('Test _defaultAjaxErrorCallback', function (assert) {
     assert.ok(alertResult === 'Http Error: STATUS - ERROR');
 });
 
-QUnit.test('Test _generatePasswordHash', function (assert) {
+QUnit.test('_generatePasswordHash', function (assert) {
     var hash = Vault.generatePasswordHash('TEST');
     assert.ok(hash === '94053587014b06e04fa78bc6fd5af62c');
 });
 
-QUnit.test('Test _generatePasswordHash64', function (assert) {
+QUnit.test('_generatePasswordHash64', function (assert) {
     var hash = Vault.generatePasswordHash64('TEST');
     assert.ok(hash === '94ee059335e587e501cc4bf90613e0814f00a7b08bc7c648fd865a2af6a22cc2');
 });
 
-QUnit.test('Test _changePassword', function (assert) { });
-QUnit.test('Test _exportData', function (assert) { });
+//QUnit.test('_changePassword', function (assert) { });
+//QUnit.test('_exportData', function (assert) { });
 
-QUnit.test('Test _buildDataTable', function (assert) {
-    expect(4);
+QUnit.test('_buildDataTable', function (assert) {
+   assert.expect(4);
     var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
     var userId = 1;
     var list = [
@@ -204,7 +204,7 @@ QUnit.test('Test _buildDataTable', function (assert) {
     }, masterKey, userId);
 });
 
-QUnit.test('Test _createCredentialTable', function (assert) {
+QUnit.test('_createCredentialTable', function (assert) {
     var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
     var data = [
         { credentialid: 1, masterkey: masterKey, userid: 1, description: 'ITEM1' },
@@ -218,7 +218,7 @@ QUnit.test('Test _createCredentialTable', function (assert) {
     assert.ok($(rows[1]).find('.full').text() === 'ITEM2');
 });
 
-QUnit.test('Test _createCredentialDisplayData', function (assert) {
+QUnit.test('_createCredentialDisplayData', function (assert) {
     // base64encode('test123' + passpackhash('test123'))
     var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
     var credential = { CredentialID: 1, Description: 'ITEM1' };
@@ -229,7 +229,7 @@ QUnit.test('Test _createCredentialDisplayData', function (assert) {
     assert.ok(data.masterkey === masterKey);
 });
 
-QUnit.test('Test _validateRecord', function (assert) {
+QUnit.test('_validateRecord', function (assert) {
     var form = $('<form><input id="Description" name="Description" />' +
                  '<input id="Password" name="Password" />' + 
                  '<input id="PasswordConfirmation" name="PasswordConfirmation" /></form>');
@@ -244,23 +244,23 @@ QUnit.test('Test _validateRecord', function (assert) {
     assert.ok(valid.length === 0);
 });
 
-QUnit.test('Test _utf8_to_b64', function (assert) {
+QUnit.test('_utf8_to_b64', function (assert) {
     var b64 = Vault.utf8_to_b64('TEST');
     assert.ok(b64 === 'VEVTVA==');
 });
 
-QUnit.test('Test _b64_to_utf8', function (assert) {
+QUnit.test('_b64_to_utf8', function (assert) {
     var utf8 = Vault.b64_to_utf8('VEVTVA==');
     assert.ok(utf8 === 'TEST');
 });
 
-QUnit.test('Test _truncate', function (assert) {
+QUnit.test('_truncate', function (assert) {
     var testString = 'This Is A Test';
     assert.ok(Vault.truncate(testString, 10) === 'This Is...');
     assert.ok(Vault.truncate(testString, 20) === 'This Is A Test');
 });
 
-QUnit.test('Test _search', function (assert) {
+QUnit.test('_search', function (assert) {
     var list = [
         { CredentialID: 1, Description: 'Cat', Username: 'cat', Password: 'cat123', UserID: '1' },
         { CredentialID: 2, Description: 'Dog', Username: 'dog', Password: 'dog123', UserID: '1' },
@@ -286,27 +286,16 @@ QUnit.test('Test _search', function (assert) {
     assert.ok(results[1].Description === 'Catfish');
 });
 
-QUnit.asyncTest('Test _debounce', function (assert) {
-    expect(3);
-    var flag = false;
+QUnit.test('_debounce', function (assert) {
+    var done = assert.async();
     var func = Vault.debounce(function () {
-        flag = true;
+        assert.ok(true);
+        done();
     }, 100);
     func();
-    assert.ok(flag === false);
-    setTimeout(function () {
-        assert.ok(flag === true);
-        QUnit.start();
-    }, 110);
-    var flag2 = false;
-    var func2 = Vault.debounce(function () {
-        flag2 = true;
-    }, 100, true);
-    func2();
-    assert.ok(flag2 === true);
 });
 
-QUnit.test('Test _sortCredentials', function (assert) {
+QUnit.test('_sortCredentials', function (assert) {
     var list = [
         { CredentialID: 1, Description: 'BBB', UserID: '1' },
         { CredentialID: 2, Description: 'AAA', UserID: '1' },
