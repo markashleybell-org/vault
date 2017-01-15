@@ -673,6 +673,9 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         // Determine whether we're testing or not
         if (testMode) {
             let testMethods: any = {
+                createCredentialFromFormFields: _createCredentialFromFormFields,
+                isChecked: _isChecked,
+                checkIf: _checkIf,
                 crypt: _crypt,
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,

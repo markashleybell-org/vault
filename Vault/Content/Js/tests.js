@@ -1,39 +1,4 @@
-﻿/*
-var testMethods = {
-    encryptObject: _encryptObject,
-    decryptObject: _decryptObject,
-    removeFromList: _removeFromList,
-    updateDescription: _updateDescription,
-    defaultAjaxErrorCallback: _defaultAjaxErrorCallback,
-    ajaxPost: _ajaxPost,
-    loadCredentials: _loadCredentials,
-    showDetail: _showDetail,
-    defaultAcceptAction: _defaultAcceptAction,
-    defaultCloseAction: _defaultCloseAction,
-    showModal: _showModal,
-    loadCredential: _loadCredential,
-    deleteCredential: _deleteCredential,
-    confirmDelete: _confirmDelete,
-    generatePasswordHash: _generatePasswordHash,
-    generatePasswordHash64: _generatePasswordHash64,
-    changePassword: _changePassword,
-    exportData: _exportData,
-    options: _options,
-    buildDataTable: _buildDataTable,
-    createCredentialTable: _createCredentialTable,
-    createCredentialDisplayData: _createCredentialDisplayData,
-    validateRecord: _validateRecord,
-    utf8_to_b64: _utf8_to_b64,
-    b64_to_utf8: _b64_to_utf8,
-    truncate: _truncate,
-    search: _search,
-    debounce: _debounce,
-    sortCredentials: _sortCredentials,
-    init: _init
-};
-*/
-
-var TestGlobals = {
+﻿var TestGlobals = {
     // Vault.utf8_to_b64(Vault.createMasterKey('test123'))
     masterKey: 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==',
     masterKeyDecoded: window.unescape(decodeURIComponent(window.atob('JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg=='))),
@@ -139,6 +104,15 @@ QUnit.test('_buildDataTable', function (assert) {
     }, masterKey, userId);
 });
 
+QUnit.test('_checkIf', function (assert) {
+    var checkbox1 = $('<input type="checkbox">');
+    var checkbox2 = $('<input type="checkbox" checked="checked">');
+    Vault.checkIf(checkbox1, function() { return true; });
+    Vault.checkIf(checkbox2, function() { return false; });
+    assert.ok(checkbox1[0].checked === true);
+    assert.ok(checkbox2[0].checked === false);
+});
+
 QUnit.test('_createCredentialDisplayData', function (assert) {
     // base64encode('test123' + passpackhash('test123'))
     var masterKey = 'JTI1OTElMjUyNXMlMjVDMUklNDBZJTI1QzUlMjU5MUclMjVCRiUyNTk0JTI1QjVBJTI1ODAlMjUxRg==';
@@ -148,6 +122,51 @@ QUnit.test('_createCredentialDisplayData', function (assert) {
     assert.ok(data.description === 'ITEM1');
     assert.ok(data.userid === 5);
     assert.ok(data.masterkey === masterKey);
+});
+
+QUnit.test('_createCredentialFromFormFields', function (assert) {
+    var html = '<form>'
+             + '<input type="text" name="CredentialID" value="CredentialID">'
+             + '<input type="text" name="UserID" value="UserID">'
+             + '<input type="text" name="Description" value="Description">'
+             + '<input type="text" name="Username" value="Username">'
+             + '<input type="text" name="Password" value="Password">'
+             + '<input type="text" name="PwdOptions" value="PwdOptions">'
+             + '<input type="text" name="PasswordConfirmation" value="PasswordConfirmation">'
+             + '<input type="text" name="Url" value="Url">'
+             + '<input type="text" name="UserDefined1Label" value="UserDefined1Label">'
+             + '<input type="text" name="UserDefined1" value="UserDefined1">'
+             + '<input type="text" name="UserDefined2Label" value="UserDefined2Label">'
+             + '<input type="text" name="UserDefined2" value="UserDefined2">'
+             + '<textarea name="Notes">Notes</textarea>'
+             + '<input type="text" name="chromeusername" class="chrome-autocomplete-fake" value="ABC">'
+             + '<input type="text" name="chromepassword" class="chrome-autocomplete-fake" value="123">'
+             + '<input type="text" name="len" value="16">'
+             + '<input type="text" name="ucase" value="1">'
+             + '<input type="text" name="lcase" value="1">'
+             + '<input type="text" name="nums" value="1">'
+             + '<input type="text" name="symb" value="1">'
+             + '<input type="submit" name="submit" class="submit" value="Save">'
+             + '</form>';
+
+    var form = $(html);
+    var obj = Vault.createCredentialFromFormFields(form);
+    assert.ok(obj.CredentialID === 'CredentialID');
+    assert.ok(obj.UserID === 'UserID');
+    assert.ok(obj.Description === 'Description');
+    assert.ok(obj.Username === 'Username');
+    assert.ok(obj.Password === 'Password');
+    assert.ok(obj.PwdOptions === 'PwdOptions');
+    assert.ok(obj.PasswordConfirmation === 'PasswordConfirmation');
+    assert.ok(obj.Url === 'Url');
+    assert.ok(obj.UserDefined1Label === 'UserDefined1Label');
+    assert.ok(obj.UserDefined1 === 'UserDefined1');
+    assert.ok(obj.UserDefined2Label === 'UserDefined2Label');
+    assert.ok(obj.UserDefined2 === 'UserDefined2');
+    assert.ok(obj.Notes === 'Notes');
+    assert.ok(typeof obj.chromeusername === 'undefined');
+    assert.ok(typeof obj.chromepassword === 'undefined');
+    assert.ok(typeof obj.submit === 'undefined');
 });
 
 QUnit.test('_createCredentialTable', function (assert) {
@@ -227,6 +246,13 @@ QUnit.test('_generatePasswordHash64', function (assert) {
     assert.ok(hash === '94ee059335e587e501cc4bf90613e0814f00a7b08bc7c648fd865a2af6a22cc2');
 });
 
+QUnit.test('_isChecked', function (assert) {
+    var checkbox1 = $('<input type="checkbox">');
+    var checkbox2 = $('<input type="checkbox" checked="checked">');
+    assert.ok(Vault.isChecked(checkbox1) === false);
+    assert.ok(Vault.isChecked(checkbox2) === true);
+});
+
 //QUnit.test('_changePassword', function (assert) { });
 //QUnit.test('_exportData', function (assert) { });
 
@@ -247,8 +273,9 @@ QUnit.test('_search', function (assert) {
         { CredentialID: 1, Description: 'Cat', Username: 'cat', Password: 'cat123', UserID: '1' },
         { CredentialID: 2, Description: 'Dog', Username: 'dog', Password: 'dog123', UserID: '1' },
         { CredentialID: 3, Description: 'Fish', Username: 'fish', Password: 'fish123', UserID: '1' },
-        { CredentialID: 3, Description: 'Catfish', Username: 'catfish', Password: 'catfish123', UserID: '1' },
-        { CredentialID: 3, Description: 'Dogfish', Username: 'dogfish', Password: 'dogfish123', UserID: '1' }
+        { CredentialID: 4, Description: 'Catfish', Username: 'catfish', Password: 'catfish123', UserID: '1' },
+        { CredentialID: 5, Description: 'Dogfish', Username: 'dogfish', Password: 'dogfish123', UserID: '1' },
+        { CredentialID: 6, Description: 'Owl', Username: 'owl', Password: '_nT:NP?uovID8,TE', UserID: '1' }
     ];
     var noresults1 = Vault.search(null, list);
     var noresults2 = Vault.search('', list);
@@ -266,6 +293,14 @@ QUnit.test('_search', function (assert) {
     assert.ok(results.length === 2);
     assert.ok(results[0].Description === 'Cat');
     assert.ok(results[1].Description === 'Catfish');
+    results = Vault.search('filter:all', list);
+    assert.ok(results.length === 6);
+    assert.ok(results[0].Description === 'Cat');
+    assert.ok(results[5].Description === 'Owl');
+    results = Vault.search('filter:weak', list);
+    assert.ok(results.length === 3);
+    assert.ok(results[0].Description === 'Cat');
+    assert.ok(results[2].Description === 'Fish');
 });
 
 QUnit.test('_sortCredentials', function (assert) {
