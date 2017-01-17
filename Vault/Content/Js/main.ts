@@ -330,8 +330,8 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         return Passpack.utils.hashx(password, false, true);
     }
 
-    function _getPasswordLength(): number {
-        let len: number = parseInt($('#len').val(), 10);
+    function _getPasswordLength(val: any): number {
+        let len: number = parseInt(val, 10);
         return isNaN(len) ? 16 : len;
     }
 
@@ -679,6 +679,7 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 crypt: _crypt,
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,
+                getPasswordLength: _getPasswordLength,
                 findIndex: _findIndex,
                 createMasterKey: _createMasterKey,
                 removeFromList: _removeFromList,
@@ -887,7 +888,7 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             // Generate a nice strong password
             $('body').on('click', 'button.generate-password', function (e: Event): void {
                 e.preventDefault();
-                let password: string = Passpack.utils.passGenerator(_getPasswordGenerationOptions(), _getPasswordLength());
+                let password: string = Passpack.utils.passGenerator(_getPasswordGenerationOptions(), _getPasswordLength($('#len').val()));
                 $('#Password').val(password);
                 $('#PasswordConfirmation').val(password);
                 let opts: any[] = [$('#len').val(),

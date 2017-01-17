@@ -246,6 +246,15 @@ QUnit.test('_generatePasswordHash64', function (assert) {
     assert.ok(hash === '94ee059335e587e501cc4bf90613e0814f00a7b08bc7c648fd865a2af6a22cc2');
 });
 
+QUnit.test('_getPasswordLength', function (assert) {
+    var val1 = Vault.getPasswordLength(null);
+    var val2 = Vault.getPasswordLength('');
+    var val3 = Vault.getPasswordLength('10');
+    assert.ok(val1 === 16);
+    assert.ok(val2 === 16);
+    assert.ok(val3 === 10);
+});
+
 QUnit.test('_isChecked', function (assert) {
     var checkbox1 = $('<input type="checkbox">');
     var checkbox2 = $('<input type="checkbox" checked="checked">');
