@@ -335,11 +335,11 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
         return isNaN(len) ? 16 : len;
     }
 
-    function _getPasswordGenerationOptions(): any {
+    function _getPasswordGenerationOptions(inputs: JQuery, predicate: (JQuery) => boolean): any {
         let options: any = {};
-        $('input.generate-password-option').each(function (): void {
+        inputs.each(function (): void {
             let checkbox: JQuery = $(this);
-            if (_isChecked(checkbox)) {
+            if (predicate(checkbox)) {
                 options[checkbox.attr('name')] = 1;
             }
         });
@@ -680,6 +680,7 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
                 encryptObject: _encryptObject,
                 decryptObject: _decryptObject,
                 getPasswordLength: _getPasswordLength,
+                getPasswordGenerationOptions: _getPasswordGenerationOptions,
                 findIndex: _findIndex,
                 createMasterKey: _createMasterKey,
                 removeFromList: _removeFromList,
@@ -888,7 +889,9 @@ let Vault = (function ($, Passpack, Handlebars, Cookies, window, document) {
             // Generate a nice strong password
             $('body').on('click', 'button.generate-password', function (e: Event): void {
                 e.preventDefault();
-                let password: string = Passpack.utils.passGenerator(_getPasswordGenerationOptions(), _getPasswordLength($('#len').val()));
+                let passwordOptions = _getPasswordGenerationOptions($('input.generate-password-option'), _isChecked);
+                let passwordLength = _getPasswordLength($('#len').val());
+                let password: string = Passpack.utils.passGenerator(passwordOptions, passwordLength);
                 $('#Password').val(password);
                 $('#PasswordConfirmation').val(password);
                 let opts: any[] = [$('#len').val(),

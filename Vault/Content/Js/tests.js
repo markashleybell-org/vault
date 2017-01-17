@@ -246,6 +246,22 @@ QUnit.test('_generatePasswordHash64', function (assert) {
     assert.ok(hash === '94ee059335e587e501cc4bf90613e0814f00a7b08bc7c648fd865a2af6a22cc2');
 });
 
+QUnit.test('_getPasswordGenerationOptions', function (assert) {
+    var html = '<div>'
+             + '<input type="checkbox" class="generate-password-option" id="ucase" name="ucase" value="1" checked="checked">'
+             + '<input type="checkbox" class="generate-password-option" id="lcase" name="lcase" value="1">'
+             + '<input type="checkbox" class="generate-password-option" id="nums" name="nums" value="1" checked="checked">'
+             + '<input type="checkbox" class="generate-password-option" id="symb" name="symb" value="1">'
+             + '</div>';
+
+    var el = $(html);
+    var options = Vault.getPasswordGenerationOptions(el.find('input.generate-password-option'), Vault.isChecked);
+    assert.ok(options.ucase === 1);
+    assert.ok(typeof options.lcase === 'undefined');
+    assert.ok(options.nums === 1);
+    assert.ok(typeof options.symb === 'undefined');
+});
+
 QUnit.test('_getPasswordLength', function (assert) {
     var val1 = Vault.getPasswordLength(null);
     var val2 = Vault.getPasswordLength('');
