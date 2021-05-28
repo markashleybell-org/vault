@@ -16,14 +16,12 @@ export function range(from: number, to: number): number[] {
     return Array(to).fill(0).map((_, i) => from + i);
 }
 
-export function rateLimit(func: JQuery.EventHandler<HTMLElement>, wait?: number) {
+export function rateLimit(func: (...args: any[]) => void, wait?: number) {
     let timeout: any;
-    return function() {
-        const context = this;
-        const args: IArguments = arguments;
+    return function (...args: any[]) {
         const later = () => {
             timeout = null;
-            func.apply(context, args);
+            func(...args);
         };
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);

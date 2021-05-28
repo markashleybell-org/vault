@@ -1,18 +1,18 @@
-﻿import $ from 'jquery';
-import * as Cookies from 'js-cookie';
+﻿import * as Cookies from 'js-cookie';
+import { dom } from 'mab-dom';
 
-const dialog = $('#set-dev-cookie-form-dialog');
+const dialog = dom('#set-dev-cookie-form-dialog');
 
 const cookieOptions: Cookies.CookieAttributes = {
     sameSite: 'strict',
     secure: true
 };
 
-function setDevCookie(e: JQuery.Event) {
+function setDevCookie(e: Event) {
     e.preventDefault();
 
-    Cookies.set('vault-dev-username', $('#Username').val() as string, cookieOptions);
-    Cookies.set('vault-dev-password', $('#Password').val() as string, cookieOptions);
+    Cookies.set('vault-dev-username', dom('#Username').val(), cookieOptions);
+    Cookies.set('vault-dev-password', dom('#Password').val(), cookieOptions);
 
     alert('Cookie set');
 }

@@ -1,16 +1,16 @@
-﻿import $ from 'jquery';
-import { hash, hex } from './modules/all';
+﻿import { hash, hex } from './modules/all';
+import { dom } from 'mab-dom';
 
-const dialog = $('#generate-form-dialog');
+const dialog = dom('#generate-form-dialog');
 
-async function generatePassword(e: JQuery.Event) {
+async function generatePassword(e: Event) {
     e.preventDefault();
 
-    const usernameHash = await hash($('#Username').val() as string);
-    const passwordHash = await hash($('#Password').val() as string);
+    const usernameHash = await hash(dom('#Username').val() as string);
+    const passwordHash = await hash(dom('#Password').val() as string);
 
-    $('#HashedUsername').attr('value', hex(usernameHash));
-    $('#HashedPassword').attr('value', hex(passwordHash));
+    dom('#HashedUsername').val(hex(usernameHash));
+    dom('#HashedPassword').val(hex(passwordHash));
 }
 
 dialog.find('.btn-primary').on('click', generatePassword);

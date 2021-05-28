@@ -1,6 +1,7 @@
 ﻿import 'bootstrap/js/modal';
 import * as Handlebars from 'handlebars';
-import $ from 'jquery';
+import { dom, DOM } from 'mab-dom';
+import { Modal } from 'bootstrap';
 import * as Cookies from 'js-cookie';
 import {
     generatePassword,
@@ -36,19 +37,19 @@ interface IVaultGlobals {
 }
 
 interface IVaultUIElements {
-    body: JQuery;
-    loginFormDialog: JQuery;
-    loginForm: JQuery;
-    loginErrorMessage: JQuery;
-    container: JQuery;
-    controls: JQuery;
-    modal: JQuery;
-    modalContent: JQuery;
-    newButton: JQuery;
-    adminButton: JQuery;
-    clearSearchButton: JQuery;
-    searchInput: JQuery;
-    spinner: JQuery;
+    body: DOM;
+    loginFormDialog: Modal;
+    loginForm: DOM;
+    loginErrorMessage: DOM;
+    container: DOM;
+    controls: DOM;
+    modal: Modal;
+    modalContent: DOM;
+    newButton: DOM;
+    adminButton: DOM;
+    clearSearchButton: DOM;
+    searchInput: DOM;
+    spinner: DOM;
 }
 
 interface IVaultUITemplates {
@@ -74,16 +75,16 @@ interface IVaultModalOptions {
     credentialId?: string;
     showAccept?: boolean;
     acceptText?: string;
-    onaccept?: (e: JQuery.Event) => void;
+    onaccept?: (e: Event) => void;
     showClose?: boolean;
     closeText?: string;
-    onclose?: (e: JQuery.Event) => void;
+    onclose?: (e: Event) => void;
     showEdit?: boolean;
     editText?: string;
-    onedit?: (e: JQuery.Event) => void;
+    onedit?: (e: Event) => void;
     showDelete?: boolean;
     deleteText?: string;
-    ondelete?: (e: JQuery.Event) => void;
+    ondelete?: (e: Event) => void;
 }
 
 declare var _VAULT_GLOBALS: IVaultGlobals;
@@ -95,36 +96,36 @@ const repository = new Repository(_VAULT_GLOBALS.securityKey);
 const defaultPasswordSpecification = new PasswordSpecification(16, true, true, true, true);
 
 const ui: IVaultUIElements = {
-    body: $('body'),
-    loginFormDialog: $('#login-form-dialog'),
-    loginForm: $('#login-form'),
-    loginErrorMessage: $('#login-form-dialog').find('.validation-message'),
-    container: $('#container'),
-    controls: $('#controls'),
-    modal: $('#modal'),
-    modalContent: $('#modal-content'),
-    newButton: $('#new'),
-    adminButton: $('#admin'),
-    clearSearchButton: $('#clear-search'),
-    searchInput: $('#search'),
-    spinner: $('#spinner')
+    body: dom('body'),
+    loginFormDialog: new Modal(dom('#login-form-dialog').get(), { keyboard: false, backdrop: 'static' }),
+    loginForm: dom('#login-form'),
+    loginErrorMessage: dom('#login-form-dialog').find('.validation-message'),
+    container: dom('#container'),
+    controls: dom('#controls'),
+    modal: new Modal(dom('#modal').get()),
+    modalContent: dom('#modal-content'),
+    newButton: dom('#new'),
+    adminButton: dom('#admin'),
+    clearSearchButton: dom('#clear-search'),
+    searchInput: dom('#search'),
+    spinner: dom('#spinner')
 };
 
 const templates: IVaultUITemplates = {
-    urlLink: Handlebars.compile($('#tmpl-urllink').html()),
-    urlText: Handlebars.compile($('#tmpl-urltext').html()),
-    detail: Handlebars.compile($('#tmpl-detail').html()),
-    credentialForm: Handlebars.compile($('#tmpl-credentialform').html()),
-    deleteConfirmationDialog: Handlebars.compile($('#tmpl-deleteconfirmationdialog').html()),
-    optionsDialog: Handlebars.compile($('#tmpl-optionsdialog').html()),
-    exportedDataWindow: Handlebars.compile($('#tmpl-exporteddatawindow').html()),
-    credentialTable: Handlebars.compile($('#tmpl-credentialtable').html()),
-    credentialTableRow: Handlebars.compile($('#tmpl-credentialtablerow').html()),
-    validationMessage: Handlebars.compile($('#tmpl-validationmessage').html()),
-    modalHeader: Handlebars.compile($('#tmpl-modalheader').html()),
-    modalBody: Handlebars.compile($('#tmpl-modalbody').html()),
-    modalFooter: Handlebars.compile($('#tmpl-modalfooter').html()),
-    copyLink: Handlebars.compile($('#tmpl-copylink').html())
+    urlLink: Handlebars.compile(dom('#tmpl-urllink').html()),
+    urlText: Handlebars.compile(dom('#tmpl-urltext').html()),
+    detail: Handlebars.compile(dom('#tmpl-detail').html()),
+    credentialForm: Handlebars.compile(dom('#tmpl-credentialform').html()),
+    deleteConfirmationDialog: Handlebars.compile(dom('#tmpl-deleteconfirmationdialog').html()),
+    optionsDialog: Handlebars.compile(dom('#tmpl-optionsdialog').html()),
+    exportedDataWindow: Handlebars.compile(dom('#tmpl-exporteddatawindow').html()),
+    credentialTable: Handlebars.compile(dom('#tmpl-credentialtable').html()),
+    credentialTableRow: Handlebars.compile(dom('#tmpl-credentialtablerow').html()),
+    validationMessage: Handlebars.compile(dom('#tmpl-validationmessage').html()),
+    modalHeader: Handlebars.compile(dom('#tmpl-modalheader').html()),
+    modalBody: Handlebars.compile(dom('#tmpl-modalbody').html()),
+    modalFooter: Handlebars.compile(dom('#tmpl-modalfooter').html()),
+    copyLink: Handlebars.compile(dom('#tmpl-copylink').html())
 };
 
 Handlebars.registerPartial('credentialtablerow', templates.credentialTableRow);
@@ -145,15 +146,15 @@ let currentSession: any = null;
 
 // Pure functions
 
-export function isChecked(el: JQuery) {
-    return (el[0] as HTMLInputElement).checked;
+export function isChecked(el: DOM) {
+    return (el.get() as HTMLInputElement).checked;
 }
 
-export function checkIf(el: JQuery, condition: boolean) {
-    (el[0] as HTMLInputElement).checked = condition;
+export function checkIf(el: DOM, condition: boolean) {
+    (el.get() as HTMLInputElement).checked = condition;
 }
 
-export function getPasswordSpecificationFromUI(container: JQuery, predicate: (element: JQuery) => boolean) {
+export function getPasswordSpecificationFromUI(container: DOM, predicate: (element: DOM) => boolean) {
     const len = parseInt(container.find('[name=len]').val() as string, 10);
     const specification = new PasswordSpecification(
         isNaN(len) ? 16 : len,
@@ -165,7 +166,7 @@ export function getPasswordSpecificationFromUI(container: JQuery, predicate: (el
     return specification;
 }
 
-export function updatePasswordSpecificationOptionUI(container: JQuery, specification: PasswordSpecification) {
+export function updatePasswordSpecificationOptionUI(container: DOM, specification: PasswordSpecification) {
     container.find('[name=len]').val(specification.length);
     checkIf(container.find('[name=ucase]'), specification.uppercase);
     checkIf(container.find('[name=lcase]'), specification.lowercase);
@@ -173,11 +174,11 @@ export function updatePasswordSpecificationOptionUI(container: JQuery, specifica
     checkIf(container.find('[name=symb]'), specification.symbols);
 }
 
-export function getCredentialFromUI(container: JQuery) {
+export function getCredentialFromUI(container: DOM) {
     const obj: any = {};
     // Serialize the form inputs into an object
     container.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each((i, el) => {
-        obj[(el as HTMLInputElement).name] = $(el).val();
+        obj[(el as HTMLInputElement).name] = dom(el).val();
     });
     return (obj as ICredential);
 }
@@ -210,9 +211,16 @@ function search(query: string, credentials: ICredential[]) {
     return sortCredentials(results);
 }
 
-function updateCredentialListUI(container: JQuery, data: ICredential[]) {
+function updateCredentialListUI(container: DOM, data: ICredential[]) {
     const rows = data.map(c => mapToSummary(c, isWeakPassword));
     container.html(templates.credentialTable({ rows: rows }));
+}
+
+async function withLoadSpinner<T>(action: () => Promise<T>) {
+    ui.spinner.get().classList.remove('d-none');
+    const result: T = await action();
+    ui.spinner.get().classList.add('d-none');
+    return result;
 }
 
 function confirmDelete(id: string) {
@@ -224,33 +232,27 @@ function confirmDelete(id: string) {
         ondelete: async e => {
             e.preventDefault();
 
-            ui.spinner.show();
+            const updatedCredentials = await withLoadSpinner(async () => {
+                await repository.deleteCredential(id);
 
-            await repository.deleteCredential(id);
-
-            const updatedCredentials = await repository.loadCredentialSummaryList();
-
-            ui.spinner.hide();
+                return await repository.loadCredentialSummaryList();
+            });
 
             const results = search(ui.searchInput.val() as string, updatedCredentials);
             updateCredentialListUI(ui.container, results);
 
-            ui.modal.modal('hide');
+            ui.modal.hide();
         }
     });
 }
 
-function hideModal(e: JQuery.Event) {
+function hideModal(e: Event) {
     e.preventDefault();
-    ui.modal.modal('hide');
+    ui.modal.hide();
 }
 
 async function editCredential(credentialId: string) {
-    ui.spinner.show();
-
-    const credential = await repository.loadCredential(credentialId);
-
-    ui.spinner.hide();
+    const credential = await withLoadSpinner(async () => await repository.loadCredential(credentialId));
 
     showModal({
         title: 'Edit Credential',
@@ -258,13 +260,13 @@ async function editCredential(credentialId: string) {
         showAccept: true,
         acceptText: 'Save',
         onaccept: (): void => {
-            $('#credential-form').submit();
+            (dom('#credential-form').get() as HTMLFormElement).submit();
         }
     });
 
-    ui.modal.find('#Description').focus();
+    ui.modalContent.find('#Description').focus();
 
-    showPasswordStrength(ui.modal.find('#Password'));
+    showPasswordStrength(ui.modalContent.find('#Password'));
 
     const savedPasswordSpecification = parsePasswordSpecificationString(credential.PwdOptions);
     const currentPasswordSpecification = getPasswordSpecificationFromPassword(credential.Password);
@@ -277,7 +279,7 @@ async function editCredential(credentialId: string) {
         || currentPasswordSpecification
         || defaultPasswordSpecification;
 
-    updatePasswordSpecificationOptionUI(ui.modal, passwordSpecification);
+    updatePasswordSpecificationOptionUI(ui.modalContent, passwordSpecification);
 }
 
 function openExportPopup(data: ICredential[]) {
@@ -297,11 +299,7 @@ function optionsDialog() {
 }
 
 async function showDetail(credentialId: string) {
-    ui.spinner.show();
-
-    const credential = await repository.loadCredential(credentialId);
-
-    ui.spinner.hide();
+    const credential = await withLoadSpinner(async () => await repository.loadCredential(credentialId));
 
     // Slightly convoluted, but basically don't link up the URL if it doesn't contain a protocol
     const urlText = templates.urlText({ Url: credential.Url });
@@ -379,14 +377,14 @@ function showModal(options: IVaultModalOptions) {
     ui.modal.off('click', 'button.btn-close');
     ui.modal.off('click', 'button.btn-edit');
     ui.modal.off('click', 'button.btn-delete');
-    ui.modal.on('click', 'button.btn-accept', options.onaccept || hideModal);
-    ui.modal.on('click', 'button.btn-close', options.onclose || hideModal);
-    ui.modal.on('click', 'button.btn-edit', options.onedit || (() => alert('NOT BOUND')));
-    ui.modal.on('click', 'button.btn-delete', options.ondelete || (() => alert('NOT BOUND')));
+    ui.modal.onchild('button.btn-accept', 'click', options.onaccept || hideModal);
+    ui.modal.onchild('button.btn-close', 'click',  options.onclose || hideModal);
+    ui.modal.onchild('button.btn-edit', 'click',  options.onedit || (() => alert('NOT BOUND')));
+    ui.modal.onchild('button.btn-delete', 'click',  options.ondelete || (() => alert('NOT BOUND')));
     ui.modal.modal();
 }
 
-function showPasswordStrength(field: JQuery) {
+function showPasswordStrength(field: DOM) {
     const strengthIndicator = field.next('div.password-strength');
     const status = strengthIndicator.find('> span');
     const bar = strengthIndicator.find('> div');
@@ -426,9 +424,9 @@ function showPasswordStrength(field: JQuery) {
 
 // Event handlers
 
-ui.container.on('click', '.btn-credential-show-detail', e => {
+ui.container.onchild('.btn-credential-show-detail', 'click', e => {
     e.preventDefault();
-    const id = $(e.currentTarget).parent().parent().attr('id');
+    const id = (e.currentTarget as HTMLElement).parentElement.parentElement.getAttribute('id');
     showDetail(id);
 });
 
@@ -440,12 +438,12 @@ ui.newButton.on('click', e => {
         showAccept: true,
         acceptText: 'Save',
         onaccept: (): void => {
-            $('#credential-form').submit();
+            (dom('#credential-form').get() as HTMLFormElement).submit();
         }
     });
-    ui.modal.find('#Description').focus();
-    showPasswordStrength(ui.modal.find('#Password'));
-    updatePasswordSpecificationOptionUI(ui.modal, defaultPasswordSpecification);
+    ui.modalContent.find('#Description').focus();
+    showPasswordStrength(ui.modalContent.find('#Password'));
+    updatePasswordSpecificationOptionUI(ui.modalContent, defaultPasswordSpecification);
 });
 
 ui.adminButton.on('click', e => {
@@ -456,13 +454,12 @@ ui.adminButton.on('click', e => {
 ui.clearSearchButton.on('click', async e => {
     e.preventDefault();
     updateCredentialListUI(ui.container, []);
-    ui.searchInput.val('').focus();
+    ui.searchInput.val('')
+    ui.searchInput.focus();
 });
 
 ui.searchInput.on('keyup', rateLimit(async e => {
-    ui.spinner.show();
-    const credentials = await repository.loadCredentialSummaryList();
-    ui.spinner.hide();
+    const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
     const results = search((e.currentTarget as HTMLInputElement).value, credentials);
     updateCredentialListUI(ui.container, results);
 }, 200));
@@ -470,36 +467,34 @@ ui.searchInput.on('keyup', rateLimit(async e => {
 ui.loginForm.on('submit', async e => {
     e.preventDefault();
 
-    ui.spinner.show();
+    await withLoadSpinner(async () => {
+        const username = ui.loginForm.find('#UN1209').val() as string;
+        const password = ui.loginForm.find('#PW9804').val() as string;
 
-    const username = ui.loginForm.find('#UN1209').val() as string;
-    const password = ui.loginForm.find('#PW9804').val() as string;
+        ui.loginErrorMessage.get().innerText = '';
 
-    ui.loginErrorMessage.text('');
+        const loginResult = await repository.login(username, password);
 
-    const loginResult = await repository.login(username, password);
-
-    if (loginResult.Success) {
-        ui.loginForm.hide();
-        ui.loginFormDialog.modal('hide');
-        ui.controls.show();
-        ui.searchInput.focus();
-        setSession();
-        ui.body.on('click keyup', setSession);
-    } else {
-        ui.loginErrorMessage.text('Login failed');
-    }
-
-    ui.spinner.hide();
+        if (loginResult.Success) {
+            ui.loginForm.get().classList.add('d-none');
+            ui.loginFormDialog.hide();
+            ui.controls.get().classList.remove('d-none');
+            ui.searchInput.focus();
+            setSession();
+            ui.body.on('click keyup', setSession);
+        } else {
+            ui.loginErrorMessage.get().innerText = 'Login failed';
+        }
+    });
 });
 
-ui.body.on('submit', '#credential-form', async e => {
+ui.body.onchild('#credential-form', 'submit', async e => {
     e.preventDefault();
 
-    const form = $(e.currentTarget);
+    const form = dom(e.currentTarget);
     const errorMsg: string[] = [];
 
-    $('.validation-message').remove();
+    dom('.validation-message').remove();
     form.find('div.has-error').removeClass('has-error');
 
     const credential = getCredentialFromUI(form);
@@ -509,61 +504,57 @@ ui.body.on('submit', '#credential-form', async e => {
     if (errors.length > 0) {
         errors.forEach(err => {
             errorMsg.push(err.errorMessage);
-            $(`${err.property}`).parent().parent().addClass('has-error');
+            dom(`${err.property}`).parent().parent().addClass('has-error');
         });
 
-        ui.modal.find('div.modal-body').prepend(templates.validationMessage({ errors: errorMsg.join('<br />') }));
+        ui.modalContent.find('div.modal-body').prepend(templates.validationMessage({ errors: errorMsg.join('<br />') }));
         return;
     }
 
-    ui.spinner.show();
+    const results = await withLoadSpinner(async () => {
+        if (!credential.CredentialID) {
+            await repository.createCredential(credential);
+        } else {
+            await repository.updateCredential(credential);
+        }
 
-    if (!credential.CredentialID) {
-        await repository.createCredential(credential);
-    } else {
-        await repository.updateCredential(credential);
-    }
+        const updatedCredentials = await repository.loadCredentialSummaryList();
 
-    const updatedCredentials = await repository.loadCredentialSummaryList();
+        return search(ui.searchInput.val() as string, updatedCredentials);
+    });
 
-    const results = search(ui.searchInput.val() as string, updatedCredentials);
-
-    ui.spinner.hide();
-
-    ui.modal.modal('hide');
+    ui.modal.hide();
 
     updateCredentialListUI(ui.container, results);
 });
 
 // Show password strength as it is typed
-ui.body.on('keyup', '#Password', rateLimit(e => {
-    showPasswordStrength($(e.target));
-}, 200));
+ui.body.onchild('#Password', 'keyup', rateLimit(e => showPasswordStrength(dom(e.target)), 200));
 
-ui.body.on('click', 'button.generate-password', e => {
+ui.body.onchild('button.generate-password', 'click', e => {
     e.preventDefault();
-    const passwordSpecification = getPasswordSpecificationFromUI(ui.modal, isChecked);
+    const passwordSpecification = getPasswordSpecificationFromUI(ui.modalContent, isChecked);
     const password = generatePassword(passwordSpecification);
-    $('#Password').val(password);
-    const opts = [$('#len').val() as number,
-    isChecked($('#ucase')) ? 1 : 0,
-    isChecked($('#lcase')) ? 1 : 0,
-    isChecked($('#nums')) ? 1 : 0,
-    isChecked($('#symb')) ? 1 : 0];
-    $('#PwdOptions').val(opts.join('|'));
-    showPasswordStrength($('#Password'));
+    dom('#Password').val(password);
+    const opts = [parseInt(dom('#len').val(), 10),
+    isChecked(dom('#ucase')) ? 1 : 0,
+    isChecked(dom('#lcase')) ? 1 : 0,
+    isChecked(dom('#nums')) ? 1 : 0,
+    isChecked(dom('#symb')) ? 1 : 0];
+    dom('#PwdOptions').val(opts.join('|'));
+    showPasswordStrength(dom('#Password'));
 });
 
 // Toggle password generation option UI visibility
-ui.body.on('click', 'a.generate-password-options-toggle', e => {
+ui.body.onchild('a.generate-password-options-toggle', 'click', e => {
     e.preventDefault();
-    $('div.generate-password-options').toggle();
+    dom('div.generate-password-options').toggle();
 });
 
-ui.body.on('click', 'a.copy-link', e => {
+ui.body.onchild('a.copy-link', 'click', e => {
     e.preventDefault();
-    const a = $(e.currentTarget);
-    $('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
+    const a = dom(e.currentTarget);
+    dom('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
     a.next('input.copy-content').select();
     try {
         if (document.execCommand('copy')) {
@@ -574,20 +565,20 @@ ui.body.on('click', 'a.copy-link', e => {
     }
 });
 
-ui.body.on('click', 'a.toggle-password-info', e => {
+ui.body.onchild('a.toggle-password-info', 'click', e => {
     e.preventDefault();
-    $(e.currentTarget).parents('.modal-body').find('.row-detail-password-info').toggle();
+    dom(e.currentTarget).parents('.modal-body').find('.row-detail-password-info').toggle();
 });
 
-ui.body.on('click', 'button.btn-credential-open', e => {
+ui.body.onchild('button.btn-credential-open', 'click', e => {
     e.preventDefault();
-    open($(e.currentTarget).data('url'));
+    open(dom(e.currentTarget).data('url'));
 });
 
-ui.body.on('click', 'button.btn-credential-copy', e => {
+ui.body.onchild('button.btn-credential-copy', 'click', e => {
     e.preventDefault();
-    const allButtons = $('button.btn-credential-copy');
-    const button = $(e.currentTarget);
+    const allButtons = dom('button.btn-credential-copy');
+    const button = dom(e.currentTarget);
     allButtons.removeClass('btn-success').addClass('btn-primary');
     allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
     button.next('input.copy-content').select();
@@ -620,9 +611,9 @@ ui.body.on('keydown', e => {
     }
 });
 
-ui.body.on('click', '#change-password-button', async e => {
-    const newPassword = $('#NewPassword').val() as string;
-    const newPasswordConfirm = $('#NewPasswordConfirm').val() as string;
+ui.body.onchild('#change-password-button', 'click', async e => {
+    const newPassword = dom('#NewPassword').val() as string;
+    const newPasswordConfirm = dom('#NewPasswordConfirm').val() as string;
 
     const confirmationMsg = 'When the password change is complete you will be logged out and will need to log back in.\n\n'
         + 'Are you SURE you want to change the master password?';
@@ -641,30 +632,23 @@ ui.body.on('click', '#change-password-button', async e => {
         return;
     }
 
-    ui.spinner.show();
-
-    await repository.updatePassword(newPassword);
-
-    ui.spinner.hide();
+    await withLoadSpinner(async () => await repository.updatePassword(newPassword));
 
     reloadApp();
 });
 
-ui.body.on('click', '#export-button', async e => {
-    e.preventDefault();
-    ui.spinner.show();
-    const exportedData = await repository.loadCredentials();
-    ui.spinner.hide();
+ui.body.onchild('#export-button', 'click', async e => {
+    const exportedData = await withLoadSpinner(async () => await repository.loadCredentials());
     openExportPopup(exportedData);
 });
 
-ui.body.on('click', '#import-button', async e => {
+ui.body.onchild('#import-button', 'click', async e => {
     e.preventDefault();
-    ui.spinner.show();
-    const rawData = $('#import-data').val() as string;
-    const parsedData = parseImportData(rawData);
-    await repository.import(parsedData);
-    ui.spinner.hide();
+    await withLoadSpinner(async () => {
+        const rawData = dom('#import-data').val() as string;
+        const parsedData = parseImportData(rawData);
+        await repository.import(parsedData);
+    });
     reloadApp();
 });
 
@@ -672,9 +656,9 @@ ui.body.on('click', '#import-button', async e => {
 if (_VAULT_GLOBALS.devMode) {
     ui.loginForm.find('#UN1209').val(Cookies.get('vault-dev-username'));
     ui.loginForm.find('#PW9804').val(Cookies.get('vault-dev-password'));
-    ui.loginForm.submit();
+    (ui.loginForm.get() as HTMLFormElement).submit();
 } else {
     ui.loginForm.find('#UN1209').focus();
 }
 
-ui.loginFormDialog.modal({ keyboard: false, backdrop: 'static' });
+ui.loginFormDialog.show();
