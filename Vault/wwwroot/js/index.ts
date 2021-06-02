@@ -491,7 +491,7 @@ ui.loginForm.on('submit', async e => {
 ui.body.onchild('#credential-form', 'submit', async e => {
     e.preventDefault();
 
-    const form = dom(e.currentTarget);
+    const form = dom((e.currentTarget as HTMLElement));
     const errorMsg: string[] = [];
 
     dom('.validation-message').remove();
@@ -553,7 +553,7 @@ ui.body.onchild('a.generate-password-options-toggle', 'click', e => {
 
 ui.body.onchild('a.copy-link', 'click', e => {
     e.preventDefault();
-    const a = dom(e.currentTarget);
+    const a = dom((e.currentTarget as HTMLElement));
     dom('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
     a.next('input.copy-content').select();
     try {
@@ -567,18 +567,18 @@ ui.body.onchild('a.copy-link', 'click', e => {
 
 ui.body.onchild('a.toggle-password-info', 'click', e => {
     e.preventDefault();
-    dom(e.currentTarget).parents('.modal-body').find('.row-detail-password-info').toggle();
+    dom((e.currentTarget as HTMLElement)).parents('.modal-body').find('.row-detail-password-info').toggle();
 });
 
 ui.body.onchild('button.btn-credential-open', 'click', e => {
     e.preventDefault();
-    open(dom(e.currentTarget).data('url'));
+    open(dom((e.currentTarget as HTMLElement)).data('url'));
 });
 
 ui.body.onchild('button.btn-credential-copy', 'click', e => {
     e.preventDefault();
     const allButtons = dom('button.btn-credential-copy');
-    const button = dom(e.currentTarget);
+    const button = dom((e.currentTarget as HTMLElement));
     allButtons.removeClass('btn-success').addClass('btn-primary');
     allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
     button.next('input.copy-content').select();
