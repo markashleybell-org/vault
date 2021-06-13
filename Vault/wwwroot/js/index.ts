@@ -1,5 +1,4 @@
-﻿import 'bootstrap/js/modal';
-import * as Handlebars from 'handlebars';
+﻿import * as Handlebars from 'handlebars';
 import { dom, DOM } from 'mab-dom';
 import { Modal } from 'bootstrap';
 import * as Cookies from 'js-cookie';
@@ -177,8 +176,8 @@ export function updatePasswordSpecificationOptionUI(container: DOM, specificatio
 export function getCredentialFromUI(container: DOM) {
     const obj: any = {};
     // Serialize the form inputs into an object
-    container.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each((i, el) => {
-        obj[(el as HTMLInputElement).name] = dom(el).val();
+    container.find('input:not(.submit, .chrome-autocomplete-fake), textarea').each(el => {
+        obj[(el.get() as HTMLInputElement).name] = el.val();
     });
     return (obj as ICredential);
 }
@@ -194,6 +193,18 @@ export function parseImportData(rawData: string) {
     });
 
     return newData;
+}
+
+// Functions 'missing' from mab-dom which were in jQuery
+
+function setWidth(el: DOM, val: string) {
+    el.get().style.width = val;
+}
+
+function toggle(el: DOM, display: string) {
+    const e = el.get();
+    const hidden = e.style.display === 'none';
+    e.style.display = !hidden ? display : 'none';
 }
 
 // Impure functions
@@ -373,29 +384,29 @@ function showModal(options: IVaultModalOptions) {
     }
 
     ui.modalContent.html(html);
-    ui.modal.off('click', 'button.btn-accept');
-    ui.modal.off('click', 'button.btn-close');
-    ui.modal.off('click', 'button.btn-edit');
-    ui.modal.off('click', 'button.btn-delete');
-    ui.modal.onchild('button.btn-accept', 'click', options.onaccept || hideModal);
-    ui.modal.onchild('button.btn-close', 'click',  options.onclose || hideModal);
-    ui.modal.onchild('button.btn-edit', 'click',  options.onedit || (() => alert('NOT BOUND')));
-    ui.modal.onchild('button.btn-delete', 'click',  options.ondelete || (() => alert('NOT BOUND')));
-    ui.modal.modal();
+    //ui.modal.off('click', 'button.btn-accept');
+    //ui.modal.off('click', 'button.btn-close');
+    //ui.modal.off('click', 'button.btn-edit');
+    //ui.modal.off('click', 'button.btn-delete');
+    //ui.modal.onchild('button.btn-accept', 'click', options.onaccept || hideModal);
+    //ui.modal.onchild('button.btn-close', 'click',  options.onclose || hideModal);
+    //ui.modal.onchild('button.btn-edit', 'click',  options.onedit || (() => alert('NOT BOUND')));
+    //ui.modal.onchild('button.btn-delete', 'click',  options.ondelete || (() => alert('NOT BOUND')));
+    ui.modal.show();
 }
 
 function showPasswordStrength(field: DOM) {
-    const strengthIndicator = field.next('div.password-strength');
+    const strengthIndicator = field.parent().find('div.password-strength');
     const status = strengthIndicator.find('> span');
     const bar = strengthIndicator.find('> div');
     const password = field.val() as string;
     const strength = getPasswordScore(password);
-    bar.removeClass();
+    bar.get().classList.remove('extremely-weak', 'very-weak', 'weak', 'average', 'strong', 'very-strong', 'extremely-strong');
     if (strength === 0) {
         status.html('No Password');
-        bar.css('width', 0);
+        setWidth(bar, '0');
     } else if (strength <= 100) {
-        bar.css('width', strength + '%');
+        setWidth(bar, strength + '%');
         if (strength <= 10) {
             bar.addClass('extremely-weak');
             status.html('Extremely Weak (' + strength + ')');
@@ -418,7 +429,7 @@ function showPasswordStrength(field: DOM) {
     } else {
         bar.addClass('extremely-strong');
         status.html('Extremely Strong (' + strength + ')');
-        bar.css('width', '100%');
+        setWidth(bar, '100%');
     }
 }
 
@@ -494,7 +505,7 @@ ui.body.onchild('#credential-form', 'submit', async e => {
     const form = dom((e.currentTarget as HTMLElement));
     const errorMsg: string[] = [];
 
-    dom('.validation-message').remove();
+    dom('.validation-message').get().remove();
     form.find('div.has-error').removeClass('has-error');
 
     const credential = getCredentialFromUI(form);
@@ -507,7 +518,9 @@ ui.body.onchild('#credential-form', 'submit', async e => {
             dom(`${err.property}`).parent().parent().addClass('has-error');
         });
 
-        ui.modalContent.find('div.modal-body').prepend(templates.validationMessage({ errors: errorMsg.join('<br />') }));
+        const message = templates.validationMessage({ errors: errorMsg.join('<br />') });
+
+        ui.modalContent.find('div.modal-body').get().prepend(message);
         return;
     }
 
@@ -548,14 +561,14 @@ ui.body.onchild('button.generate-password', 'click', e => {
 // Toggle password generation option UI visibility
 ui.body.onchild('a.generate-password-options-toggle', 'click', e => {
     e.preventDefault();
-    dom('div.generate-password-options').toggle();
+    toggle(dom('div.generate-password-options'), 'block');
 });
 
 ui.body.onchild('a.copy-link', 'click', e => {
     e.preventDefault();
     const a = dom((e.currentTarget as HTMLElement));
     dom('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
-    a.next('input.copy-content').select();
+    (a.parent().find('input.copy-content').get() as HTMLInputElement).select();
     try {
         if (document.execCommand('copy')) {
             a.find('span').addClass('copied').removeClass('fa-clone').addClass('fa-check-square');
@@ -567,7 +580,7 @@ ui.body.onchild('a.copy-link', 'click', e => {
 
 ui.body.onchild('a.toggle-password-info', 'click', e => {
     e.preventDefault();
-    dom((e.currentTarget as HTMLElement)).parents('.modal-body').find('.row-detail-password-info').toggle();
+    toggle(dom('#modal').find('.row-detail-password-info'), 'block');
 });
 
 ui.body.onchild('button.btn-credential-open', 'click', e => {
@@ -581,7 +594,7 @@ ui.body.onchild('button.btn-credential-copy', 'click', e => {
     const button = dom((e.currentTarget as HTMLElement));
     allButtons.removeClass('btn-success').addClass('btn-primary');
     allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
-    button.next('input.copy-content').select();
+    (button.parent().find('input.copy-content').get() as HTMLInputElement).select();
     try {
         if (document.execCommand('copy')) {
             button.addClass('btn-success').removeClass('btn-primary');
@@ -598,16 +611,16 @@ ui.body.on('keydown', e => {
     if (eventTarget.nodeName === 'BODY') {
         e.preventDefault();
         // Cancel the first mouseup event which will be fired after focus
-        ui.searchInput.one('mouseup', me => {
-            me.preventDefault();
-        });
+        //ui.searchInput.one('mouseup', me => {
+        //    me.preventDefault();
+        //});
         ui.searchInput.focus();
-        const char = String.fromCharCode(e.keyCode);
-        if (/[a-zA-Z0-9]/.test(char)) {
-            ui.searchInput.val(e.shiftKey ? char : char.toLowerCase());
-        } else {
-            ui.searchInput.select();
-        }
+        //const char = String.fromCharCode(e.keyCode);
+        //if (/[a-zA-Z0-9]/.test(char)) {
+        //    ui.searchInput.val(e.shiftKey ? char : char.toLowerCase());
+        //} else {
+        //    (ui.searchInput.get() as HTMLInputElement).select();
+        //}
     }
 });
 
@@ -656,7 +669,7 @@ ui.body.onchild('#import-button', 'click', async e => {
 if (_VAULT_GLOBALS.devMode) {
     ui.loginForm.find('#UN1209').val(Cookies.get('vault-dev-username'));
     ui.loginForm.find('#PW9804').val(Cookies.get('vault-dev-password'));
-    (ui.loginForm.get() as HTMLFormElement).submit();
+    // (ui.loginForm.get() as HTMLFormElement).submit();
 } else {
     ui.loginForm.find('#UN1209').focus();
 }
