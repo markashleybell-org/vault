@@ -7,7 +7,6 @@
 }
 
 #controls {
-    display: none;
     padding-top: 15px;
 }
 
@@ -47,14 +46,13 @@
 }
 
 #spinner {
-    padding: 3px 5px 5px 5px; 
+    padding: 3px 5px 5px 5px;
     background-color: #000;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 9999;
     border-bottom-right-radius: 3px;
-    display: none;
 }
 
 .full {
@@ -95,7 +93,7 @@
 .extremely-strong { background-color: #5cbb37; }
 
 .modal-valign-container {
-    display:table;
+    display: table;
     height: 100%;
     width: 100%;
     pointer-events:none; /* This makes sure that we can still click outside of the modal to close it */
@@ -121,16 +119,9 @@
     opacity: 0.8;
 }
 
-.chrome-autocomplete-fake {
-    display: none;
-}
-
 @media (min-width: 500px) {
     .full {
         display: inline;
-    }
-    .truncated {
-        display: none;
     }
 }
 
@@ -187,10 +178,6 @@
     text-decoration: none !important;
 }
 
-.generate-password-options {
-    display: none;
-}
-
 .btn-credential-show-detail {
     padding-top: 8px;
     display: table-cell;
@@ -235,10 +222,6 @@
 
 .row-detail-header {
     font-weight: bold;
-}
-
-.row-detail-password-info {
-    display: none;
 }
 
 .password-character-table {

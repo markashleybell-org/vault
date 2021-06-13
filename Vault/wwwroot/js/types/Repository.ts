@@ -133,39 +133,39 @@ export class Repository implements IRepository {
         return this.post<void>('Credentials/Delete', data);
     }
 
-    private get<T>(url: string, data: any) {
-        return new Promise<T>((resolve, reject) => {
-            const dataWithSecurityKey = Object.assign({}, data, this.securityKeyParameter);
+    private async get<T>(url: string, data: any) {
+        const dataWithSecurityKey = Object.assign({}, data, this.securityKeyParameter);
 
-            const options: any = {
-                url: url,
-                data: dataWithSecurityKey,
-                type: 'GET',
-                success: (result: any) => resolve(result),
-                error: (xhr: JQueryXHR, status: string, error: string) => reject(error)
-            };
+        const queryString = Object.keys(dataWithSecurityKey)
+            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(dataWithSecurityKey[k]))
+            .join('&');
 
-            $.ajax(options);
-        });
+        const urlAndQueryString = data
+            ? `${url}?${queryString}`
+            : url;
+
+        const response = await fetch(urlAndQueryString);
+        const json = await response.json() as T;
+
+        return response.ok ? json : Promise.reject(json);
     }
 
-    private post<T>(url: string, data: any) {
-        return new Promise<T>((resolve, reject) => {
-            const urlWithSecurityKey = this.securityKey
-                ? `${url}?${this.securityKey.parameterName}=${this.securityKey.key}`
-                : url;
+    private async post<T>(url: string, data: any) {
+        const urlWithSecurityKey = this.securityKey
+            ? `${url}?${this.securityKey.parameterName}=${this.securityKey.key}`
+            : url;
 
-            const options: any = {
-                url: urlWithSecurityKey,
-                data: JSON.stringify(data),
-                dataType: 'json',
-                contentType: 'application/json; charset=utf-8',
-                type: 'POST',
-                success: (result: any) => resolve(result),
-                error: (xhr: JQueryXHR, status: string, error: string) => reject(error)
-            };
+        const options: any = {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
 
-            $.ajax(options);
-        });
+        const response = await fetch(urlWithSecurityKey, options);
+        const json = await response.json() as T;
+
+        return response.ok ? json : Promise.reject(json);
     }
 }

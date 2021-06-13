@@ -669,7 +669,7 @@ ui.body.onchild('#import-button', 'click', async e => {
 if (_VAULT_GLOBALS.devMode) {
     ui.loginForm.find('#UN1209').val(Cookies.get('vault-dev-username'));
     ui.loginForm.find('#PW9804').val(Cookies.get('vault-dev-password'));
-    // (ui.loginForm.get() as HTMLFormElement).submit();
+    //(ui.loginForm.get() as HTMLFormElement).submit();
 } else {
     ui.loginForm.find('#UN1209').focus();
 }

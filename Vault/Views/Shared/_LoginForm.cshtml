@@ -4,15 +4,15 @@
     <div class="modal-valign-container">
         <div class="modal-dialog modal-lg modal-valign">
             <div class="modal-content">
-                @using (Html.BeginForm("Login", "Main", FormMethod.Post, new { id = "login-form", @class = "form-horizontal" })) {
+                @using (Html.BeginForm("Login", "Home", FormMethod.Post, new { id = "login-form", @class = "form-horizontal" })) {
                 <div class="modal-header">
                     <h4 class="modal-title">Log In</h4>
                 </div>
                 <div class="modal-body">
                     <p>Enter your username and master password:</p>
                     <!-- These fake fields are a workaround for Chrome not respecting the autocomplete attribute and autofilling fields with the wrong values... -->
-                    <input class="chrome-autocomplete-fake" type="text" name="chromeusername"/>
-                    <input class="chrome-autocomplete-fake" type="password" name="chromepassword"/>
+                    <input class="chrome-autocomplete-fake d-none" type="text" name="chromeusername"/>
+                    <input class="chrome-autocomplete-fake d-none" type="password" name="chromepassword"/>
                     <div class="form-group">
                         @Html.LabelFor(model => model.UN1209, new { @class = "col-sm-8 control-label" })
                         <div class="col-sm-16">
