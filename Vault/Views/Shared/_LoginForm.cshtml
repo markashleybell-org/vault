@@ -1,28 +1,27 @@
 ﻿@model Vault.Models.LoginViewModel
 
 <div id="login-form-dialog" class="modal">
-    <div class="modal-valign-container">
-        <div class="modal-dialog modal-lg modal-valign">
-            <div class="modal-content">
-                @using (Html.BeginForm("Login", "Home", FormMethod.Post, new { id = "login-form", @class = "form-horizontal" })) {
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="login-form" asp-action="Login" asp-controller="Home" method="post">
                 <div class="modal-header">
                     <h4 class="modal-title">Log In</h4>
                 </div>
                 <div class="modal-body">
                     <p>Enter your username and master password:</p>
                     <!-- These fake fields are a workaround for Chrome not respecting the autocomplete attribute and autofilling fields with the wrong values... -->
-                    <input class="chrome-autocomplete-fake d-none" type="text" name="chromeusername"/>
-                    <input class="chrome-autocomplete-fake d-none" type="password" name="chromepassword"/>
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.UN1209, new { @class = "col-sm-8 control-label" })
-                        <div class="col-sm-16">
-                            @Html.PasswordFor(model => model.UN1209, new { @class = "form-control", autocomplete = "un1209" })
+                    <input class="chrome-autocomplete-fake d-none" type="text" name="chromeusername" />
+                    <input class="chrome-autocomplete-fake d-none" type="password" name="chromepassword" />
+                    <div class="row mb-3">
+                        <label asp-for="UN1209" class="col-sm-3 col-form-label text-end"></label>
+                        <div class="col-sm-9">
+                            <input asp-for="UN1209" type="password" class="form-control" autocomplete="un1209" />
                         </div>
                     </div>
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.PW9804, new { @class = "col-sm-8 control-label" })
-                        <div class="col-sm-16">
-                            @Html.PasswordFor(model => model.PW9804, new { @class = "form-control", autocomplete = "pw9804" })
+                    <div class="row">
+                        <label asp-for="PW9804" class="col-sm-3 col-form-label text-end"></label>
+                        <div class="col-sm-9">
+                            <input asp-for="PW9804" type="password" class="form-control" autocomplete="un1209" />
                         </div>
                     </div>
                 </div>
@@ -30,8 +29,7 @@
                     <span class="validation-message"></span>
                     <button type="submit" class="btn btn-primary">Log In</button>
                 </div>
-                }
-            </div>
+            </form>
         </div>
     </div>
 </div>

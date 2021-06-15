@@ -257,11 +257,6 @@ function confirmDelete(id: string) {
     });
 }
 
-function hideModal(e: Event) {
-    e.preventDefault();
-    ui.modal.hide();
-}
-
 async function editCredential(credentialId: string) {
     const credential = await withLoadSpinner(async () => await repository.loadCredential(credentialId));
 
@@ -397,8 +392,8 @@ function showModal(options: IVaultModalOptions) {
 
 function showPasswordStrength(field: DOM) {
     const strengthIndicator = field.parent().find('div.password-strength');
-    const status = strengthIndicator.find('> span');
-    const bar = strengthIndicator.find('> div');
+    const status = strengthIndicator.find(':scope > span');
+    const bar = strengthIndicator.find(':scope > div');
     const password = field.val() as string;
     const strength = getPasswordScore(password);
     bar.get().classList.remove('extremely-weak', 'very-weak', 'weak', 'average', 'strong', 'very-strong', 'extremely-strong');
@@ -471,7 +466,7 @@ ui.clearSearchButton.on('click', async e => {
 
 ui.searchInput.on('keyup', rateLimit(async e => {
     const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
-    const results = search((e.currentTarget as HTMLInputElement).value, credentials);
+    const results = search(ui.searchInput.val(), credentials);
     updateCredentialListUI(ui.container, results);
 }, 200));
 

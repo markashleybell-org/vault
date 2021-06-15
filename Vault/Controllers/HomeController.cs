@@ -84,5 +84,8 @@ namespace Vault.Controllers
 
         public IActionResult SetDevCookie() =>
             View();
+
+        public IActionResult AutoFillTest() =>
+            View();
     }
 }

@@ -4,10 +4,10 @@
 
 <script id="tmpl-modalheader" type="text/html">
     <div class="modal-header">
-        {{#if showClose}}
-        <button type="button" class="close btn-close"><span aria-hidden="true">&times;</span><span class="sr-only">{{closeText}}</span></button>
-        {{/if}}
         <h4 class="modal-title">{{title}}</h4>
+        {{#if showClose}}
+        <button type="button" class="close btn-close" data-bs-dismiss="modal" aria-label="{{closeText}}"></button>
+        {{/if}}
     </div>
 </script>
 
@@ -29,7 +29,7 @@
         <button type="submit" class="btn btn-primary btn-accept"><span class="fa fa-check"></span> {{acceptText}}</button>
         {{/if}}
         {{#if showClose}}
-        <button type="button" class="btn btn-default btn-close"><span class="fa fa-times"></span> {{closeText}}</button>
+        <button type="button" class="btn btn-default" data-bs-dismiss="modal"><span class="fa fa-times"></span> {{closeText}}</button>
         {{/if}}
     </div>
 </script>
