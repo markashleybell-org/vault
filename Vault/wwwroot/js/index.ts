@@ -432,7 +432,7 @@ function showPasswordStrength(field: DOM) {
 
 ui.container.onchild('.btn-credential-show-detail', 'click', e => {
     e.preventDefault();
-    const id = (e.currentTarget as HTMLElement).parentElement.parentElement.getAttribute('id');
+    const id = (e.target as HTMLElement).getAttribute('data-id');
     showDetail(id);
 });
 
@@ -664,7 +664,8 @@ ui.body.onchild('#import-button', 'click', async e => {
 if (_VAULT_GLOBALS.devMode) {
     ui.loginForm.find('#UN1209').val(Cookies.get('vault-dev-username'));
     ui.loginForm.find('#PW9804').val(Cookies.get('vault-dev-password'));
-    //(ui.loginForm.get() as HTMLFormElement).submit();
+    const form = ui.loginForm.get() as HTMLFormElement;
+    form.requestSubmit();
 } else {
     ui.loginForm.find('#UN1209').focus();
 }
