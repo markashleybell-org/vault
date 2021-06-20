@@ -432,7 +432,7 @@ function showPasswordStrength(field: DOM) {
 
 ui.container.onchild('.btn-credential-show-detail', 'click', e => {
     e.preventDefault();
-    const id = (e.target as HTMLElement).getAttribute('data-id');
+    const id = e.targetElement.getAttribute('data-id');
     showDetail(id);
 });
 

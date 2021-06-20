@@ -1,8 +1,4 @@
-﻿@{
-    var homeUrl = Url.Action("Index", "Main", null).TrimEnd('/');
-}
-
-<script id="tmpl-modalheader" type="text/html">
+﻿<script id="tmpl-modalheader" type="text/html">
     <div class="modal-header">
         <h4 class="modal-title">{{title}}</h4>
         {{#if showClose}}
@@ -168,29 +164,29 @@
 
 <script id="tmpl-credentialtablerow" type="text/html">
     <div id="{{credentialid}}" class="credential d-flex justify-content-end mb-1">
-        <button class="btn btn-credential-show-detail" data-id="{{credentialid}}">
+        <div class="btn btn-credential-show-detail" data-id="{{credentialid}}">
             <span class="d-none d-md-inline">{{description}}</span><span class="d-md-none">{{truncate description 31}}</span>
             <span>{{username}}</span>
             {{#if weak}}
             <span>Weak Password</span>
             {{/if}}
-        </button>
+        </div>
         {{#if url}}
         <a class="btn btn-primary btn-credential-open ml-1" href="{{url}}" target="_blank">
             <span class="bi bi-box-arrow-up-right"></span> Web
         </a>
         {{else}}
-        <button class="btn btn-primary btn-credential-open ms-1" disabled="disabled">
+        <a class="btn btn-primary btn-credential-open ms-1" disabled="disabled">
             <span class="bi bi-box-arrow-up-right"></span> Web
-        </button>
+        </a>
         {{/if}}
-        <button class="btn btn-primary btn-credential-copy btn-credential-copy-username ms-1">
+        <a class="btn btn-primary btn-credential-copy btn-credential-copy-username ms-1">
             <span class="bi bi-clipboard"></span> User
-        </button>
+        </a>
         <input type="text" class="copy-content d-none" name="copy-content" value="{{username}}" />
-        <button class="btn btn-primary btn-credential-copy btn-credential-copy-password ms-1">
+        <a class="btn btn-primary btn-credential-copy btn-credential-copy-password ms-1">
             <span class="bi bi-clipboard"></span> Pwd
-        </button>
+        </a>
         <input type="text" class="copy-content d-none" name="copy-content" value="{{password}}" />
     </div>
 </script>

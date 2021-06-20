@@ -2,13 +2,13 @@
 
 @{
     ViewBag.Title = "Set Dev Cookie";
-    ViewBag.BodyClass = "modal-open";
+    ViewBag.BodyClass = "base modal-open";
 }
 
 @section main {
 
-    <div id="set-dev-cookie-form-dialog" class="modal in" style="display: block;">
-        <div class="modal-dialog modal-lg">
+    <div id="set-dev-cookie-form-dialog" class="modal show" style="display: block;">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <form id="generate-form" action="" method="post" class="form-horizontal">
                     <div class="modal-header">
@@ -16,15 +16,15 @@
                     </div>
                     <div class="modal-body">
                         <p>Enter a username and password to put into the dev mode cookie:</p>
-                        <div class="form-group">
-                            <label for="Username" class="col-sm-8 control-label">Username</label>
-                            <div class="col-sm-16">
+                        <div class="row mb-3">
+                            <label for="Username" class="col-sm-3 col-form-label text-end">Username</label>
+                            <div class="col-sm-9">
                                 <input type="text" size="40" id="Username" name="Username" value="" class="form-control" />
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="Password" class="col-sm-8 control-label">Password</label>
-                            <div class="col-sm-16">
+                        <div class="row mb-3">
+                            <label for="Password" class="col-sm-3 col-form-label text-end">Password</label>
+                            <div class="col-sm-9">
                                 <input type="text" size="40" id="Password" name="Password" value="" class="form-control" />
                             </div>
                         </div>
@@ -44,6 +44,6 @@
     @*<script src="~/js/dist/setdevcookie.js" asp-append-version="true" integrity="sha512-ww04LyyL4yhU0xXhr2HHnk+o0M+9COQ3/7GXcAvRvg+8AOBDiyOcOZAfnnR4a4SYdFpj0ckNJUKSgKQU0sebew=="></script>*@
     <script src="~/js/dist/setdevcookie.js" asp-append-version="true"></script>
 
-    <div class="modal-backdrop in"></div>
+    <div class="modal-backdrop show"></div>
 
 }
