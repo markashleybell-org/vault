@@ -1,14 +1,18 @@
 ﻿<div id="spinner" class="d-none">
-    <img src="~/img/ajax-loader.gif" />
+    <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
 </div>
 
 <div class="row d-none" id="controls">
     <div class="col-sm-8">
         <label class="visually-hidden" for="search">Search</label>
-        <input type="text" id="search" name="search" class="form-control" placeholder="Search..." autocomplete="off" />
-        <button id="clear-search" class="btn btn-link">
-            <span class="bi bi-x-lg"></span>
-        </button>
+        <div class="search-input">
+            <input type="text" id="search" name="search" class="form-control" placeholder="Search..." autocomplete="off" />
+            <button id="clear-search" class="btn btn-link">
+                <span class="bi bi-x-lg"></span>
+            </button>
+        </div>
     </div>
     <div class="col-sm-2">
         <label class="visually-hidden" for="new">New Item</label>

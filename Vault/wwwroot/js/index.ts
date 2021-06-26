@@ -77,7 +77,6 @@ interface IVaultModalOptions {
     onaccept?: (e: Event) => void;
     showClose?: boolean;
     closeText?: string;
-    onclose?: (e: Event) => void;
     showEdit?: boolean;
     editText?: string;
     onedit?: (e: Event) => void;
@@ -353,6 +352,7 @@ function showModal(options: IVaultModalOptions) {
     const showClose: boolean = options.showClose || true;
     const showEdit: boolean = options.showEdit || false;
     const showDelete: boolean = options.showDelete || false;
+
     let html: string = templates.modalHeader({
         title: options.title,
         closeText: options.closeText || 'Close',
@@ -379,12 +379,10 @@ function showModal(options: IVaultModalOptions) {
     }
 
     ui.modalContent.html(html);
-    ui.modalContent.offchild('button.btn-accept','click');
-    ui.modalContent.offchild('button.btn-close','click');
-    ui.modalContent.offchild('button.btn-edit','click');
-    ui.modalContent.offchild('button.btn-delete','click');
+    ui.modalContent.offchild('button.btn-accept', 'click');
+    ui.modalContent.offchild('button.btn-edit', 'click');
+    ui.modalContent.offchild('button.btn-delete', 'click');
     ui.modalContent.onchild('button.btn-accept', 'click', options.onaccept || ui.modal.hide);
-    ui.modalContent.onchild('button.btn-close', 'click', options.onclose || ui.modal.hide);
     ui.modalContent.onchild('button.btn-edit', 'click',  options.onedit || (() => alert('NOT BOUND')));
     ui.modalContent.onchild('button.btn-delete', 'click',  options.ondelete || (() => alert('NOT BOUND')));
     ui.modal.show();

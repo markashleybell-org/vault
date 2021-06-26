@@ -12,3 +12,23 @@
 .btn-credential-open, .btn-credential-copy {
     width: 100px;
 }
+
+.search-input {
+    position: relative;
+}
+
+#clear-search {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#spinner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 9999;
+    background-color: #000;
+    border-bottom-left-radius: 3px;
+    padding: 3px 3px 1px 5px;
+}
