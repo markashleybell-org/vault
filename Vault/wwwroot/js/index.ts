@@ -379,14 +379,14 @@ function showModal(options: IVaultModalOptions) {
     }
 
     ui.modalContent.html(html);
-    //ui.modal.off('click', 'button.btn-accept');
-    //ui.modal.off('click', 'button.btn-close');
-    //ui.modal.off('click', 'button.btn-edit');
-    //ui.modal.off('click', 'button.btn-delete');
-    //ui.modal.onchild('button.btn-accept', 'click', options.onaccept || hideModal);
-    //ui.modal.onchild('button.btn-close', 'click',  options.onclose || hideModal);
-    //ui.modal.onchild('button.btn-edit', 'click',  options.onedit || (() => alert('NOT BOUND')));
-    //ui.modal.onchild('button.btn-delete', 'click',  options.ondelete || (() => alert('NOT BOUND')));
+    ui.modalContent.offchild('button.btn-accept','click');
+    ui.modalContent.offchild('button.btn-close','click');
+    ui.modalContent.offchild('button.btn-edit','click');
+    ui.modalContent.offchild('button.btn-delete','click');
+    ui.modalContent.onchild('button.btn-accept', 'click', options.onaccept || ui.modal.hide);
+    ui.modalContent.onchild('button.btn-close', 'click', options.onclose || ui.modal.hide);
+    ui.modalContent.onchild('button.btn-edit', 'click',  options.onedit || (() => alert('NOT BOUND')));
+    ui.modalContent.onchild('button.btn-delete', 'click',  options.ondelete || (() => alert('NOT BOUND')));
     ui.modal.show();
 }
 
