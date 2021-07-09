@@ -1,16 +1,40 @@
-﻿.credential span {
+﻿.credential {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.credential span {
     display: block;
 }
 
 .btn-credential-show-detail {
-    flex-grow: 1;
-    text-align: left;
     border: solid 1px #e0e0e0;
     border-radius: 3px;
+    text-align: left;
+    width: 100%;
 }
 
 .btn-credential-open, .btn-credential-copy {
-    width: 100px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+}
+
+@media (min-width: 500px) {
+    .credential {
+        flex-wrap: nowrap;
+    }
+
+    .btn-credential-show-detail {
+        flex-grow: 1;
+        justify-content: end;
+    }
+
+    .btn-credential-open, .btn-credential-copy {
+        flex-grow: 0;
+        flex-shrink: 0;
+        width: 100px;
+    }
 }
 
 .search-input {
@@ -31,4 +55,28 @@
     background-color: #000;
     border-bottom-left-radius: 3px;
     padding: 3px 3px 1px 5px;
+}
+
+.copy-link, .copy-link:hover, .copy-link:visited, .copy-link:active {
+    text-decoration: none;
+}
+
+.copied, .copy-link span.copied {
+    color: #5cbb37;
+}
+
+.copy-content {
+    position: absolute;
+    top: 0;
+    left: -10000px;
+}
+
+.full {
+    display: none;
+}
+
+@media (min-width: 500px) {
+    .full {
+        display: inline;
+    }
 }

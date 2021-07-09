@@ -16,16 +16,16 @@
 <script id="tmpl-modalfooter" type="text/html">
     <div class="modal-footer">
         {{#if showEdit}}
-        <button type="button" class="btn btn-primary btn-edit" data-credentialid="{{credentialId}}"><span class="fa fa-pencil"></span> {{editText}}</button>
+        <button type="button" class="btn btn-primary btn-edit" data-credentialid="{{credentialId}}"><span class="bi bi-pencil-square"></span> {{editText}}</button>
         {{/if}}
         {{#if showDelete}}
-        <button type="button" class="btn btn-danger btn-delete" data-credentialid="{{credentialId}}"><span class="fa fa-trash-o"></span> {{deleteText}}</button>
+        <button type="button" class="btn btn-danger btn-delete" data-credentialid="{{credentialId}}"><span class="bi bi-trash"></span> {{deleteText}}</button>
         {{/if}}
         {{#if showAccept}}
-        <button type="submit" class="btn btn-primary btn-accept"><span class="fa fa-check"></span> {{acceptText}}</button>
+        <button type="submit" class="btn btn-primary btn-accept"><span class="bi bi-check"></span> {{acceptText}}</button>
         {{/if}}
         {{#if showClose}}
-        <button type="button" class="btn btn-default" data-bs-dismiss="modal"><span class="fa fa-times"></span> {{closeText}}</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><span class="bi bi-x"></span> {{closeText}}</button>
         {{/if}}
     </div>
 </script>
@@ -40,53 +40,53 @@
 </script>
 
 <script id="tmpl-copylink" type="text/html">
-    <a class="copy-link" href="#">Copy <span class="fa fa-fw fa-clone"></span></a>
+    <a class="copy-link" href="#">Copy <span class="bi bi-clipboard"></span></a>
     <input type="text" class="copy-content" value="{{Content}}" />
 </script>
 
 <script id="tmpl-detail" type="text/html">
     {{#if Url}}
     <div class="row row-detail">
-        <div class="col-xs-24 col-sm-5 row-detail-header">Url</div>
-        <div class="col-xs-6 col-sm-4">{{> copylink Content=Url }}</div>
-        <div class="col-xs-18 col-sm-15">{{{UrlHtml}}}</div>
+        <div class="col-xs-12 col-sm-3 row-detail-header">Url</div>
+        <div class="col-xs-3 col-sm-2">{{> copylink Content=Url }}</div>
+        <div class="col-xs-9 col-sm-7">{{{UrlHtml}}}</div>
     </div>
     {{/if}}
     {{#if Username}}
     <div class="row row-detail">
-        <div class="col-xs-24 col-sm-5 row-detail-header">Username</div>
-        <div class="col-xs-6 col-sm-4">{{> copylink Content=Username }}</div>
-        <div class="col-xs-18 col-sm-15">{{Username}}</div>
+        <div class="col-xs-12 col-sm-3 row-detail-header">Username</div>
+        <div class="col-xs-3 col-sm-2">{{> copylink Content=Username }}</div>
+        <div class="col-xs-9 col-sm-7">{{Username}}</div>
     </div>
     {{/if}}
     {{#if Password}}
     <div class="row row-detail">
-        <div class="col-xs-24 col-sm-5 row-detail-header">Password <a href="#" class="fa fa-info-circle toggle-password-info"></a></div>
-        <div class="col-xs-6 col-sm-4">{{> copylink Content=Password }}</div>
-        <div class="col-xs-18 col-sm-15">{{Password}}</div>
+        <div class="col-xs-12 col-sm-3 row-detail-header">Password <a href="#" class="fa fa-info-circle toggle-password-info"></a></div>
+        <div class="col-xs-3 col-sm-2">{{> copylink Content=Password }}</div>
+        <div class="col-xs-9 col-sm-7">{{Password}}</div>
     </div>
     <div class="row row-detail row-detail-password-info d-none">
-        <div class="col-xs-24 col-sm-15 col-sm-offset-9">{{{PasswordCharacterTable}}}</div>
+        <div class="col-xs-12 col-sm-7 col-sm-offset-9">{{{PasswordCharacterTable}}}</div>
     </div>
     {{/if}}
     {{#if UserDefined1}}
     <div class="row row-detail">
-        <div class="col-xs-24 col-sm-5 row-detail-header">{{UserDefined1Label}}</div>
-        <div class="col-xs-6 col-sm-4">{{> copylink Content=UserDefined1 }}</div>
-        <div class="col-xs-18 col-sm-15">{{UserDefined1}}</div>
+        <div class="col-xs-12 col-sm-3 row-detail-header">{{UserDefined1Label}}</div>
+        <div class="col-xs-3 col-sm-2">{{> copylink Content=UserDefined1 }}</div>
+        <div class="col-xs-9 col-sm-7">{{UserDefined1}}</div>
     </div>
     {{/if}}
     {{#if UserDefined2}}
     <div class="row row-detail">
-        <div class="col-xs-24 col-sm-5 row-detail-header">{{UserDefined2Label}}</div>
-        <div class="col-xs-6 col-sm-4">{{> copylink Content=UserDefined2 }}</div>
-        <div class="col-xs-18 col-sm-15">{{UserDefined2}}</div>
+        <div class="col-xs-12 col-sm-3 row-detail-header">{{UserDefined2Label}}</div>
+        <div class="col-xs-3 col-sm-2">{{> copylink Content=UserDefined2 }}</div>
+        <div class="col-xs-9 col-sm-7">{{UserDefined2}}</div>
     </div>
     {{/if}}
     {{#if Notes}}
     <div class="row row-detail">
-        <div class="col-xs-24 col-sm-9 row-detail-header">Notes</div>
-        <div class="col-xs-24 col-sm-15">{{breaklines Notes}}</div>
+        <div class="col-xs-12 col-sm-5 row-detail-header">Notes</div>
+        <div class="col-xs-12 col-sm-7">{{breaklines Notes}}</div>
     </div>
     {{/if}}
 </script>
@@ -163,7 +163,7 @@
 </script>
 
 <script id="tmpl-credentialtablerow" type="text/html">
-    <div id="{{credentialid}}" class="credential d-flex justify-content-end mb-1">
+    <div id="{{credentialid}}" class="credential mb-1">
         <div class="btn btn-credential-show-detail" data-id="{{credentialid}}">
             <span class="d-none d-md-inline">{{description}}</span><span class="d-md-none">{{truncate description 31}}</span>
             <span>{{username}}</span>
