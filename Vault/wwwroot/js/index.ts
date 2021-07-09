@@ -2,6 +2,7 @@
 import { dom, DOM } from 'mab-dom';
 import { Modal } from 'bootstrap';
 import * as Cookies from 'js-cookie';
+import Clipboard from 'clipboard';
 import {
     generatePassword,
     getPasswordScore,
@@ -495,7 +496,7 @@ ui.loginForm.on('submit', async e => {
 ui.body.onchild('#credential-form', 'submit', async e => {
     e.preventDefault();
 
-    const form = dom((e.currentTarget as HTMLElement));
+    const form = dom((e.targetElement as HTMLElement));
     const errorMsg: string[] = [];
 
     dom('.validation-message').get().remove();
@@ -557,18 +558,23 @@ ui.body.onchild('a.generate-password-options-toggle', 'click', e => {
     toggle(dom('div.generate-password-options'), 'block');
 });
 
-ui.body.onchild('a.copy-link', 'click', e => {
+ui.body.onchild('.copy-link', 'click', e => {
     e.preventDefault();
-    const a = dom((e.currentTarget as HTMLElement));
-    dom('a.copy-link').find('span').removeClass('copied').addClass('fa-clone').removeClass('fa-check-square');
-    (a.parent().find('input.copy-content').get() as HTMLInputElement).select();
-    try {
-        if (document.execCommand('copy')) {
-            a.find('span').addClass('copied').removeClass('fa-clone').addClass('fa-check-square');
-        }
-    } catch (ex) {
-        alert('Copy operation is not supported by the current browser: ' + ex.message);
-    }
+    dom('.copy-link').find('span').removeClass('copied').addClass('bi-clipboard').removeClass('bi-clipboard-check');
+});
+
+// For the links, we need to pass in the container modal element; this deals with the fact that
+// the modal steals focus. Without this, content appears to be copied, but you can't paste it.
+// See https://github.com/zenorocha/clipboard.js/issues/514
+const copyLinks = new Clipboard('.copy-link', {
+    container: document.getElementById('modal-content')
+});
+
+copyLinks.on('success', function (e) {
+    const a = dom((e.trigger as HTMLElement));
+    a.find('span').addClass('copied').removeClass('bi-clipboard').addClass('bi-clipboard-check');
+
+    // e.clearSelection();
 });
 
 ui.body.onchild('a.toggle-password-info', 'click', e => {
@@ -576,26 +582,26 @@ ui.body.onchild('a.toggle-password-info', 'click', e => {
     toggle(dom('#modal').find('.row-detail-password-info'), 'block');
 });
 
-ui.body.onchild('button.btn-credential-open', 'click', e => {
+ui.body.onchild('a.btn-credential-open', 'click', e => {
     e.preventDefault();
-    open(dom((e.currentTarget as HTMLElement)).data('url'));
+    open(dom((e.targetElement as HTMLElement)).data('url'));
 });
 
-ui.body.onchild('button.btn-credential-copy', 'click', e => {
+ui.body.onchild('.btn-credential-copy', 'click', e => {
     e.preventDefault();
-    const allButtons = dom('button.btn-credential-copy');
-    const button = dom((e.currentTarget as HTMLElement));
+    const allButtons = dom('a.btn-credential-copy');
     allButtons.removeClass('btn-success').addClass('btn-primary');
-    allButtons.find('span').addClass('fa-clone').removeClass('fa-check-square');
-    (button.parent().find('input.copy-content').get() as HTMLInputElement).select();
-    try {
-        if (document.execCommand('copy')) {
-            button.addClass('btn-success').removeClass('btn-primary');
-            button.find('span').removeClass('fa-clone').addClass('fa-check-square');
-        }
-    } catch (ex) {
-        alert('Copy operation is not supported by the current browser: ' + ex.message);
-    }
+    allButtons.find('span').addClass('bi-clipboard').removeClass('bi-clipboard-check');
+});
+
+const copyButtons = new Clipboard('.btn-credential-copy');
+
+copyButtons.on('success', function (e) {
+    const a = dom((e.trigger as HTMLElement));
+    a.removeClass('btn-primary').addClass('btn-success');
+    a.find('span').addClass('copied').removeClass('bi-clipboard').addClass('bi-clipboard-check');
+
+    // e.clearSelection();
 });
 
 // Automatically focus the search field if a key is pressed from the credential list

@@ -40,53 +40,52 @@
 </script>
 
 <script id="tmpl-copylink" type="text/html">
-    <a class="copy-link" href="#">Copy <span class="bi bi-clipboard"></span></a>
-    <input type="text" class="copy-content" value="{{Content}}" />
+    <a class="copy-link" data-clipboard-text="{{Content}}">Copy <span class="bi bi-clipboard"></span></a>
 </script>
 
 <script id="tmpl-detail" type="text/html">
     {{#if Url}}
     <div class="row row-detail">
-        <div class="col-xs-12 col-sm-3 row-detail-header">Url</div>
-        <div class="col-xs-3 col-sm-2">{{> copylink Content=Url }}</div>
-        <div class="col-xs-9 col-sm-7">{{{UrlHtml}}}</div>
+        <div class="col-12 col-sm-3 row-detail-header">Url</div>
+        <div class="col-3 col-sm-2">{{> copylink Content=Url }}</div>
+        <div class="col-9 col-sm-7">{{{UrlHtml}}}</div>
     </div>
     {{/if}}
     {{#if Username}}
     <div class="row row-detail">
-        <div class="col-xs-12 col-sm-3 row-detail-header">Username</div>
-        <div class="col-xs-3 col-sm-2">{{> copylink Content=Username }}</div>
-        <div class="col-xs-9 col-sm-7">{{Username}}</div>
+        <div class="col-12 col-sm-3 row-detail-header">Username</div>
+        <div class="col-3 col-sm-2">{{> copylink Content=Username }}</div>
+        <div class="col-9 col-sm-7">{{Username}}</div>
     </div>
     {{/if}}
     {{#if Password}}
     <div class="row row-detail">
-        <div class="col-xs-12 col-sm-3 row-detail-header">Password <a href="#" class="fa fa-info-circle toggle-password-info"></a></div>
-        <div class="col-xs-3 col-sm-2">{{> copylink Content=Password }}</div>
-        <div class="col-xs-9 col-sm-7">{{Password}}</div>
+        <div class="col-12 col-sm-3 row-detail-header">Password <a href="#" class="fa fa-info-circle toggle-password-info"></a></div>
+        <div class="col-3 col-sm-2">{{> copylink Content=Password }}</div>
+        <div class="col-9 col-sm-7">{{Password}}</div>
     </div>
     <div class="row row-detail row-detail-password-info d-none">
-        <div class="col-xs-12 col-sm-7 col-sm-offset-9">{{{PasswordCharacterTable}}}</div>
+        <div class="col-12 col-sm-7 col-sm-offset-9">{{{PasswordCharacterTable}}}</div>
     </div>
     {{/if}}
     {{#if UserDefined1}}
     <div class="row row-detail">
-        <div class="col-xs-12 col-sm-3 row-detail-header">{{UserDefined1Label}}</div>
-        <div class="col-xs-3 col-sm-2">{{> copylink Content=UserDefined1 }}</div>
-        <div class="col-xs-9 col-sm-7">{{UserDefined1}}</div>
+        <div class="col-12 col-sm-3 row-detail-header">{{UserDefined1Label}}</div>
+        <div class="col-3 col-sm-2">{{> copylink Content=UserDefined1 }}</div>
+        <div class="col-9 col-sm-7">{{UserDefined1}}</div>
     </div>
     {{/if}}
     {{#if UserDefined2}}
     <div class="row row-detail">
-        <div class="col-xs-12 col-sm-3 row-detail-header">{{UserDefined2Label}}</div>
-        <div class="col-xs-3 col-sm-2">{{> copylink Content=UserDefined2 }}</div>
-        <div class="col-xs-9 col-sm-7">{{UserDefined2}}</div>
+        <div class="col-12 col-sm-3 row-detail-header">{{UserDefined2Label}}</div>
+        <div class="col-3 col-sm-2">{{> copylink Content=UserDefined2 }}</div>
+        <div class="col-9 col-sm-7">{{UserDefined2}}</div>
     </div>
     {{/if}}
     {{#if Notes}}
     <div class="row row-detail">
-        <div class="col-xs-12 col-sm-5 row-detail-header">Notes</div>
-        <div class="col-xs-12 col-sm-7">{{breaklines Notes}}</div>
+        <div class="col-12 col-sm-5 row-detail-header">Notes</div>
+        <div class="col-12 col-sm-7">{{breaklines Notes}}</div>
     </div>
     {{/if}}
 </script>
@@ -180,13 +179,11 @@
             <span class="bi bi-box-arrow-up-right"></span> Web
         </a>
         {{/if}}
-        <a class="btn btn-primary btn-credential-copy btn-credential-copy-username ms-1">
+        <a class="btn btn-primary btn-credential-copy btn-credential-copy-username ms-1" data-clipboard-text="{{username}}">
             <span class="bi bi-clipboard"></span> User
         </a>
-        <input type="text" class="copy-content d-none" name="copy-content" value="{{username}}" />
-        <a class="btn btn-primary btn-credential-copy btn-credential-copy-password ms-1">
+        <a class="btn btn-primary btn-credential-copy btn-credential-copy-password ms-1" data-clipboard-text="{{password}}">
             <span class="bi bi-clipboard"></span> Pwd
         </a>
-        <input type="text" class="copy-content d-none" name="copy-content" value="{{password}}" />
     </div>
 </script>

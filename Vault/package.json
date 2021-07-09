@@ -20,6 +20,7 @@
     "dependencies": {
         "@tsconfig/recommended": "^1.0.1",
         "bootstrap": "^5.0.1",
+        "clipboard": "^2.0.8",
         "handlebars": "^4.7.7",
         "js-cookie": "^2.2.1",
         "mab-dom": "^0.10.0",
