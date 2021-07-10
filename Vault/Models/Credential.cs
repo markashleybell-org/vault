@@ -25,7 +25,7 @@ namespace Vault.Models
 
         public string UserID { get; set; }
 
-        [DisplayName("* Description")]
+        [DisplayName("Description")]
         public string Description { get; set; }
 
         public string Username { get; set; }

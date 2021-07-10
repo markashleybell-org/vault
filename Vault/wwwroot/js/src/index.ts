@@ -201,10 +201,14 @@ function setWidth(el: DOM, val: string) {
     el.get().style.width = val;
 }
 
-function toggle(el: DOM, display: string) {
+function toggle(el: DOM, className: string) {
     const e = el.get();
-    const hidden = e.style.display === 'none';
-    e.style.display = !hidden ? display : 'none';
+
+    if (e.classList.contains(className)) {
+        e.classList.remove(className);
+    } else {
+        e.classList.add(className);
+    }
 }
 
 // Impure functions
@@ -315,12 +319,16 @@ async function showDetail(credentialId: string) {
 
     const passwordCharacterTable = [
         '<table class="table table-bordered password-character-table">',
+        '<thead>',
         '<tr>',
-        charIndexes.map(i => `<td class="position">${(i + 1)}</td>`).join(''),
+        charIndexes.map(i => `<th class="position">${(i + 1)}</th>`).join(''),
         '</tr>',
+        '</thead>',
+        '<tbody>',
         '<tr>',
         charIndexes.map(i => `<td>${credential.Password[i]}</td>`).join(''),
         '</tr>',
+        '</tbody>',
         '</table>'
     ];
 
@@ -391,16 +399,18 @@ function showModal(options: IVaultModalOptions) {
 
 function showPasswordStrength(field: DOM) {
     const strengthIndicator = field.parent().find('div.password-strength');
-    const status = strengthIndicator.find(':scope > span');
-    const bar = strengthIndicator.find(':scope > div');
+    const status = strengthIndicator.find(':scope > .status');
+    const bar = strengthIndicator.find(':scope > .progress > .progress-bar');
     const password = field.val() as string;
     const strength = getPasswordScore(password);
+    // Score can be negative... which breaks progress bar
+    const width = strength >= 0 ? strength : 0;
     bar.get().classList.remove('extremely-weak', 'very-weak', 'weak', 'average', 'strong', 'very-strong', 'extremely-strong');
     if (strength === 0) {
         status.html('No Password');
         setWidth(bar, '0');
     } else if (strength <= 100) {
-        setWidth(bar, strength + '%');
+        setWidth(bar, width + '%');
         if (strength <= 10) {
             bar.addClass('extremely-weak');
             status.html('Extremely Weak (' + strength + ')');
@@ -561,7 +571,7 @@ ui.body.onchild('button.generate-password', 'click', e => {
 // Toggle password generation option UI visibility
 ui.body.onchild('a.generate-password-options-toggle', 'click', e => {
     e.preventDefault();
-    toggle(dom('div.generate-password-options'), 'block');
+    toggle(dom('div.generate-password-options'), 'd-none');
 });
 
 ui.body.onchild('.copy-link', 'click', e => {
@@ -585,7 +595,7 @@ copyLinks.on('success', function (e) {
 
 ui.body.onchild('a.toggle-password-info', 'click', e => {
     e.preventDefault();
-    toggle(dom('#modal').find('.row-detail-password-info'), 'block');
+    toggle(dom('#modal').find('.row-detail-password-info'), 'd-none');
 });
 
 ui.body.onchild('a.btn-credential-open', 'click', e => {

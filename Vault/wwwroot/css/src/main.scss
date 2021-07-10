@@ -73,8 +73,53 @@
 
 .copy-link, .copy-link:hover, .copy-link:visited, .copy-link:active {
     text-decoration: none;
+    cursor: pointer;
 }
 
 .copied, .copy-link span.copied {
     color: $success;
+}
+
+.password-character-table {
+    font-family: Courier New, Courier, monospace;
+    font-weight: bold;
+    width: 100%;
+}
+
+.password-character-table th, .password-character-table td {
+    text-align: center;
+    font-size: 14px;
+    padding: 3px 0 2px 0 !important;
+}
+
+.password-strength .status {
+    font-size: 0.8rem;
+}
+
+.extremely-weak {
+    background-color: #e43e3b;
+}
+
+.very-weak {
+    background-color: #e66f6d;
+}
+
+.weak {
+    background-color: #e08056;
+}
+
+.average {
+    background-color: #de9c41;
+}
+
+.strong {
+    background-color: #acf36c;
+}
+
+.very-strong {
+    background-color: #8edd70;
+}
+
+.extremely-strong {
+    background-color: #5cbb37;
 }
