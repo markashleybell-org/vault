@@ -7,9 +7,9 @@ module.exports = {
         library: 'Vault'
     },
     entry: {
-        'index': './wwwroot/js/index.ts',
-        'setdevcookie': './wwwroot/js/setdevcookie.ts',
-        'generatevaultcredential': './wwwroot/js/generatevaultcredential.ts',
+        'index': './wwwroot/js/src/index.ts',
+        'setdevcookie': './wwwroot/js/src/setdevcookie.ts',
+        'generatevaultcredential': './wwwroot/js/src/generatevaultcredential.ts',
     },
     devtool: 'source-map',
     plugins: [
