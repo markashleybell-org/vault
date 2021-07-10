@@ -35,8 +35,8 @@
 </script>
 
 <script id="tmpl-urltext" type="text/html">
-    <span class="full">{{truncate Url 50}}</span>
-    <span class="truncated">{{truncate Url 26}}</span>
+    <span class="d-none d-lg-block">{{truncate Url 50}}</span>
+    <span class="d-lg-none">{{truncate Url 26}}</span>
 </script>
 
 <script id="tmpl-copylink" type="text/html">
@@ -171,7 +171,7 @@
             {{/if}}
         </div>
         {{#if url}}
-        <a class="btn btn-primary btn-credential-open ml-1" href="{{url}}" target="_blank">
+        <a class="btn btn-primary btn-credential-open ms-1" href="{{url}}" target="_blank">
             <span class="bi bi-box-arrow-up-right"></span> Web
         </a>
         {{else}}
