@@ -332,11 +332,17 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
-# TypeScript Output
-Vault/wwwroot/js/dist/
-
 # Test coverage artifacts
 coverage/
 
 # Development settings
 appsettings.*.json
+
+# Bootstrap sources (pulled in by gulp task)
+Vault/wwwroot/css/src/vendor/bootstrap/
+
+# SCSS artefacts
+Vault/wwwroot/css/dist/
+
+# TypeScript Output
+Vault/wwwroot/js/dist/

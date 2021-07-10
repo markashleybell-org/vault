@@ -1,10 +1,8 @@
-﻿.credential {
+﻿@import "./vendor/bootstrap/bootstrap.scss";
+
+.credential {
     display: flex;
     flex-wrap: wrap;
-}
-
-.credential span {
-    display: block;
 }
 
 .btn-credential-show-detail {
@@ -14,13 +12,25 @@
     width: 100%;
 }
 
+.btn-credential-username {
+    font-size: 0.9rem;
+    color: #808080;
+}
+
 .btn-credential-open, .btn-credential-copy {
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 0;
 }
 
-@media (min-width: 500px) {
+@media (max-width: map-get($grid-breakpoints, "md")) {
+    .btn-credential-open, .btn-credential-copy {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
+@media (min-width: map-get($grid-breakpoints, "md")) {
     .credential {
         flex-wrap: nowrap;
     }
@@ -62,14 +72,14 @@
 }
 
 .copied, .copy-link span.copied {
-    color: #5cbb37;
+    color: $success;
 }
 
 .full {
     display: none;
 }
 
-@media (min-width: 500px) {
+@media (min-width: map-get($grid-breakpoints, "md")) {
     .full {
         display: inline;
     }
@@ -78,4 +88,3 @@
         display: none;
     }
 }
-

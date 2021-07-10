@@ -487,6 +487,12 @@ ui.loginForm.on('submit', async e => {
             ui.searchInput.focus();
             setSession();
             ui.body.on('click keyup', setSession);
+
+            // TODO: REMOVE
+            ui.searchInput.val('filter:all');
+            const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
+            const results = search(ui.searchInput.val(), credentials);
+            updateCredentialListUI(ui.container, results);
         } else {
             ui.loginErrorMessage.get().innerText = 'Login failed';
         }

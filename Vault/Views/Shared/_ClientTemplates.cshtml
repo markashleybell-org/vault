@@ -46,46 +46,46 @@
 <script id="tmpl-detail" type="text/html">
     {{#if Url}}
     <div class="row row-detail">
-        <div class="col-12 col-sm-3 row-detail-header">Url</div>
-        <div class="col-3 col-sm-2">{{> copylink Content=Url }}</div>
-        <div class="col-9 col-sm-7">{{{UrlHtml}}}</div>
+        <div class="col-12 col-md-3 row-detail-header">Url</div>
+        <div class="col-3 col-md-2">{{> copylink Content=Url }}</div>
+        <div class="col-9 col-md-7">{{{UrlHtml}}}</div>
     </div>
     {{/if}}
     {{#if Username}}
     <div class="row row-detail">
-        <div class="col-12 col-sm-3 row-detail-header">Username</div>
-        <div class="col-3 col-sm-2">{{> copylink Content=Username }}</div>
-        <div class="col-9 col-sm-7">{{Username}}</div>
+        <div class="col-12 col-md-3 row-detail-header">Username</div>
+        <div class="col-3 col-md-2">{{> copylink Content=Username }}</div>
+        <div class="col-9 col-md-7">{{Username}}</div>
     </div>
     {{/if}}
     {{#if Password}}
     <div class="row row-detail">
-        <div class="col-12 col-sm-3 row-detail-header">Password <a href="#" class="fa fa-info-circle toggle-password-info"></a></div>
-        <div class="col-3 col-sm-2">{{> copylink Content=Password }}</div>
-        <div class="col-9 col-sm-7">{{Password}}</div>
+        <div class="col-12 col-md-3 row-detail-header">Password <a href="#" class="fa fa-info-circle toggle-password-info"></a></div>
+        <div class="col-3 col-md-2">{{> copylink Content=Password }}</div>
+        <div class="col-9 col-md-7">{{Password}}</div>
     </div>
     <div class="row row-detail row-detail-password-info d-none">
-        <div class="col-12 col-sm-7 col-sm-offset-9">{{{PasswordCharacterTable}}}</div>
+        <div class="col-12 col-md-7 col-md-offset-9">{{{PasswordCharacterTable}}}</div>
     </div>
     {{/if}}
     {{#if UserDefined1}}
     <div class="row row-detail">
-        <div class="col-12 col-sm-3 row-detail-header">{{UserDefined1Label}}</div>
-        <div class="col-3 col-sm-2">{{> copylink Content=UserDefined1 }}</div>
-        <div class="col-9 col-sm-7">{{UserDefined1}}</div>
+        <div class="col-12 col-md-3 row-detail-header">{{UserDefined1Label}}</div>
+        <div class="col-3 col-md-2">{{> copylink Content=UserDefined1 }}</div>
+        <div class="col-9 col-md-7">{{UserDefined1}}</div>
     </div>
     {{/if}}
     {{#if UserDefined2}}
     <div class="row row-detail">
-        <div class="col-12 col-sm-3 row-detail-header">{{UserDefined2Label}}</div>
-        <div class="col-3 col-sm-2">{{> copylink Content=UserDefined2 }}</div>
-        <div class="col-9 col-sm-7">{{UserDefined2}}</div>
+        <div class="col-12 col-md-3 row-detail-header">{{UserDefined2Label}}</div>
+        <div class="col-3 col-md-2">{{> copylink Content=UserDefined2 }}</div>
+        <div class="col-9 col-md-7">{{UserDefined2}}</div>
     </div>
     {{/if}}
     {{#if Notes}}
     <div class="row row-detail">
-        <div class="col-12 col-sm-5 row-detail-header">Notes</div>
-        <div class="col-12 col-sm-7">{{breaklines Notes}}</div>
+        <div class="col-12 col-md-5 row-detail-header">Notes</div>
+        <div class="col-12 col-md-7">{{breaklines Notes}}</div>
     </div>
     {{/if}}
 </script>
@@ -102,38 +102,38 @@
     <p>Enter and confirm a new password:</p>
     <div class="form-horizontal">
         <div class="form-group">
-            <label for="NewPassword" class="col-sm-8 control-label">New Password</label>
-            <div class="col-sm-16">
+            <label for="NewPassword" class="col-md-8 control-label">New Password</label>
+            <div class="col-md-16">
                 <input type="password" id="NewPassword" name="NewPassword" class="form-control" value="" />
             </div>
         </div>
         <div class="form-group">
-            <label for="NewPasswordConfirm" class="col-sm-8 control-label">Confirm New Password</label>
-            <div class="col-sm-16">
+            <label for="NewPasswordConfirm" class="col-md-8 control-label">Confirm New Password</label>
+            <div class="col-md-16">
                 <input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" class="form-control" value="" />
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-8 col-sm-16">
+            <div class="col-md-offset-8 col-md-16">
                 <button class="btn btn-primary" id="change-password-button">Change Password</button>
             </div>
         </div>
         <hr />
         <div class="form-group">
-            <label for="import-data" class="col-sm-8 control-label">Import Data</label>
-            <div class="col-sm-16">
+            <label for="import-data" class="col-md-8 control-label">Import Data</label>
+            <div class="col-md-16">
                 <textarea class="form-control" id="import-data" placeholder="Paste exported JSON data here"></textarea>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-8 col-sm-16">
+            <div class="col-md-offset-8 col-md-16">
                 <button class="btn btn-primary" id="import-button">Import Data</button>
             </div>
         </div>
         <hr />
         <div class="form-group">
-            <label for="export-button" class="col-sm-8 control-label">Export Data</label>
-            <div class="col-sm-16">
+            <label for="export-button" class="col-md-8 control-label">Export Data</label>
+            <div class="col-md-16">
                 <button class="btn btn-primary" id="export-button">Export Data</button>
             </div>
         </div>
@@ -162,12 +162,12 @@
 </script>
 
 <script id="tmpl-credentialtablerow" type="text/html">
-    <div id="{{credentialid}}" class="credential mb-1">
-        <div class="btn btn-credential-show-detail" data-id="{{credentialid}}">
-            <span class="d-none d-md-inline">{{description}}</span><span class="d-md-none">{{truncate description 31}}</span>
-            <span>{{username}}</span>
+    <div id="{{credentialid}}" class="credential mb-2 mb-md-1">
+        <div class="btn btn-credential-show-detail mb-1 mb-md-0" data-id="{{credentialid}}">
+            <div class="d-none d-md-block">{{description}}</div><div class="d-md-none">{{truncate description 31}}</div>
+            <span class="btn-credential-username">{{username}}</span>
             {{#if weak}}
-            <span>Weak Password</span>
+            <span class="ms-2 badge rounded-pill bg-warning text-dark">Weak Password</span>
             {{/if}}
         </div>
         {{#if url}}
