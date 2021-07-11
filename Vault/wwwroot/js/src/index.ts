@@ -96,7 +96,7 @@ const ui: IVaultUIElements = {
     body: dom('body'),
     loginFormDialog: new Modal(dom('#login-form-dialog').get(), { keyboard: false, backdrop: 'static' }),
     loginForm: dom('#login-form'),
-    loginErrorMessage: dom('#login-form-dialog').find('.validation-message'),
+    loginErrorMessage: dom('#login-form-dialog').find('.modal-footer .badge'),
     container: dom('#container'),
     controls: dom('#controls'),
     modal: new Modal(dom('#modal').get()),
@@ -479,11 +479,17 @@ ui.searchInput.on('keyup', rateLimit(async e => {
 ui.loginForm.on('submit', async e => {
     e.preventDefault();
 
+    const form = dom(e.targetElement);
+
+    if (!validate(form)) {
+        return false;
+    }
+
     await withLoadSpinner(async () => {
         const username = ui.loginForm.find('#UN1209').val() as string;
         const password = ui.loginForm.find('#PW9804').val() as string;
 
-        ui.loginErrorMessage.get().innerText = '';
+        ui.loginErrorMessage.addClass('d-none');
 
         const loginResult = await repository.login(username, password);
 
@@ -503,17 +509,28 @@ ui.loginForm.on('submit', async e => {
                 updateCredentialListUI(ui.container, results);
             }
         } else {
-            ui.loginErrorMessage.get().innerText = 'Login failed';
+            ui.loginErrorMessage.removeClass('d-none');
         }
     });
 });
+
+function validate(form: DOM) {
+    form.removeClass('was-validated');
+    const valid = (form.get() as HTMLFormElement).checkValidity();
+    if (!valid) {
+        form.addClass('was-validated');
+    }
+    return valid;
+}
 
 ui.body.onchild('#credential-form', 'submit', async e => {
     e.preventDefault();
 
     const form = dom((e.targetElement as HTMLElement));
 
-
+    if (!validate(form)) {
+        return;
+    }
 
     const credential = getCredentialFromUI(form);
 
@@ -622,28 +639,48 @@ ui.body.on('keydown', e => {
     }
 });
 
-ui.body.onchild('#change-password-button', 'click', async e => {
-    const newPassword = dom('#NewPassword').val() as string;
-    const newPasswordConfirm = dom('#NewPasswordConfirm').val() as string;
+function validatePasswordMatch() {
+    const newPasswordConfirmInput = dom('#NewPasswordConfirm');
+
+    const newPassword = dom('#NewPassword').get() as HTMLInputElement;
+    const newPasswordConfirm = newPasswordConfirmInput.get() as HTMLInputElement;
+
+    const validationText = newPasswordConfirmInput.parent().find('.invalid-feedback').get();
+
+    const mismatch = newPassword.value !== newPasswordConfirm.value;
+
+    const errorMessage = mismatch
+        ? validationText.getAttribute('data-mismatch')
+        : validationText.getAttribute('data-required');
+
+    if (mismatch) {
+        newPasswordConfirm.setCustomValidity(errorMessage);
+    } else {
+        newPasswordConfirm.setCustomValidity('');
+    }
+
+    validationText.textContent = errorMessage;
+}
+
+ui.body.onchild('#change-password-form', 'submit', async e => {
+    e.preventDefault();
+
+    validatePasswordMatch();
+
+    const form = dom(e.targetElement);
+
+    if (!validate(form)) {
+        return false;
+    }
 
     const confirmationMsg = 'When the password change is complete you will be logged out and will need to log back in.\n\n'
         + 'Are you SURE you want to change the master password?';
 
-    if (newPassword === '') {
-        alert('Password cannot be left blank.');
-        return;
-    }
-
-    if (newPassword !== newPasswordConfirm) {
-        alert('Password confirmation does not match password.');
-        return;
-    }
-
     if (!confirm(confirmationMsg)) {
-        return;
+        return false;
     }
 
-    await withLoadSpinner(async () => await repository.updatePassword(newPassword));
+    await withLoadSpinner(async () => await repository.updatePassword(dom('#NewPassword').val()));
 
     reloadApp();
 });

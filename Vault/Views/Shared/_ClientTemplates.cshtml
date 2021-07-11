@@ -8,7 +8,7 @@
 </script>
 
 <script id="tmpl-modalbody" type="text/html">
-    <div class="modal-body mt-@(RowMargin) mt-md-@(RowMarginMD)">
+    <div class="modal-body">
         {{{content}}}
     </div>
 </script>
@@ -99,23 +99,27 @@
 </script>
 
 <script id="tmpl-optionsdialog" type="text/html">
-    <div class="row mb-md-@(RowMarginMD)">
-        <label for="NewPassword" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">New Password</label>
-        <div class="col-md-@(FieldColumnWidthMD)">
-            <input type="password" id="NewPassword" name="NewPassword" class="form-control" value="" />
+    <form id="change-password-form" class="needs-validation" novalidate>
+        <div class="row mb-md-@(RowMarginMD)">
+            <label for="NewPassword" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">New Password</label>
+            <div class="col-md-@(FieldColumnWidthMD)">
+                <input type="password" id="NewPassword" name="NewPassword" class="form-control" value="" required />
+                <div class="invalid-feedback">Please enter a password</div>
+            </div>
         </div>
-    </div>
-    <div class="row mb-md-@(RowMarginMD)">
-        <label for="NewPasswordConfirm" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">Confirm Password</label>
-        <div class="col-md-@(FieldColumnWidthMD)">
-            <input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" class="form-control" value="" />
+        <div class="row mb-md-@(RowMarginMD)">
+            <label for="NewPasswordConfirm" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">Confirm Password</label>
+            <div class="col-md-@(FieldColumnWidthMD)">
+                <input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" class="form-control" value="" required />
+                <div class="invalid-feedback" data-required="Please confirm the password" data-mismatch="Confirmation doesn't match password">Please confirm the password</div>
+            </div>
         </div>
-    </div>
-    <div class="row mb-md-@(RowMarginMD)">
-        <div class="offset-md-@(LabelColumnWidthMD) col-md-@(FieldColumnWidthMD)">
-            <button class="btn btn-primary" id="change-password-button">Change Password</button>
+        <div class="row mb-md-@(RowMarginMD)">
+            <div class="offset-md-@(LabelColumnWidthMD) col-md-@(FieldColumnWidthMD)">
+                <button type="submit" class="btn btn-primary">Change Password</button>
+            </div>
         </div>
-    </div>
+    </form>
     <hr />
     <div class="row mb-md-@(RowMarginMD)">
         <label for="import-data" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)">Import Data</label>
@@ -146,10 +150,6 @@
         <textarea style="border: none; width: 100%; height: 600px;">{{json}}</textarea>
     </body>
 </html>
-</script>
-
-<script id="tmpl-validationmessage" type="text/html">
-    <div class="validation-message"><p>{{{errors}}}</p></div>
 </script>
 
 <script id="tmpl-credentialtable" type="text/html">

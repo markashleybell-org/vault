@@ -3,7 +3,7 @@
 <div id="login-form-dialog" class="modal">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <form id="login-form" asp-action="Login" asp-controller="Home" method="post">
+            <form id="login-form" asp-action="Login" asp-controller="Home" method="post" class="needs-validation" novalidate>
                 <div class="modal-header">
                     <h4 class="modal-title">Log In</h4>
                 </div>
@@ -12,22 +12,23 @@
                     <!-- These fake fields are a workaround for Chrome not respecting the autocomplete attribute and autofilling fields with the wrong values... -->
                     <input class="chrome-autocomplete-fake d-none" type="text" name="chromeusername" />
                     <input class="chrome-autocomplete-fake d-none" type="password" name="chromepassword" />
-                    <div class="row mb-3">
+                    <div class="row mb-md-@(RowMarginMD)">
                         <label asp-for="UN1209" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)"></label>
                         <div class="col-md-@(FieldColumnWidthMD)">
-                            <input asp-for="UN1209" type="password" class="form-control" autocomplete="un1209" />
+                            <input asp-for="UN1209" type="password" class="form-control" autocomplete="un1209" required />
+                            <div class="invalid-feedback">Please enter a username</div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-md-@(RowMarginMD)">
                         <label asp-for="PW9804" class="col-md-@(LabelColumnWidthMD) col-form-label @(LabelVisualEffectClasses)"></label>
                         <div class="col-md-@(FieldColumnWidthMD)">
-                            <input asp-for="PW9804" type="password" class="form-control" autocomplete="un1209" />
+                            <input asp-for="PW9804" type="password" class="form-control" autocomplete="un1209" required />
+                            <div class="invalid-feedback">Please enter a password</div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <span class="validation-message"></span>
-                    <button type="submit" class="btn btn-primary">Log In</button>
+                    <span class="badge rounded-pill bg-danger me-3 d-none">Login Failed</span> <button type="submit" class="btn btn-primary">Log In</button>
                 </div>
             </form>
         </div>
