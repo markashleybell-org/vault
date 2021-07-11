@@ -22,10 +22,10 @@
         <button type="button" class="btn btn-danger btn-delete" data-credentialid="{{credentialId}}"><span class="bi bi-trash"></span> {{deleteText}}</button>
         {{/if}}
         {{#if showAccept}}
-        <button type="submit" class="btn btn-primary btn-accept"><span class="bi bi-check"></span> {{acceptText}}</button>
+        <button type="submit" class="btn btn-primary btn-accept"><span class="bi bi-check-lg"></span> {{acceptText}}</button>
         {{/if}}
         {{#if showClose}}
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><span class="bi bi-x"></span> {{closeText}}</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><span class="bi bi-x-lg"></span> {{closeText}}</button>
         {{/if}}
     </div>
 </script>
@@ -45,47 +45,47 @@
 
 <script id="tmpl-detail" type="text/html">
     {{#if Url}}
-    <div class="row row-detail mb-2">
-        <div class="col-12 col-md-3 row-detail-header">Url</div>
-        <div class="col-9 col-md-7">{{{UrlHtml}}}</div>
-        <div class="col-3 col-md-2 text-end">{{> copylink Content=Url }}</div>
+    <div class="row row-detail mb-3">
+        <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">Url</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)">{{{UrlHtml}}}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-md-end">{{> copylink Content=Url }}</div>
     </div>
     {{/if}}
     {{#if Username}}
-    <div class="row row-detail mb-2">
-        <div class="col-12 col-md-3 row-detail-header">Username</div>
-        <div class="col-9 col-md-7">{{Username}}</div>
-        <div class="col-3 col-md-2 text-end">{{> copylink Content=Username }}</div>
+    <div class="row row-detail mb-3">
+        <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">Username</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)">{{Username}}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-md-end">{{> copylink Content=Username }}</div>
     </div>
     {{/if}}
     {{#if Password}}
-    <div class="row row-detail mb-2">
-        <div class="col-12 col-md-3 row-detail-header">Password <a href="#" class="bi bi-info-circle toggle-password-info"></a></div>
-        <div class="col-9 col-md-7">{{Password}}</div>
-        <div class="col-3 col-md-2 text-end">{{> copylink Content=Password }}</div>
+    <div class="row row-detail mb-3">
+        <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">Password</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="user-select-all">{{Password}}</span> <a href="#" class="bi bi-info-circle toggle-password-info"></a></div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-md-end">{{> copylink Content=Password }}</div>
     </div>
     <div class="row row-detail row-detail-password-info d-none">
-        <div class="col-12 col-md-9 offset-md-3">{{{PasswordCharacterTable}}}</div>
+        <div class="col-md-@(DataCopyLinkSpanColumnWidthMD) offset-md-@(LabelColumnWidthMD)">{{{PasswordCharacterTable}}}</div>
     </div>
     {{/if}}
     {{#if UserDefined1}}
-    <div class="row row-detail mb-2">
-        <div class="col-12 col-md-3 row-detail-header">{{UserDefined1Label}}</div>
-        <div class="col-9 col-md-7">{{UserDefined1}}</div>
-        <div class="col-3 col-md-2 text-end">{{> copylink Content=UserDefined1 }}</div>
+    <div class="row row-detail mb-3">
+        <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">{{UserDefined1Label}}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)">{{UserDefined1}}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-md-end">{{> copylink Content=UserDefined1 }}</div>
     </div>
     {{/if}}
     {{#if UserDefined2}}
-    <div class="row row-detail mb-2">
-        <div class="col-12 col-md-3 row-detail-header">{{UserDefined2Label}}</div>
-        <div class="col-9 col-md-7">{{UserDefined2}}</div>
-        <div class="col-3 col-md-2 text-end">{{> copylink Content=UserDefined2 }}</div>
+    <div class="row row-detail mb-3">
+        <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">{{UserDefined2Label}}</div>
+        <div class="col-9 col-md-@(DataColumnWidthMD)">{{UserDefined2}}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-md-end">{{> copylink Content=UserDefined2 }}</div>
     </div>
     {{/if}}
     {{#if Notes}}
-    <div class="row row-detail mb-2">
-        <div class="col-12 col-md-5 row-detail-header">Notes</div>
-        <div class="col-12 col-md-9">{{breaklines Notes}}</div>
+    <div class="row row-detail mb-3">
+        <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">Notes</div>
+        <div class="col-md-@(DataCopyLinkSpanColumnWidthMD)">{{breaklines Notes}}</div>
     </div>
     {{/if}}
 </script>
@@ -100,7 +100,7 @@
 
 <script id="tmpl-optionsdialog" type="text/html">
     <p>Enter and confirm a new password:</p>
-    <div class="form-horizontal">
+    <div>
         <div class="form-group">
             <label for="NewPassword" class="col-md-8 control-label">New Password</label>
             <div class="col-md-16">

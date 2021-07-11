@@ -10,21 +10,21 @@
     <div id="set-dev-cookie-form-dialog" class="modal show" style="display: block;">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <form id="generate-form" action="" method="post" class="form-horizontal">
+                <form id="generate-form" action="" method="post">
                     <div class="modal-header">
                         <h4 class="modal-title">Set Dev Cookie</h4>
                     </div>
                     <div class="modal-body">
                         <p>Enter a username and password to put into the dev mode cookie:</p>
                         <div class="row mb-3">
-                            <label for="Username" class="col-md-3 col-form-label text-end">Username</label>
-                            <div class="col-md-9">
+                            <label for="Username" class="col-md-@(LabelColumnWidthMD) col-form-label text-md-end">Username</label>
+                            <div class="col-md-@(FieldColumnWidthMD)">
                                 <input type="text" size="40" id="Username" name="Username" value="" class="form-control" />
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label for="Password" class="col-md-3 col-form-label text-end">Password</label>
-                            <div class="col-md-9">
+                            <label for="Password" class="col-md-@(LabelColumnWidthMD) col-form-label text-md-end">Password</label>
+                            <div class="col-md-@(FieldColumnWidthMD)">
                                 <input type="text" size="40" id="Password" name="Password" value="" class="form-control" />
                             </div>
                         </div>

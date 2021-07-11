@@ -495,11 +495,13 @@ ui.loginForm.on('submit', async e => {
             setSession();
             ui.body.on('click keyup', setSession);
 
-            // TODO: REMOVE
-            ui.searchInput.val('filter:all');
-            const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
-            const results = search(ui.searchInput.val(), credentials);
-            updateCredentialListUI(ui.container, results);
+            // TODO: REMOVE?
+            if (_VAULT_GLOBALS.devMode) {
+                ui.searchInput.val('filter:all');
+                const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
+                const results = search(ui.searchInput.val(), credentials);
+                updateCredentialListUI(ui.container, results);
+            }
         } else {
             ui.loginErrorMessage.get().innerText = 'Login failed';
         }
