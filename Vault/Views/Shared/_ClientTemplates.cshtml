@@ -8,7 +8,7 @@
 </script>
 
 <script id="tmpl-modalbody" type="text/html">
-    <div class="modal-body">
+    <div class="modal-body mt-@(RowMargin) mt-md-@(RowMarginMD)">
         {{{content}}}
     </div>
 </script>
@@ -45,45 +45,45 @@
 
 <script id="tmpl-detail" type="text/html">
     {{#if Url}}
-    <div class="row row-detail mb-3">
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">Url</div>
         <div class="col-9 col-md-@(DataColumnWidthMD)">{{{UrlHtml}}}</div>
-        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-md-end">{{> copylink Content=Url }}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=Url }}</div>
     </div>
     {{/if}}
     {{#if Username}}
-    <div class="row row-detail mb-3">
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">Username</div>
         <div class="col-9 col-md-@(DataColumnWidthMD)">{{Username}}</div>
-        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-md-end">{{> copylink Content=Username }}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=Username }}</div>
     </div>
     {{/if}}
     {{#if Password}}
-    <div class="row row-detail mb-3">
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">Password</div>
         <div class="col-9 col-md-@(DataColumnWidthMD)"><span class="user-select-all">{{Password}}</span> <a href="#" class="bi bi-info-circle toggle-password-info"></a></div>
-        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-md-end">{{> copylink Content=Password }}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=Password }}</div>
     </div>
     <div class="row row-detail row-detail-password-info d-none">
         <div class="col-md-@(DataCopyLinkSpanColumnWidthMD) offset-md-@(LabelColumnWidthMD)">{{{PasswordCharacterTable}}}</div>
     </div>
     {{/if}}
     {{#if UserDefined1}}
-    <div class="row row-detail mb-3">
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">{{UserDefined1Label}}</div>
         <div class="col-9 col-md-@(DataColumnWidthMD)">{{UserDefined1}}</div>
-        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-md-end">{{> copylink Content=UserDefined1 }}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=UserDefined1 }}</div>
     </div>
     {{/if}}
     {{#if UserDefined2}}
-    <div class="row row-detail mb-3">
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">{{UserDefined2Label}}</div>
         <div class="col-9 col-md-@(DataColumnWidthMD)">{{UserDefined2}}</div>
-        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-md-end">{{> copylink Content=UserDefined2 }}</div>
+        <div class="col-3 col-md-@(CopyLinkColumnWidthMD) text-end">{{> copylink Content=UserDefined2 }}</div>
     </div>
     {{/if}}
     {{#if Notes}}
-    <div class="row row-detail mb-3">
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
         <div class="col-md-@(LabelColumnWidthMD) row-detail-header text-md-end">Notes</div>
         <div class="col-md-@(DataCopyLinkSpanColumnWidthMD)">{{breaklines Notes}}</div>
     </div>
@@ -101,39 +101,39 @@
 <script id="tmpl-optionsdialog" type="text/html">
     <p>Enter and confirm a new password:</p>
     <div>
-        <div class="form-group">
-            <label for="NewPassword" class="col-md-8 control-label">New Password</label>
-            <div class="col-md-16">
+        <div class="row mb-md-@(RowMarginMD)">
+            <label for="NewPassword" class="col-md-@(LabelColumnWidthMD) col-form-label text-md-end">New Password</label>
+            <div class="col-md-@(FieldColumnWidthMD)">
                 <input type="password" id="NewPassword" name="NewPassword" class="form-control" value="" />
             </div>
         </div>
-        <div class="form-group">
-            <label for="NewPasswordConfirm" class="col-md-8 control-label">Confirm New Password</label>
-            <div class="col-md-16">
+        <div class="row mb-md-@(RowMarginMD)">
+            <label for="NewPasswordConfirm" class="col-md-@(LabelColumnWidthMD) col-form-label text-md-end">Confirm New Password</label>
+            <div class="col-md-@(FieldColumnWidthMD)">
                 <input type="password" id="NewPasswordConfirm" name="NewPasswordConfirm" class="form-control" value="" />
             </div>
         </div>
-        <div class="form-group">
-            <div class="col-md-offset-8 col-md-16">
+        <div class="row mb-md-@(RowMarginMD)">
+            <div class="offset-md-@(LabelColumnWidthMD) col-md-@(FieldColumnWidthMD)">
                 <button class="btn btn-primary" id="change-password-button">Change Password</button>
             </div>
         </div>
         <hr />
-        <div class="form-group">
-            <label for="import-data" class="col-md-8 control-label">Import Data</label>
-            <div class="col-md-16">
+        <div class="row mb-md-@(RowMarginMD)">
+            <label for="import-data" class="col-md-@(LabelColumnWidthMD) col-form-label text-md-end">Import Data</label>
+            <div class="col-md-@(FieldColumnWidthMD)">
                 <textarea class="form-control" id="import-data" placeholder="Paste exported JSON data here"></textarea>
             </div>
         </div>
-        <div class="form-group">
-            <div class="col-md-offset-8 col-md-16">
+        <div class="row mb-md-@(RowMarginMD)">
+            <div class="offset-md-@(LabelColumnWidthMD) col-md-@(FieldColumnWidthMD)">
                 <button class="btn btn-primary" id="import-button">Import Data</button>
             </div>
         </div>
         <hr />
-        <div class="form-group">
-            <label for="export-button" class="col-md-8 control-label">Export Data</label>
-            <div class="col-md-16">
+        <div class="row mb-md-@(RowMarginMD)">
+            <label for="export-button" class="col-md-@(LabelColumnWidthMD) col-form-label text-md-end">Export Data</label>
+            <div class="col-md-@(FieldColumnWidthMD)">
                 <button class="btn btn-primary" id="export-button">Export Data</button>
             </div>
         </div>
