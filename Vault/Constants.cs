@@ -15,5 +15,7 @@
         public static readonly int RowMargin = 2;
 
         public static readonly int RowMarginMD = 3;
+
+        public static readonly string LabelVisualEffectClasses = "fw-bold text-md-end"; // string.Empty;
     }
 }
