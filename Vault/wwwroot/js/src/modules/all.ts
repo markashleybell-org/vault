@@ -17,8 +17,7 @@ export {
     parsePasswordSpecificationString,
     parseSearchQuery,
     searchCredentials,
-    sortCredentials,
-    validateCredential
+    sortCredentials
 } from './Vault';
 export {
     trim,

@@ -5,8 +5,7 @@ import {
     parsePasswordSpecificationString,
     parseSearchQuery,
     searchCredentials,
-    sortCredentials,
-    validateCredential
+    sortCredentials
 } from '../modules/all';
 import { ICredential, PasswordSpecification } from '../types/all';
 import { FakeRepository } from '../types/FakeRepository';
@@ -139,14 +138,6 @@ describe('Vault', () => {
         expect(summary.url).toBe('http://www.test.com?id=23&param=TEST+VALUE');
         expect(summary.username).toBe('_testuser123');
         expect(summary.weak).toBe(true);
-    });
-
-    test('validateCredential', () => {
-        const validCredential = { CredentialID: 'ID', UserID: 'USER', Description: 'VALID CREDENTIAL' };
-        const invalidCredential = { CredentialID: 'ID', UserID: 'USER', Description: '' };
-
-        expect(validateCredential(validCredential).length).toBe(0);
-        expect(validateCredential(invalidCredential).length).toBe(1);
     });
 
     test('parsePasswordSpecificationString bad inputs', () => {

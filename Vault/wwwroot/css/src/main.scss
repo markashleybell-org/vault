@@ -1,5 +1,9 @@
 ﻿@import "./vendor/bootstrap/bootstrap.scss";
 
+.container {
+    max-width: map-get($grid-breakpoints, "md");
+}
+
 .credential {
     display: flex;
     flex-wrap: wrap;
@@ -76,7 +80,7 @@
     cursor: pointer;
 }
 
-.copied, .copy-link span.copied {
+.copy-link span.copied {
     color: $success;
 }
 

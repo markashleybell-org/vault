@@ -165,25 +165,29 @@
     <div id="{{credentialid}}" class="credential mb-2 mb-md-1">
         <div class="btn btn-credential-show-detail mb-1 mb-md-0" data-id="{{credentialid}}">
             <div class="d-none d-md-block">{{description}}</div><div class="d-md-none">{{truncate description 31}}</div>
-            <span class="btn-credential-username">{{username}}</span>
             {{#if weak}}
-            <span class="ms-2 badge rounded-pill bg-warning text-dark">Weak Password</span>
+            {{#if username}}
+            <span class="btn-credential-username me-2">{{username}}</span>
+            {{/if}}
+            <span class="badge rounded-pill bg-warning text-dark">Weak Password</span>
+            {{else}}
+            <span class="btn-credential-username">{{username}}&nbsp;</span>
             {{/if}}
         </div>
         {{#if url}}
         <a class="btn btn-primary btn-credential-open ms-1" href="{{url}}" target="_blank">
-            <span class="bi bi-box-arrow-up-right"></span> Web
+            <span class="bi bi-box-arrow-up-right me-1"></span> Web
         </a>
         {{else}}
-        <a class="btn btn-primary btn-credential-open ms-1" disabled="disabled">
-            <span class="bi bi-box-arrow-up-right"></span> Web
+        <a class="btn btn-primary btn-credential-open disabled ms-1">
+            <span class="bi bi-box-arrow-up-right me-1"></span> Web
         </a>
         {{/if}}
         <a class="btn btn-primary btn-credential-copy btn-credential-copy-username ms-1" data-clipboard-text="{{username}}">
-            <span class="bi bi-clipboard"></span> User
+            <span class="bi bi-clipboard me-1"></span> User
         </a>
         <a class="btn btn-primary btn-credential-copy btn-credential-copy-password ms-1" data-clipboard-text="{{password}}">
-            <span class="bi bi-clipboard"></span> Pwd
+            <span class="bi bi-clipboard me-1"></span> Pwd
         </a>
     </div>
 </script>

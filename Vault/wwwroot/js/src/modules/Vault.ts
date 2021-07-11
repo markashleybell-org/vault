@@ -78,16 +78,6 @@ export function mapToSummary(credential: ICredential, isWeakPassword: (password:
     return credentialSummary;
 }
 
-export function validateCredential(credential: ICredential) {
-    const errors: ICredentialValidationError[] = [];
-
-    if (!credential.Description) {
-        errors.push({ property: 'Description', errorMessage: 'You must fill in a description' });
-    }
-
-    return errors;
-}
-
 export function parsePasswordSpecificationString(optionString: string) {
     if (!optionString || optionString.indexOf('|') === -1) {
         return null;

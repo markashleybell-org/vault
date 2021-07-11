@@ -16,7 +16,6 @@ import {
     searchCredentials,
     sortCredentials,
     truncate,
-    validateCredential,
     weakPasswordScoreThreshold
 } from './modules/all';
 import {
@@ -61,7 +60,6 @@ interface IVaultUITemplates {
     optionsDialog: HandlebarsTemplateDelegate;
     credentialTable: HandlebarsTemplateDelegate;
     credentialTableRow: HandlebarsTemplateDelegate;
-    validationMessage: HandlebarsTemplateDelegate;
     modalHeader: HandlebarsTemplateDelegate;
     modalBody: HandlebarsTemplateDelegate;
     modalFooter: HandlebarsTemplateDelegate;
@@ -120,7 +118,6 @@ const templates: IVaultUITemplates = {
     exportedDataWindow: Handlebars.compile(dom('#tmpl-exporteddatawindow').html()),
     credentialTable: Handlebars.compile(dom('#tmpl-credentialtable').html()),
     credentialTableRow: Handlebars.compile(dom('#tmpl-credentialtablerow').html()),
-    validationMessage: Handlebars.compile(dom('#tmpl-validationmessage').html()),
     modalHeader: Handlebars.compile(dom('#tmpl-modalheader').html()),
     modalBody: Handlebars.compile(dom('#tmpl-modalbody').html()),
     modalFooter: Handlebars.compile(dom('#tmpl-modalfooter').html()),
@@ -270,7 +267,7 @@ async function editCredential(credentialId: string) {
         showAccept: true,
         acceptText: 'Save',
         onaccept: (): void => {
-            (dom('#credential-form').get() as HTMLFormElement).submit();
+            (dom('#credential-form').get() as HTMLFormElement).requestSubmit();
         }
     });
 
@@ -453,7 +450,7 @@ ui.newButton.on('click', e => {
         showAccept: true,
         acceptText: 'Save',
         onaccept: (): void => {
-            (dom('#credential-form').get() as HTMLFormElement).submit();
+            (dom('#credential-form').get() as HTMLFormElement).requestSubmit();
         }
     });
     ui.modalContent.find('#Description').focus();
@@ -513,26 +510,10 @@ ui.body.onchild('#credential-form', 'submit', async e => {
     e.preventDefault();
 
     const form = dom((e.targetElement as HTMLElement));
-    const errorMsg: string[] = [];
 
-    dom('.validation-message').get().remove();
-    form.find('div.has-error').removeClass('has-error');
+
 
     const credential = getCredentialFromUI(form);
-
-    const errors = validateCredential(credential);
-
-    if (errors.length > 0) {
-        errors.forEach(err => {
-            errorMsg.push(err.errorMessage);
-            dom(`${err.property}`).parent().parent().addClass('has-error');
-        });
-
-        const message = templates.validationMessage({ errors: errorMsg.join('<br />') });
-
-        ui.modalContent.find('div.modal-body').get().prepend(message);
-        return;
-    }
 
     const results = await withLoadSpinner(async () => {
         if (!credential.CredentialID) {
