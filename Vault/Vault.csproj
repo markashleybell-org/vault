@@ -26,19 +26,19 @@
 
     <ItemGroup>
         <PackageReference Include="Dapper" Version="2.0.90" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.6" />
-        <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.3.2">
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.8" />
+        <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.3.5">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.VisualStudio.Validation" Version="16.9.32" />
+        <PackageReference Include="Microsoft.VisualStudio.Validation" Version="16.10.26" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
         <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.114" />
+        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.114.3" />
     </ItemGroup>
 
 </Project>
