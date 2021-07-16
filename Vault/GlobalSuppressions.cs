@@ -9,3 +9,8 @@
     "Style",
     "IDE0063: Use simple 'using' statement",
     Justification = "Makes the code far less clear.")]
+
+[assembly: SuppressMessage(
+    "Design",
+    "CA1056: URI-like properties should not be strings",
+    Justification = "Well, they are, so... deal with it.")]
