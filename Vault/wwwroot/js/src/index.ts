@@ -622,20 +622,17 @@ copyButtons.on('success', function (e) {
 
 // Automatically focus the search field if a key is pressed from the credential list
 ui.body.on('keydown', e => {
+    const keyboardEvent = e as any;
     const eventTarget = e.target as HTMLElement;
     if (eventTarget.nodeName === 'BODY') {
         e.preventDefault();
-        // Cancel the first mouseup event which will be fired after focus
-        //ui.searchInput.one('mouseup', me => {
-        //    me.preventDefault();
-        //});
         ui.searchInput.focus();
-        //const char = String.fromCharCode(e.keyCode);
-        //if (/[a-zA-Z0-9]/.test(char)) {
-        //    ui.searchInput.val(e.shiftKey ? char : char.toLowerCase());
-        //} else {
-        //    (ui.searchInput.get() as HTMLInputElement).select();
-        //}
+        const char = String.fromCharCode(keyboardEvent.keyCode);
+        if (/[a-zA-Z0-9]/.test(char)) {
+            ui.searchInput.val(keyboardEvent.shiftKey ? char : char.toLowerCase());
+        } else {
+            (ui.searchInput.get() as HTMLInputElement).select();
+        }
     }
 });
 
