@@ -385,12 +385,14 @@ function showModal(options: IVaultModalOptions) {
     }
 
     ui.modalContent.html(html);
+
     ui.modalContent.offchild('button.btn-accept', 'click');
     ui.modalContent.offchild('button.btn-edit', 'click');
     ui.modalContent.offchild('button.btn-delete', 'click');
     ui.modalContent.onchild('button.btn-accept', 'click', options.onaccept || ui.modal.hide);
     ui.modalContent.onchild('button.btn-edit', 'click',  options.onedit || (() => alert('NOT BOUND')));
-    ui.modalContent.onchild('button.btn-delete', 'click',  options.ondelete || (() => alert('NOT BOUND')));
+    ui.modalContent.onchild('button.btn-delete', 'click', options.ondelete || (() => alert('NOT BOUND')));
+
     ui.modal.show();
 }
 
@@ -589,8 +591,6 @@ const copyLinks = new Clipboard('.copy-link', {
 copyLinks.on('success', function (e) {
     const a = dom((e.trigger as HTMLElement));
     a.find('span').addClass('copied').removeClass('bi-clipboard').addClass('bi-clipboard-check');
-
-    // e.clearSelection();
 });
 
 ui.body.onchild('a.toggle-password-info', 'click', e => {
@@ -616,8 +616,6 @@ copyButtons.on('success', function (e) {
     const a = dom((e.trigger as HTMLElement));
     a.removeClass('btn-primary').addClass('btn-success');
     a.find('span').addClass('copied').removeClass('bi-clipboard').addClass('bi-clipboard-check');
-
-    // e.clearSelection();
 });
 
 // Automatically focus the search field if a key is pressed from the credential list
