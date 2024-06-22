@@ -1,5 +1,6 @@
 ﻿import * as Handlebars from 'handlebars';
 import { dom, DOM, DOMEvent } from 'mab-dom';
+import { TagInput } from 'mab-bootstrap-taginput';
 import { Modal } from 'bootstrap';
 import Clipboard from 'clipboard';
 import {
@@ -20,6 +21,8 @@ import {
 import {
     ICredential,
     ISecurityKeyDetails,
+    ITag,
+    ITagIndex,
     PasswordSpecification,
     Repository
 } from './types/all';
@@ -49,6 +52,7 @@ interface IVaultUIElements {
     clearSearchButton: DOM;
     searchInput: DOM;
     spinner: DOM;
+    tagsInput: TagInput<ITag>;
 }
 
 interface IVaultUITemplates {
@@ -108,7 +112,8 @@ const ui: IVaultUIElements = {
     adminButton: dom('#admin'),
     clearSearchButton: dom('#clear-search'),
     searchInput: dom('#search'),
-    spinner: dom('#spinner')
+    spinner: dom('#spinner'),
+    tagsInput: null
 };
 
 const templates: IVaultUITemplates = {
@@ -142,6 +147,8 @@ Handlebars.registerHelper('truncate', (text: string, size: number) => {
 });
 
 let currentSession: any = null;
+
+let tagIndex: ITagIndex = null;
 
 // Pure functions
 
@@ -220,9 +227,17 @@ function setSession() {
     currentSession = setTimeout(reloadApp, sessionTimeoutMs);
 }
 
-function search(query: string, credentials: ICredential[]) {
+function getTagIdListFromInput() {
+    const value = ui.tagsInput.getValue();
+
+    return value
+        ? value.split('|') as string[]
+        : [];
+}
+
+function search(query: string, tags: string[], credentials: ICredential[]) {
     const parsedQuery = parseSearchQuery(query);
-    const results = searchCredentials(parsedQuery, isWeakPassword, credentials);
+    const results = searchCredentials(parsedQuery, tagIndex, tags, isWeakPassword, credentials);
     return sortCredentials(results);
 }
 
@@ -253,7 +268,7 @@ function confirmDelete(id: string) {
                 return await repository.loadCredentialSummaryList();
             });
 
-            const results = search(ui.searchInput.val() as string, updatedCredentials);
+            const results = search(ui.searchInput.val(), getTagIdListFromInput(), updatedCredentials);
             updateCredentialListUI(ui.container, results);
 
             ui.modal.hide();
@@ -272,6 +287,16 @@ async function editCredential(credentialId: string) {
         onaccept: (): void => {
             (dom('#credential-form').get() as HTMLFormElement).requestSubmit();
         }
+    });
+
+    const tagInput = new TagInput<ITag>({
+        input: ui.modalContent.find('#Tags').get(0),
+        data: tagIndex.tags || [],
+        maxNumberOfSuggestions: 5,
+        getId: (item) => item.TagID,
+        getLabel: (item) => item.Label,
+        allowNewTags: false,
+        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>'
     });
 
     ui.modalContent.find('#Description').focus();
@@ -332,6 +357,10 @@ async function showDetail(credentialId: string) {
         '</table>'
     ];
 
+    const tagDisplay = credential.TagDisplay
+        ? credential.TagDisplay.split('|').map(t => ({ Label: t }))
+        : [];
+
     const detailHtml = templates.detail({
         Url: credential.Url,
         UrlHtml: urlHtml,
@@ -342,7 +371,8 @@ async function showDetail(credentialId: string) {
         UserDefined1Label: credential.UserDefined1Label,
         UserDefined2: credential.UserDefined2,
         UserDefined2Label: credential.UserDefined2Label,
-        Notes: credential.Notes
+        Notes: credential.Notes,
+        TagDisplay: tagDisplay
     });
 
     showModal({
@@ -458,6 +488,15 @@ ui.newButton.on('click', e => {
             (dom('#credential-form').get() as HTMLFormElement).requestSubmit();
         }
     });
+    const tagInput = new TagInput<ITag>({
+        input: ui.modalContent.find('#Tags').get(0),
+        data: tagIndex.tags || [],
+        maxNumberOfSuggestions: 5,
+        getId: (item) => item.TagID,
+        getLabel: (item) => item.Label,
+        allowNewTags: false,
+        itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>'
+    });
     ui.modalContent.find('#Description').focus();
     showPasswordStrength(ui.modalContent.find('#Password'));
     updatePasswordSpecificationOptionUI(ui.modalContent, defaultPasswordSpecification);
@@ -470,14 +509,16 @@ ui.adminButton.on('click', e => {
 
 ui.clearSearchButton.on('click', async e => {
     e.preventDefault();
-    updateCredentialListUI(ui.container, []);
-    ui.searchInput.val('')
+    ui.searchInput.val('');
+    const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
+    const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
+    updateCredentialListUI(ui.container, results);
     ui.searchInput.focus();
 });
 
 ui.searchInput.on('keyup', rateLimit(async e => {
     const credentials = await withLoadSpinner(async () => await repository.loadCredentialSummaryList());
-    const results = search(ui.searchInput.val(), credentials);
+    const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
     updateCredentialListUI(ui.container, results);
 }, 200));
 
@@ -499,6 +540,23 @@ ui.loginForm.on('submit', async e => {
         const loginResult = await repository.login(username, password);
 
         if (loginResult.Success) {
+            tagIndex = await repository.loadTagIndex();
+
+            ui.tagsInput = new TagInput<ITag>({
+                input: document.getElementById('tags'),
+                data: tagIndex.tags || [],
+                maxNumberOfSuggestions: 5,
+                getId: (item) => item.TagID,
+                getLabel: (item) => item.Label,
+                allowNewTags: false,
+                itemTemplate: '<div class="{{globalCssClassPrefix}}-tag" data-id="{{id}}" data-label="{{label}}">{{label}} <i class="{{globalCssClassPrefix}}-removetag bi bi-x"></i></div>',
+                onTagsChanged: async (instance, added, removed, selected) => {
+                    const credentials = await repository.loadCredentialSummaryList();
+                    const results = search(ui.searchInput.val(), getTagIdListFromInput(), credentials);
+                    updateCredentialListUI(ui.container, results);
+                }
+            });
+
             ui.loginForm.get().classList.add('d-none');
             ui.loginFormModal.hide();
             ui.controls.get().classList.remove('d-none');
@@ -543,9 +601,11 @@ ui.body.onchild('#credential-form', 'submit', async e => {
             await repository.updateCredential(credential);
         }
 
+        tagIndex = await repository.loadTagIndex();
+
         const updatedCredentials = await repository.loadCredentialSummaryList();
 
-        return search(ui.searchInput.val() as string, updatedCredentials);
+        return search(ui.searchInput.val(), getTagIdListFromInput(), updatedCredentials);
     });
 
     ui.modal.hide();

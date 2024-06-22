@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Serialization;
+using Vault.Models;
 using Vault.Support;
 
 namespace Vault
@@ -32,9 +33,11 @@ namespace Vault
 
             services.AddMvc(options => options.Filters.Add<ProtectWithSecurityKeyFilter>());
 
+            SqlStatements.DatabaseType = Configuration["DbType"] == "SQLite" ? DatabaseType.SQLite : DatabaseType.SqlServer;
+
             var connectionString = Configuration.GetConnectionString("Main");
 
-            var connectionFactory = Configuration["DbType"] == "SQLite"
+            var connectionFactory = SqlStatements.DatabaseType == DatabaseType.SQLite
                 ? new Func<IServiceProvider, IConnectionFactory>(_ => new SQLiteConnectionFactory(connectionString))
                 : _ => new SqlConnectionFactory(connectionString);
 

@@ -349,3 +349,6 @@ Vault/wwwroot/js/dist/
 
 # Development settings
 appsettings.Development.json
+
+# Database releases
+!db/releases

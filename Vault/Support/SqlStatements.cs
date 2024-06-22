@@ -1,11 +1,13 @@
-﻿namespace Vault.Support
+﻿using System;
+using Vault.Models;
+
+namespace Vault.Support
 {
     public static class SqlStatements
     {
         public const string SelectSummary =
             @"SELECT
                   CredentialID,
-                  UserID,
                   Description,
                   Username,
                   Password,
@@ -19,38 +21,60 @@
             "SELECT * FROM Credentials WHERE UserID = @UserID";
 
         public const string SelectSingle =
-            "SELECT * FROM Credentials WHERE CredentialID = @CredentialID";
+            """
+            SELECT
+                *
+            FROM
+                Credentials
+            WHERE
+                CredentialID = @CredentialID;
+
+            SELECT
+                tc.TagID,
+                t.Label
+            FROM
+                Tags_Credentials tc
+            INNER JOIN
+                Tags t
+                    ON t.TagID = tc.TagID
+            WHERE
+                tc.CredentialID = @CredentialID
+            ORDER BY
+                t.Label;
+            """;
 
         public const string Insert =
-            @"INSERT INTO
-                  Credentials (
-                      CredentialID,
-                      UserID,
-                      Description,
-                      Username,
-                      Password,
-                      Url,
-                      UserDefined1Label,
-                      UserDefined1,
-                      UserDefined2Label,
-                      UserDefined2,
-                      Notes,
-                      PwdOptions
-                  )
-              VALUES (
-                  @CredentialID,
-                  @UserID,
-                  @Description,
-                  @Username,
-                  @Password,
-                  @Url,
-                  @UserDefined1Label,
-                  @UserDefined1,
-                  @UserDefined2Label,
-                  @UserDefined2,
-                  @Notes,
-                  @PwdOptions
-              )";
+            """
+            INSERT INTO
+                Credentials (
+                    CredentialID,
+                    UserID,
+                    Description,
+                    Username,
+                    Password,
+                    Url,
+                    UserDefined1Label,
+                    UserDefined1,
+                    UserDefined2Label,
+                    UserDefined2,
+                    Notes,
+                    PwdOptions
+                )
+            VALUES (
+                @CredentialID,
+                @UserID,
+                @Description,
+                @Username,
+                @Password,
+                @Url,
+                @UserDefined1Label,
+                @UserDefined1,
+                @UserDefined2Label,
+                @UserDefined2,
+                @Notes,
+                @PwdOptions
+            );
+            """;
 
         public const string Update =
             @"UPDATE
@@ -77,5 +101,54 @@
 
         public const string Login =
             "SELECT UserID FROM Users WHERE Username = @Username AND Password = @Password";
+
+        public const string TagIndex =
+            """
+            SELECT
+                TagID,
+                Label
+            FROM
+                Tags
+            WHERE
+                UserID = @UserID
+            ORDER BY
+                Label;
+
+            SELECT
+                tc.TagID,
+                tc.CredentialID
+            FROM
+                Tags_Credentials tc
+            INNER JOIN
+                Tags t
+                    ON t.TagID = tc.TagID
+            WHERE
+                t.UserID = @UserID
+            ORDER BY
+                t.Label;
+            """;
+
+        public const string DeleteTagsFromCredential =
+            """
+            DELETE FROM
+                Tags_Credentials
+            WHERE
+                CredentialID = @CredentialID;
+            """;
+
+        public const string TagsToCredential =
+            """
+            INSERT INTO
+                Tags_Credentials (
+                    TagID,
+                    CredentialID
+                )
+            VALUES (
+                @TagID,
+                @CredentialID
+            );
+            """;
+
+        public static DatabaseType DatabaseType { get; internal set; }
     }
 }

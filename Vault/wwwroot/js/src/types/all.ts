@@ -6,5 +6,7 @@ export { IDictionary } from './IDictionary';
 export { ILoginResult } from './ILoginResult';
 export { IRepository } from './IRepository';
 export { ISecurityKeyDetails } from './ISecurityKeyDetails';
+export { ITag } from './ITag';
+export { ITagIndex } from './ITagIndex';
 export { PasswordSpecification } from './PasswordSpecification';
 export { Repository } from './Repository';

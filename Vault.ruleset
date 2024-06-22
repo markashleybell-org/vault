@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Vault" ToolsVersion="16.0">
-  <Rules AnalyzerId="Microsoft.CodeAnalysis.NetAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.NetAnalyzers">
-    <Rule Id="CA1014" Action="None" />
+<RuleSet Name="Vault" ToolsVersion="17.0">
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp.Features" RuleNamespace="Microsoft.CodeAnalysis.CSharp.Features">
+    <Rule Id="IDE0290" Action="None" />
   </Rules>
   <Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
     <Rule Id="CA2007" Action="None" />

@@ -88,6 +88,17 @@
         <div class="col-md-@(DataColumnWidthMD)">{{breaklines Notes}}</div>
     </div>
     {{/if}}
+
+    {{#if TagDisplay}}
+    <div class="row row-detail mb-@(RowMargin) mb-md-@(RowMarginMD)">
+        <div class="col-md-@(LabelColumnWidthMD) @(LabelVisualEffectClasses)">Tags</div>
+        <div class="col-md-@(DataColumnWidthMD)">
+            {{#each TagDisplay}}
+                <div class="mab-bootstrap-taginput-tag mab-bootstrap-taginput-tag no-margin">{{Label}}</div>
+            {{/each}}
+        </div>
+    </div>
+    {{/if}}
 </script>
 
 <script id="tmpl-credentialform" type="text/html">

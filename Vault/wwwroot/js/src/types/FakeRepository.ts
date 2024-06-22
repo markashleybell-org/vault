@@ -1,4 +1,4 @@
-﻿import { ICredential, IRepository } from './all';
+﻿import { ICredential, IRepository, ITag, ITagIndex } from './all';
 
 export class FakeRepository implements IRepository {
     public credentials: ICredential[];
@@ -16,7 +16,8 @@ export class FakeRepository implements IRepository {
             UserDefined2Label: 'Cat UD 1',
             UserDefined2: 'catud1',
             Notes: 'Cat notes',
-            PwdOptions: '12|1|1|1|1'
+            PwdOptions: '12|1|1|1|1',
+            Tags: 'cat'
         }, {
             CredentialID: 'cr2',
             UserID: 'user1',
@@ -29,7 +30,8 @@ export class FakeRepository implements IRepository {
             UserDefined2Label: 'Dog UD 1',
             UserDefined2: 'dogud1',
             Notes: 'Dog notes',
-            PwdOptions: '12|1|1|1|1'
+            PwdOptions: '12|1|1|1|1',
+            Tags: 'dog'
         }, {
             CredentialID: 'cr3',
             UserID: 'user1',
@@ -42,7 +44,8 @@ export class FakeRepository implements IRepository {
             UserDefined2Label: 'Fish UD 1',
             UserDefined2: 'fishud1',
             Notes: 'Fish notes',
-            PwdOptions: '12|1|1|1|1'
+            PwdOptions: '12|1|1|1|1',
+            Tags: 'fish'
         }, {
             CredentialID: 'cr4',
             UserID: 'user1',
@@ -55,7 +58,8 @@ export class FakeRepository implements IRepository {
             UserDefined2Label: 'Catfish UD 1',
             UserDefined2: 'catfishud1',
             Notes: 'Catfish notes',
-            PwdOptions: '12|1|1|1|1'
+            PwdOptions: '12|1|1|1|1',
+            Tags: 'cat|fish'
         }, {
             CredentialID: 'cr5',
             UserID: 'user1',
@@ -68,7 +72,8 @@ export class FakeRepository implements IRepository {
             UserDefined2Label: 'Dogfish UD 1',
             UserDefined2: 'dogfishud1',
             Notes: 'Dogfish notes',
-            PwdOptions: '12|1|1|1|1'
+            PwdOptions: '12|1|1|1|1',
+            Tags: 'dog|fish'
         }, {
             CredentialID: 'cr6',
             UserID: 'user1',
@@ -81,12 +86,32 @@ export class FakeRepository implements IRepository {
             UserDefined2Label: 'Owl UD 1',
             UserDefined2: 'owlud1',
             Notes: 'Owl notes',
-            PwdOptions: '12|1|1|1|1'
+            PwdOptions: '12|1|1|1|1',
+            Tags: ''
         }];
     }
 
     public async login(hashedUsername: string, hashedPassword: string) {
         return { UserID: 'user1', Success: true };
+    }
+
+    public async loadTagIndex() {
+        const map = new Map();
+
+        map.set('cat', ['cr1', 'cr4']);
+        map.set('dog', ['cr2', 'cr5']);
+        map.set('fish', ['cr3', 'cr4', 'cr5']);
+
+        const testTagIndex: ITagIndex = {
+            tags: [
+                { TagID: 'cat', Label: 'Cat' },
+                { TagID: 'dog', Label: 'Dog' },
+                { TagID: 'fish', Label: 'Fish' }
+            ],
+            index: map
+        };
+
+        return new Promise<ITagIndex>(resolve => resolve(testTagIndex));
     }
 
     public async loadCredential(credentialId: string) {

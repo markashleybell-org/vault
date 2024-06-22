@@ -7,7 +7,7 @@ import {
     searchCredentials,
     sortCredentials
 } from '../modules/all';
-import { ICredential, PasswordSpecification } from '../types/all';
+import { ICredential, ITag, ITagIndex, PasswordSpecification } from '../types/all';
 import { FakeRepository } from '../types/FakeRepository';
 
 const testCredentialPlainText: ICredential = {
@@ -22,11 +22,16 @@ const testCredentialPlainText: ICredential = {
     UserDefined2Label: 'Custom 2',
     UserDefined2: 'CUSTOM2',
     Notes: 'Test Notes:\n\nThese are test notes.',
-    PwdOptions: '16|1|1|1|1'
+    PwdOptions: '16|1|1|1|1',
+    Tags: 'a|b|c'
 };
 
 function getTestCredentials(): ICredential[] {
     return new FakeRepository().credentials;
+}
+
+async function getTestTagIndex() {
+    return await new FakeRepository().loadTagIndex();
 }
 
 const nw = (password: string) => false;
@@ -67,14 +72,15 @@ describe('Vault', () => {
         expect(parsed.text).toBe('all');
     });
 
-    test('searchCredentials bad queries', () => {
+    test('searchCredentials bad queries', async () => {
         const testCredentials = getTestCredentials();
+        const testTagIndex = await getTestTagIndex();
 
-        const noresults1 = searchCredentials(null, nw, testCredentials);
-        const noresults2 = searchCredentials({ property: null, text: 'ABC' }, nw, testCredentials);
-        const noresults3 = searchCredentials({ property: 'Description', text: null }, nw, testCredentials);
-        const noresults4 = searchCredentials({ property: 'Description', text: 'Z' }, nw, testCredentials);
-        const noresults5 = searchCredentials({ property: 'FILTER', text: 'ABC' }, nw, testCredentials);
+        const noresults1 = searchCredentials(null, testTagIndex, [], nw, testCredentials);
+        const noresults2 = searchCredentials({ property: null, text: 'ABC' }, testTagIndex, [], nw, testCredentials);
+        const noresults3 = searchCredentials({ property: 'Description', text: null }, testTagIndex, [], nw, testCredentials);
+        const noresults4 = searchCredentials({ property: 'Description', text: 'Z' }, testTagIndex, [], nw, testCredentials);
+        const noresults5 = searchCredentials({ property: 'FILTER', text: 'ABC' }, testTagIndex, [], nw, testCredentials);
 
         expect(noresults1.length).toBe(0);
         expect(noresults2.length).toBe(0);
@@ -83,40 +89,45 @@ describe('Vault', () => {
         expect(noresults5.length).toBe(0);
     });
 
-    test('searchCredentials standard query', () => {
+    test('searchCredentials standard query', async () => {
         const testCredentials = getTestCredentials();
-        const results = searchCredentials({ property: 'Description', text: 'do' }, nw, testCredentials);
+        const testTagIndex = await getTestTagIndex();
+        const results = searchCredentials({ property: 'Description', text: 'do' }, testTagIndex, [], nw, testCredentials);
         expect(results.length).toBe(2);
         expect(results[0].Description).toBe('Dog');
         expect(results[1].Description).toBe('Dogfish');
     });
 
-    test('searchCredentials username query', () => {
+    test('searchCredentials username query', async () => {
         const testCredentials = getTestCredentials();
-        const results = searchCredentials({ property: 'Username', text: 'dog' }, nw, testCredentials);
+        const testTagIndex = await getTestTagIndex();
+        const results = searchCredentials({ property: 'Username', text: 'dog' }, testTagIndex, [], nw, testCredentials);
         expect(results.length).toBe(2);
         expect(results[0].Description).toBe('Dog');
         expect(results[1].Description).toBe('Dogfish');
     });
 
-    test('searchCredentials password query', () => {
+    test('searchCredentials password query', async () => {
         const testCredentials = getTestCredentials();
-        const results = searchCredentials({ property: 'Password', text: 'cat' }, nw, testCredentials);
+        const testTagIndex = await getTestTagIndex();
+        const results = searchCredentials({ property: 'Password', text: 'cat' }, testTagIndex, [], nw, testCredentials);
         expect(results.length).toBe(2);
         expect(results[0].Description).toBe('Cat');
         expect(results[1].Description).toBe('Catfish');
     });
 
-    test('searchCredentials all query', () => {
+    test('searchCredentials all query', async () => {
         const testCredentials = getTestCredentials();
-        const results = searchCredentials({ property: 'FILTER', text: 'all' }, nw, testCredentials);
+        const testTagIndex = await getTestTagIndex();
+        const results = searchCredentials({ property: 'FILTER', text: 'all' }, testTagIndex, [], nw, testCredentials);
         expect(results.length).toBe(6);
         expect(results[0].Description).toBe('Cat');
         expect(results[5].Description).toBe('Owl');
     });
 
-    test('searchCredentials weak password query', () => {
+    test('searchCredentials weak password query', async () => {
         const testCredentials = getTestCredentials();
+        const testTagIndex = await getTestTagIndex();
         testCredentials.push({
             CredentialID: 'TEST',
             UserID: 'user1',
@@ -124,10 +135,21 @@ describe('Vault', () => {
             Password: null
         });
         const isWeakPwd = (password: string) => !password || password.length < 7;
-        const results = searchCredentials({ property: 'FILTER', text: 'weak' }, isWeakPwd, testCredentials);
+        const results = searchCredentials({ property: 'FILTER', text: 'weak' }, testTagIndex, [], isWeakPwd, testCredentials);
         expect(results.length).toBe(2);
         expect(results[0].Description).toBe('Cat');
         expect(results[1].Description).toBe('Dog');
+    });
+
+    test('searchCredentials tag query', async () => {
+        const testCredentials = getTestCredentials();
+        const testTagIndex = await getTestTagIndex();
+        const results = searchCredentials({ property: 'Description', text: '' }, testTagIndex, ['cat', 'fish'], nw, testCredentials);
+        expect(results.length).toBe(4);
+        expect(results[0].Description).toBe('Cat');
+        expect(results[1].Description).toBe('Fish');
+        expect(results[2].Description).toBe('Catfish');
+        expect(results[3].Description).toBe('Dogfish');
     });
 
     test('mapToSummary', () => {

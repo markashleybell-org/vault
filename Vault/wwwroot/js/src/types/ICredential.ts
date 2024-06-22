@@ -11,5 +11,7 @@
     UserDefined2?: string;
     Notes?: string;
     PwdOptions?: string;
+    Tags?: string;
+    TagDisplay?: string;
     [propertyName: string]: string;
 }

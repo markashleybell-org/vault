@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Vault.Models
 {
@@ -19,6 +20,7 @@ namespace Vault.Models
             UserDefined2 = "{{UserDefined2}}";
             Notes = "{{Notes}}";
             PwdOptions = "{{PwdOptions}}";
+            Tags = "{{Tags}}";
         }
 
         public string CredentialID { get; set; }
@@ -49,6 +51,15 @@ namespace Vault.Models
         public string Notes { get; set; }
 
         public string PwdOptions { get; set; }
+
+        public string Tags { get; set; }
+
+        public string TagDisplay { get; set; }
+
+        public object[] TagArray =>
+            Tags?
+                .Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(t => new { TagID = t, CredentialID }).ToArray() ?? [];
 
         public Credential WithNewID()
         {

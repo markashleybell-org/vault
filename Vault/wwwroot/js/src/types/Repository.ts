@@ -7,10 +7,10 @@
     hash,
     hex
 } from '../modules/all';
-import { ICredential, ILoginResult, IRepository, ISecurityKeyDetails } from '../types/all';
+import { ICredential, ILoginResult, IRepository, ISecurityKeyDetails, ITag, ITagIndex } from '../types/all';
 
 export class Repository implements IRepository {
-    private readonly encryptionExcludes = ['CredentialID', 'UserID'];
+    private readonly encryptionExcludes = ['CredentialID', 'UserID', 'Tags', 'TagArray', 'TagDisplay'];
 
     private userID: string;
     private password: string;
@@ -51,6 +51,28 @@ export class Repository implements IRepository {
         }
 
         return loginResult;
+    }
+
+    public async loadTagIndex() {
+        interface Temp {
+            tags: ITag[];
+            index: { [key: string]: string[] };
+        }
+
+        const data = await this.get<Temp>('Credentials/ReadTagIndex', { userId: this.userID });
+
+        const map = new Map();
+
+        for (const k in data.index) {
+            map.set(k, data.index[k]);
+        }
+
+        const index: ITagIndex = {
+            tags: data.tags,
+            index: map
+        };
+
+        return new Promise<ITagIndex>(resolve => resolve(index));
     }
 
     public async loadCredential(credentialId: string) {
